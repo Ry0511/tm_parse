@@ -1,0 +1,33 @@
+# This starter workflow is for a CMake project running on a single platform. There is a different starter workflow if you need cross-platform coverage.
+# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-multi-platform.yml
+name: CMake Test CI/CD
+
+on:
+  workflow_dispatch:
+    branches: [ "master" ]
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        cmake_preset: [ msvc-release, msvc-debug ]
+        arch: [ "x64", "x86" ]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: TheMrMilchmann/setup-msvc-dev@v3
+        with:
+          arch: ${{ matrix.arch }}
+
+      - name: Configure CMake
+        run: cmake . --preset ${{ matrix.cmake_preset }}
+
+      - name: Build
+        run: cmake --build out/build/${{ matrix.cmake_preset }}
