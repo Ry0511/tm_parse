@@ -28,9 +28,16 @@ int main() {
 
     do {
         tk = lexer.next_token();
+
         if (tk.Kind == tk::TokenKind::EndOfInput) {
             std::cout << "EOF" << '\n';
-        } else {
+        }
+        // Print blank line tokens
+        else if (tk == tk::BlankLine) {
+            std::cout << std::format("\\n x{}", tk.Region.length()) << '\n';
+        }
+        // Print text tokens
+        else {
             std::cout << std::format(
                 "[{:>2}] ({:>2}, {:>2}) -> '{}'",
                 lexer.current_line(),

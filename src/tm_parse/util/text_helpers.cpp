@@ -8,24 +8,37 @@
 
 namespace tm_parse::txt {
 
-bool is_whitespace(char c) noexcept {
-    return std::isspace(static_cast<unsigned char>(c));
+bool is_whitespace(str_char c) noexcept {
+    switch (c) {
+        case TXT('\v'):
+        case TXT('\t'):
+        case TXT(' '):
+            return true;
+        default:
+            return false;
+    }
+
+    return std::isspace(static_cast<int>(c));
 }
 
-bool is_alpha(char c) noexcept {
-    return std::isalpha(static_cast<unsigned char>(c));
+bool is_alpha(str_char c) noexcept {
+    return std::isalpha(static_cast<int>(c));
 }
 
-bool is_digit(char c) noexcept {
-    return std::isdigit(static_cast<unsigned char>(c));
+bool is_digit(str_char c) noexcept {
+    return std::isdigit(static_cast<int>(c));
 }
 
-bool is_alnum(char c) noexcept {
-    return std::isalnum(static_cast<unsigned char>(c));
+bool is_alnum(str_char c) noexcept {
+    return std::isalnum(static_cast<int>(c));
 }
 
-bool is_identifier_start(char c) noexcept {
-    return is_alpha(c) || c == TXT('_');
+bool is_identifier(str_char c) noexcept {
+    return is_alnum(c) || c == TXT('_');
+}
+
+bool is_newline(str_char c) noexcept {
+    return c == TXT('\n') || c == TXT('\r');
 }
 
 }  // namespace tm_parse::txt

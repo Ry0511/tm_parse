@@ -23,6 +23,7 @@ class Lexer {
 
    public:
     uint32_t current_line() const noexcept { return m_Line; }
+    size_t length() const noexcept { return m_Text.size(); }
     bool is_eof() const noexcept { return m_Pos >= m_Text.size(); }
 
    public:
@@ -43,10 +44,16 @@ class Lexer {
     Token next_token_impl();
 
    private:
-    str_view m_Text;     // The text buffer to tokenise
-    size_t m_Start{0};   // Current start of token, if any
-    size_t m_Pos{0};     // Current stream index
-    uint32_t m_Line{1};  // 1 Based
+    Token read_identifier();
+    Token read_number();
+    Token read_other();
+
+   private:
+    str_view m_Text;       // The text buffer to tokenise
+    size_t m_Start{0};     // Current start of token, if any
+    size_t m_Pos{0};       // Current stream index
+    uint32_t m_Line{1};    // 1 Based
+    uint32_t m_Column{1};  // 1 Based
 };
 
 }  // namespace tm_parse

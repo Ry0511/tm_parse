@@ -10,14 +10,16 @@
 
 namespace tm_parse::txt {
 
-bool is_whitespace(char c) noexcept;
+bool is_whitespace(str_char c) noexcept;
 
-bool is_alpha(char c) noexcept;
+bool is_alpha(str_char c) noexcept;
 
-bool is_digit(char c) noexcept;
+bool is_digit(str_char c) noexcept;
 
-bool is_alnum(char c) noexcept;
+bool is_alnum(str_char c) noexcept;
 
-bool is_identifier_start(char c) noexcept;
+bool is_identifier(str_char c) noexcept;
+
+bool is_newline(str_char c) noexcept;
 
 }  // namespace tm_parse::txt

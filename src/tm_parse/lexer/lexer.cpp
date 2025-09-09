@@ -23,50 +23,57 @@ Token Lexer::peek_token() {
 }
 
 void Lexer::skip_whitespace() {
-    // Skip the current character if and only if it is a whitespace character [\n\r\t\v ]+
     while (!is_eof() && txt::is_whitespace(peek())) {
-        advance();
+        if (peek() == TXT('\n')) {
+            m_Line++;
+            m_Column = 0;
+        }
+        m_Column++;
+        m_Pos++;
     }
 }
 
-char Lexer::peek() const {
+str_char Lexer::peek() const {
     if (is_eof()) {
-        throw std::runtime_error{"peek out of bounds"};
+        return TXT('\0');
     }
     return m_Text[m_Pos];
 }
 
-char Lexer::peek(int offset) const {
+str_char Lexer::peek(int offset) const {
     if (is_eof()) {
-        throw std::runtime_error{"peek out of bounds; eof reached"};
+        return TXT('\0');
     }
     auto abs_offset = (offset < 0) ? static_cast<size_t>(-offset) : static_cast<size_t>(offset);
 
     // Lookbehind
     if (offset < 0) {
         if (abs_offset > m_Pos) {
-            throw std::runtime_error{"peek out of bounds; lookbehind"};
+            return TXT('\0');
         }
         return m_Text[m_Pos - abs_offset];
     }
 
     // Lookahead
     if ((m_Pos + abs_offset) >= m_Text.size()) {
-        throw std::runtime_error{"peek out of bounds; lookahead"};
+        return TXT('\0');
     }
     return m_Text[m_Pos + abs_offset];
 }
 
-char Lexer::advance() {
+str_char Lexer::advance() {
     if (is_eof()) {
-        throw std::runtime_error{"advance out of bounds; eof reached"};
+        return TXT('\0');
     }
-    const char c = m_Text[m_Pos];
+
+    const str_char c = m_Text[m_Pos];
     m_Pos++;
 
     if (c == TXT('\n')) {
         m_Line++;
+        m_Column = 0;
     }
+    m_Column++;
 
     return c;
 }
@@ -87,18 +94,76 @@ Token Lexer::next_token_impl() {
         return Token{};
     }
 
-    while (!txt::is_digit(peek())) {
+    // [\n]+
+    if (peek() == TXT('\n')) {
+        m_Start = m_Pos;
+        m_Pos++;
+        while (txt::is_newline(peek())) {
+            advance();
+        }
+        return create_token(tk::BlankLine);
+    }
+
+    // -?\d+(\.\d+)?
+    if (txt::is_digit(peek()) || (peek() == TXT('-') && txt::is_digit(peek(1)))) {
+        return read_number();
+    }
+
+    // [a-zA-Z_][a-zA-Z0-9_]*
+    if (txt::is_alpha(peek()) || peek() == TXT('_')) {
+        return read_identifier();
+    }
+
+    // Capture all token
+    return read_other();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// | READ FUNCTIONS |
+////////////////////////////////////////////////////////////////////////////////
+
+Token Lexer::read_identifier() {
+    m_Start = m_Pos;  // Start token
+
+    advance();  // Skip first char
+
+    // [a-zA-Z_][a-zA-Z0-9_]+
+    while (txt::is_identifier(peek())) {
+        advance();
+    }
+
+    // TODO: This needs to check if the identifier is a keyword
+    return create_token(tk::Identifier);
+}
+
+Token Lexer::read_number() {
+    m_Start = m_Pos;  // Start token
+
+    if (peek() == TXT('-')) {
+        advance();
+    }
+
+    // Consume digits
+    while (txt::is_digit(peek())) {
+        advance();
+    }
+
+    // Consume \.\d+
+    if (peek(0) == TXT('.') && txt::is_digit(peek(1))) {
         advance();
 
-        if (is_eof()) {
-            return Token{};  // Default EOF token
+        while (txt::is_digit(peek())) {
+            advance();
         }
     }
 
+    return create_token(tk::Number);
+}
+
+Token Lexer::read_other() {
     m_Start = m_Pos;
-    advance();
-    Token tk = create_token(tk::TokenKind::Number);
-    return tk;
+    m_Pos++;
+    return create_token(tk::OtherText);
 }
 
 }  // namespace tm_parse
