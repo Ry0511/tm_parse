@@ -22,4 +22,6 @@ bool is_identifier(str_char c) noexcept;
 
 bool is_newline(str_char c) noexcept;
 
+bool equal_icase(str_view a, str_view b) noexcept;
+
 }  // namespace tm_parse::txt

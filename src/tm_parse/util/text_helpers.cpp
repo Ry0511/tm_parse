@@ -5,7 +5,6 @@
 //
 
 #include "tm_parse/util/text_helpers.h"
-
 namespace tm_parse::txt {
 
 bool is_whitespace(str_char c) noexcept {
@@ -39,6 +38,12 @@ bool is_identifier(str_char c) noexcept {
 
 bool is_newline(str_char c) noexcept {
     return c == TXT('\n') || c == TXT('\r');
+}
+
+bool equal_icase(str_view a, str_view b) noexcept {
+    return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin(), [](auto&& a, auto&& b) {
+               return std::tolower(a) == std::tolower(b);
+           });
 }
 
 }  // namespace tm_parse::txt
