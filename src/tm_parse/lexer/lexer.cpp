@@ -82,6 +82,8 @@ Token Lexer::create_token(tk::TokenKind kind) {
     return Token{
         kind,
         TextRegion{m_Start, m_Pos},
+        m_Line,
+        m_Column,
     };
 }
 
@@ -132,8 +134,26 @@ Token Lexer::read_identifier() {
         advance();
     }
 
-    // TODO: This needs to check if the identifier is a keyword
-    return create_token(tk::Identifier);
+    Token tk = create_token(tk::Identifier);
+
+    // If the length of the token content is within the bounds of a keyword see if it matches any known keyword tokens
+    constinit static size_t min_len = smallest_keyword_length();
+    constinit static size_t max_len = largest_keyword_length();
+    size_t len = tk.Region.length();
+
+    if (len >= min_len && len <= max_len) {
+        str_view text = tk.Region.create_str_view(m_Text);
+
+        for (size_t i = token_type_kw_start; i < token_type_kw_end; ++i) {
+            auto kind = static_cast<tk::TokenKind>(i);
+            if (txt::equal_icase(token_type_name(kind), text)) {
+                tk.Kind = kind;
+                return tk;
+            }
+        }
+    }
+
+    return tk;
 }
 
 Token Lexer::read_number() {

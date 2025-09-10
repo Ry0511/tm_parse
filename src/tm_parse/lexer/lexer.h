@@ -49,11 +49,11 @@ class Lexer {
     Token read_other();
 
    private:
-    str_view m_Text;       // The text buffer to tokenise
-    size_t m_Start{0};     // Current start of token, if any
-    size_t m_Pos{0};       // Current stream index
-    uint32_t m_Line{1};    // 1 Based
-    uint32_t m_Column{1};  // 1 Based
+    str_view m_Text;    // The text buffer to tokenise
+    size_t m_Start{0};  // Current start of token, if any
+    size_t m_Pos{0};    // Current stream index
+    int m_Line{1};      // 1 Based
+    int m_Column{1};    // 1 Based
 };
 
 }  // namespace tm_parse
