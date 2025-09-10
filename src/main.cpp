@@ -39,10 +39,11 @@ int main() {
         // Print text tokens
         else {
             std::cout << std::format(
-                "[{:>2}] ({:>2}, {:>2}) -> '{}'",
+                "[{:>3}] ({:>3}, {:>3}) -> {:>16} '{}'",
                 lexer.current_line(),
                 tk.Region.Start,
                 tk.Region.End,
+                tk.token_name(),
                 tk.Region.create_str(test_str)
             ) << '\n';
         }
