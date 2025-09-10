@@ -12,7 +12,9 @@ set A B C
 3.1415 -3.1415
 31415.1415 -31415.1415
 
--
+- * ( ) _ + ` ~ ; ' , . / < > ? | \
+
+set none false true package name level class
 
 Identifier
 
