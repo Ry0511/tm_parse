@@ -106,6 +106,17 @@ Token Lexer::next_token_impl() {
         return create_token(tk::BlankLine);
     }
 
+    // /* ... */
+    if (peek() == TXT('/') && peek(1) == TXT('*')) {
+        return read_multiline_comment();
+    }
+
+    // TODO: Is the escape sequence really needed?
+    // # [^\n]+
+    if (peek() == TXT('#') && peek(-1) != TXT('\\')) {
+        return read_line_comment();
+    }
+
     // -?\d+(\.\d+)?
     if (txt::is_digit(peek()) || (peek() == TXT('-') && txt::is_digit(peek(1)))) {
         return read_number();
@@ -184,6 +195,39 @@ Token Lexer::read_other() {
     m_Start = m_Pos;
     m_Pos++;
     return create_token(tk::OtherText);
+}
+
+Token Lexer::read_line_comment() {
+    m_Start = m_Pos;
+    m_Pos++;
+    while (peek() != TXT('\n')) {
+        advance();
+    }
+    return create_token(tk::LineComment);
+}
+
+Token Lexer::read_multiline_comment() {
+    Lexer state = save_state();
+
+    m_Start = m_Pos;
+    m_Pos += 2;
+
+    bool terminator_found = false;
+
+    // Consume until we reach the terminating sequence */ or the end of the input
+    while (!is_eof() && !terminator_found) {
+        terminator_found = (peek() == TXT('*') && peek(1) == TXT('/'));
+        advance();
+    }
+
+    // Consumed the entire stream just restore the lexer state and process as OtherText
+    if (is_eof() && !terminator_found) {
+        restore_state(state);
+        return read_other();
+    }
+
+    m_Pos++; // peek() == '/'
+    return create_token(tk::MultiLineComment);
 }
 
 }  // namespace tm_parse
