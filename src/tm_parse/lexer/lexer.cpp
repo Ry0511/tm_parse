@@ -226,7 +226,7 @@ Token Lexer::read_multiline_comment() {
         return read_other();
     }
 
-    m_Pos++; // peek() == '/'
+    m_Pos++;  // peek() == '/'
     return create_token(tk::MultiLineComment);
 }
 
