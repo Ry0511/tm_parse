@@ -49,6 +49,7 @@ class Lexer {
     Token read_other();
     Token read_line_comment();
     Token read_multiline_comment();
+    Token read_string_literal();
 
    private:
     str_view m_Text;    // The text buffer to tokenise

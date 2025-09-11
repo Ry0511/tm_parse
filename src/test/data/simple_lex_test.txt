@@ -35,3 +35,9 @@ Begin Object Class=Foo Name=Baz
   B(000) = 2
   C[999] = 3
 End Object
+
+"String Literal"
+"\"String\" \"Literal\""
+"Bad
+String
+Literal"

@@ -116,6 +116,11 @@ Token Lexer::next_token_impl() {
         return read_line_comment();
     }
 
+    // "[^"\n]*"
+    if (peek() == TXT('"')) {
+        return read_string_literal();
+    }
+
     // -?\d+(\.\d+)?
     if (txt::is_digit(peek()) || (peek() == TXT('-') && txt::is_digit(peek(1)))) {
         return read_number();
@@ -250,6 +255,36 @@ Token Lexer::read_multiline_comment() {
 
     m_Pos++;  // peek() == '/'
     return create_token(tk::MultiLineComment);
+}
+
+Token Lexer::read_string_literal() {
+    Lexer state = save_state();
+
+    m_Start = m_Pos;
+    m_Pos++;
+
+    bool terminator_found = false;
+
+    // Consume until we reach the terminating sequence */ or the end of the input
+    while (!is_eof() && !terminator_found) {
+        str_char c = advance();
+        // peek(-1) == c
+        terminator_found = (c == TXT('\"')) && peek(-2) != TXT('\\');
+
+        if (c == TXT('\n')) {
+            restore_state(state);
+            return read_other();
+        }
+    }
+
+    // Consumed the entire stream just restore the lexer state and process as OtherText
+    if (is_eof() && !terminator_found) {
+        restore_state(state);
+        return read_other();
+    }
+
+    m_Pos++;  // peek() == "
+    return create_token(tk::StringLiteral);
 }
 
 }  // namespace tm_parse
