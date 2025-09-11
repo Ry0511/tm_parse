@@ -1,0 +1,29 @@
+test_type = LexerTest
+
+test_content = {
+  1
+  1.0
+  1.000001
+  -1
+  -1.0
+  -1.000001
+  000012340000
+  -000012340000
+  --1
+  --1.0
+  --1.000001
+}
+
+expected_output = {
+  Number
+  Number
+  Number
+  Number
+  Number
+  Number
+  Number
+  Number
+  OtherText Number
+  OtherText Number
+  OtherText Number
+}

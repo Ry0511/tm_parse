@@ -21,6 +21,13 @@ add_executable(tm_parse_main src/main.cpp)
 target_link_libraries(tm_parse_main PRIVATE tm_parse)
 target_compile_features(tm_parse_main PRIVATE cxx_std_20)
 
+# Test Main
+add_executable(tm_parse_tests src/test/src/test_main.cpp)
+target_include_directories(tm_parse_tests PRIVATE src/test/src)
+target_link_libraries(tm_parse_tests PRIVATE tm_parse)
+target_precompile_headers(tm_parse_tests PRIVATE src/tm_parse/pch.h)
+target_compile_features(tm_parse_tests PRIVATE cxx_std_20)
+
 ################################################################################
 # | TARGET TM_PARSE |
 ################################################################################

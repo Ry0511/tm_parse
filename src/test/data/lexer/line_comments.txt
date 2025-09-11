@@ -1,0 +1,17 @@
+test_type = LexerTest
+
+test_content = {
+  # Line Comment
+  #
+  3.1415 # This is pi
+  ## Single Comment!
+  # 3.1415 # This is pi
+}
+
+expected_output = {
+  LineComment
+  LineComment
+  Number LineComment
+  LineComment
+  LineComment
+}
