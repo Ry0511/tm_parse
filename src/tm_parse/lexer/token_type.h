@@ -38,6 +38,11 @@ enum TokenKind : token_kind_int {
     LeftBracket,       // [
     RightBracket,      // ]
     Equal,             // =
+    SingleQuote,       // '
+    QuestionMark,      // ?
+    DollarSign,        // $
+    LeftBrace,         // {
+    RightBrace,        // }
     Symbol_Count,      // Keep this last
     Number,            // [0-9]+ ( \. [0-9]+ )?
     Identifier,        // [a-zA-Z_][\w\d_]+
@@ -68,17 +73,46 @@ constexpr size_t token_type_symbol_end = static_cast<size_t>(tk::Symbol_Count);
 constexpr size_t token_type_count = static_cast<size_t>(tk::TokenKind_Count);
 
 constexpr std::array<std::string_view, token_type_count + 1> token_type_names{
-    "Set",        "None",          "Level",
-    "True",       "False",         "Begin",
-    "Object",     "Class",         "Name",
-    "Package",    "End",           "Keyword_Count",
-    "LeftParen",  "RightParen",    "Dot",
-    "Colon",      "Slash",         "Star",
-    "Comma",      "LeftBracket",   "RightBracket",
-    "Equal",      "Symbol_Count",  "Number",
-    "Identifier", "StringLiteral", "NameLiteral",
-    "OtherText",  "LineComment",   "MultiLineComment",
-    "BlankLine",  "EndOfInput",    "TokenKind_Count",
+    "Set",
+    "None",
+    "Level",
+    "True",
+    "False",
+    "Begin",
+    "Object",
+    "Class",
+    "Name",
+    "Package",
+    "End",
+    "Keyword_Count",
+
+    "LeftParen",
+    "RightParen",
+    "Dot",
+    "Colon",
+    "Slash",
+    "Star",
+    "Comma",
+    "LeftBracket",
+    "RightBracket",
+    "Equal",
+    "SingleQuote",
+    "QuestionMark",
+    "DollarSign",
+    "LeftBrace",
+    "RightBrace",
+    "Symbol_Count",
+
+    "Number",
+    "Identifier",
+    "StringLiteral",
+    "NameLiteral",
+    "OtherText",
+    "LineComment",
+    "MultiLineComment",
+    "BlankLine",
+    "EndOfInput",
+    "TokenKind_Count",
 };
 
 constexpr std::string_view token_type_name(tk::TokenKind kind) noexcept {

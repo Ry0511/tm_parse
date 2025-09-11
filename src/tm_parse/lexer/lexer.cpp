@@ -111,9 +111,8 @@ Token Lexer::next_token_impl() {
         return read_multiline_comment();
     }
 
-    // TODO: Is the escape sequence really needed?
     // # [^\n]+
-    if (peek() == TXT('#') && peek(-1) != TXT('\\')) {
+    if (peek() == TXT('#')) {
         return read_line_comment();
     }
 
@@ -192,9 +191,32 @@ Token Lexer::read_number() {
 }
 
 Token Lexer::read_other() {
-    m_Start = m_Pos;
-    m_Pos++;
-    return create_token(tk::OtherText);
+    auto _create_token = [&](tk::TokenKind kind) {
+        m_Start = m_Pos;
+        m_Pos++;
+        return create_token(kind);
+    };
+
+    // clang-format off
+    switch (peek()) {
+        case TXT('['):  return _create_token(tk::LeftBracket);
+        case TXT(']'):  return _create_token(tk::RightBracket);
+        case TXT('('):  return _create_token(tk::LeftParen);
+        case TXT(')'):  return _create_token(tk::RightParen);
+        case TXT('.'):  return _create_token(tk::Dot);
+        case TXT(':'):  return _create_token(tk::Colon);
+        case TXT('/'):  return _create_token(tk::Slash);
+        case TXT('*'):  return _create_token(tk::Star);
+        case TXT(','):  return _create_token(tk::Comma);
+        case TXT('='):  return _create_token(tk::Equal);
+        case TXT('\''): return _create_token(tk::SingleQuote);
+        case TXT('?'):  return _create_token(tk::QuestionMark);
+        case TXT('$'):  return _create_token(tk::DollarSign);
+        case TXT('{'):  return _create_token(tk::LeftBrace);
+        case TXT('}'):  return _create_token(tk::RightBrace);
+        default:        return _create_token(tk::OtherText);
+    }
+    // clang-format on
 }
 
 Token Lexer::read_line_comment() {
