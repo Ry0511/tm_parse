@@ -84,6 +84,7 @@ Token Lexer::create_token(tk::TokenKind kind) {
         TextRegion{m_Start, m_Pos},
         m_Line,
         m_Column,
+        m_Text.data(),
     };
 }
 
@@ -116,7 +117,7 @@ Token Lexer::next_token_impl() {
         return read_line_comment();
     }
 
-    // "[^"\n]*"
+    // "[^"\n]*" with \" being used to escape quotes
     if (peek() == TXT('"')) {
         return read_string_literal();
     }
@@ -133,6 +134,22 @@ Token Lexer::next_token_impl() {
 
     // Capture all token
     return read_other();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// | UTILITY FUNCTIONS |
+////////////////////////////////////////////////////////////////////////////////
+
+Token Lexer::require(tk::TokenKind kind) {
+    Token tk = next_token();
+
+    if (tk != kind) {
+        std::string expected = std::string{token_type_name(kind)};
+        std::string actual = std::string{token_type_name(tk.Kind)};
+        throw std::runtime_error{std::format("Expecting {} but got {}", expected, actual).c_str()};
+    }
+
+    return tk;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -219,6 +236,7 @@ Token Lexer::read_other() {
         case TXT('$'):  return _create_token(tk::DollarSign);
         case TXT('{'):  return _create_token(tk::LeftBrace);
         case TXT('}'):  return _create_token(tk::RightBrace);
+        case TXT('&'):  return _create_token(tk::Ampersand);
         default:        return _create_token(tk::OtherText);
     }
     // clang-format on

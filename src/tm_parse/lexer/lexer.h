@@ -30,6 +30,9 @@ class Lexer {
     Token next_token();
     Token peek_token();
 
+   public:
+    Token require(tk::TokenKind kind);
+
    private:
     Lexer save_state() const noexcept { return *this; }
     void restore_state(const Lexer& lexer) noexcept { *this = lexer; }
