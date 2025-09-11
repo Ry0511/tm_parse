@@ -48,6 +48,11 @@ struct Token {
     constexpr str_view token_name() const noexcept { return tm_parse::token_type_name(Kind); }
 
    public:
+    str to_string() const {
+        return std::format("{:>3}:{:<3} - {}, ( {}, {} )", Line, Column, str{token_name()}, Region.Start, Region.End);
+    }
+
+   public:
     str_view text() const {
         if (Text == nullptr) {
             throw std::runtime_error("token text is unavailable");
