@@ -6,9 +6,8 @@
 
 #pragma once
 
-#include <algorithm>
-
-#include "tm_parse/pch.h"
+#include <format>
+#include <string>
 
 namespace tm_parse {
 
@@ -43,6 +42,7 @@ enum TokenKind : token_kind_int {
     DollarSign,        // $
     LeftBrace,         // {
     RightBrace,        // }
+    Ampersand,         // &
     Symbol_Count,      // Keep this last
     Number,            // [0-9]+ ( \. [0-9]+ )?
     Identifier,        // [a-zA-Z_][\w\d_]+
@@ -101,6 +101,7 @@ constexpr std::array<std::string_view, token_type_count + 1> token_type_names{
     "DollarSign",
     "LeftBrace",
     "RightBrace",
+    "Ampersand",
     "Symbol_Count",
 
     "Number",
@@ -133,6 +134,17 @@ consteval size_t smallest_keyword_length() {
         smallest = std::min(token_type_names.at(i).size(), smallest);
     }
     return smallest;
+}
+
+constexpr tk::TokenKind str_to_token_kind(std::string_view text) {
+    for (size_t i = 0; i < token_type_count; ++i) {
+        std::string_view name = token_type_name(static_cast<tk::TokenKind>(i));
+
+        if (name == text) {
+            return static_cast<tk::TokenKind>(i);
+        }
+    }
+    throw std::runtime_error{std::format("unknown token kind {}", std::string{text}).c_str()};
 }
 
 ////////////////////////////////////////////////////////////////////////////////

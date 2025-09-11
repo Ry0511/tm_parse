@@ -48,12 +48,11 @@
 #include <unordered_set>
 #include <utility>
 
-using std::int8_t;
 using std::int16_t;
 using std::int32_t;
 using std::int64_t;
+using std::int8_t;
 
-using std::uint8_t;
 using std::uint16_t;
 using std::uint32_t;
 using std::uint8_t;
@@ -74,6 +73,10 @@ using str_char = char;
 using str = std::string;
 using str_view = std::string_view;
 
+using str_istream = std::istream;
+using str_fstream = std::fstream;
+using str_ifstream = std::ifstream;
+
 #define TXT(S) S
 
-}
+}  // namespace tm_parse
