@@ -89,16 +89,15 @@ void run_test(const fs::path& test_file) {
     TestInfo test_info = parse_test_info(test_file);
 
     if (test_info.TestType.empty()) {
-        std::cout << "TestType is not defined for " << test_file.filename() << "; Skipping this file\n";
+        INFO("TestType is not defined for {}; Skipping", test_file.filename().string());
         return;
     }
 
-    std::stringstream ss{};
-    ss << std::format("Running Test - {:>30} :: {:<20}", test_file.filename().string(), test_info.TestType);
+    INFO("Running Test - {:>25.25} :: {:<}", test_file.filename().string(), test_info.TestType);
 
     if (test_info.TestContent.size() != test_info.ExpectedOutput.size()) {
-        ss << " - Failed";
-        ss << "\n  Test content size differs from expected output";
+        std::stringstream ss{};
+        ss << "Test content size differs from expected output";
         ss << "\n  Expected: " << test_info.ExpectedOutput.size();
         ss << "\n  Actual  : " << test_info.TestContent.size();
         throw std::runtime_error{ss.str().c_str()};
@@ -115,14 +114,13 @@ void run_test(const fs::path& test_file) {
         }
 
         if (failed) {
-            ss << " - Failed";
+            std::stringstream ss{};
+            ss << "Failed to match tokens";
             ss << "\n  Expected: " << str{expected_token.text()};
             ss << "\n  Actual  : " << str{token.text()} << '(' << str{token.token_name()} << ')';
             throw std::runtime_error{ss.str().c_str()};
         }
     }
-
-    std::cout << ss.str() << " - Passed\n";
 }
 
 void run_all_tests(const fs::path& directory) {
@@ -131,8 +129,8 @@ void run_all_tests(const fs::path& directory) {
             try {
                 run_test(entry.path());
             } catch (const std::exception& err) {
-                std::cout << "Error running test: " << entry.path().string() << '\n';
-                std::cout << err.what() << '\n';
+                INFO("Error running test {}", entry.path().string());
+                INFO("{}", err.what());
             }
         }
     }
@@ -145,4 +143,9 @@ void run_all_tests(const fs::path& directory) {
 int main() {
     using namespace tm_parse;
     tests::run_all_tests(fs::current_path() / "data");
+
+    TRACE("Hello World");
+    INFO("Hello World");
+    WARN("Hello World");
+    ERR("Hello World");
 }

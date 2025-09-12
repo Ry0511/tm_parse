@@ -62,6 +62,7 @@ using std::uint8_t;
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "tm_parse/lexer/token_type.h"
+#include "tm_parse/util/logging.h"
 
 namespace tm_parse {
 
