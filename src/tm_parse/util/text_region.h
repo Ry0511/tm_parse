@@ -24,7 +24,9 @@ struct TextRegion {
     str create_str(str_view vw) const noexcept { return str{vw.substr(Start, length())}; }
 
     TextRegion extend(const TextRegion& o) const noexcept { return {std::min(Start, o.Start), std::max(End, o.End)}; }
-    bool operator==(const TextRegion& other) const noexcept { return Start == other.Start && End == other.End; }
+    bool operator==(const TextRegion& other) const noexcept {
+        return Start == other.Start && End == other.End;
+    }
     bool operator!=(const TextRegion& other) const noexcept { return !(*this == other); }
 
     operator bool() const noexcept { return operator==(TextRegion{}); }

@@ -1,0 +1,21 @@
+test_type = LexerTest
+skip_comments = False
+
+test_content = {
+  /**/
+  /* */
+  /*
+  */
+  /*
+  /*
+  1 2 3 4 5 - - 1
+}
+
+expected_tokens = {
+  MultiLineComment
+  MultiLineComment
+  MultiLineComment
+  Slash Star
+  Slash Star
+  Number Number Number Number Number OtherText OtherText Number
+}

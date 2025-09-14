@@ -1,0 +1,17 @@
+test_type = LexerTest
+skip_blank_lines = False
+
+test_content = {
+
+
+
+
+}
+
+expected_tokens = {
+  BlankLine
+  BlankLine
+  BlankLine
+  BlankLine
+  BlankLine
+}

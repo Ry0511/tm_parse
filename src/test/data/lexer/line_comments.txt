@@ -1,0 +1,18 @@
+test_type = LexerTest
+skip_comments = False
+
+test_content = {
+  # Line Comment
+  #
+  3.1415 # This is pi
+  ## Single Comment!
+  # 3.1415 # This is pi
+}
+
+expected_tokens = {
+  LineComment
+  LineComment
+  Number LineComment
+  LineComment
+  LineComment
+}

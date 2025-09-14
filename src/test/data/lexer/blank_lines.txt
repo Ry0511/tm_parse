@@ -1,0 +1,46 @@
+#
+# Default line skipping mode should ensure that when parsing a file the blank lines are ignored
+# unless explicitly looking for them.
+#
+
+test_type
+  = LexerTest
+
+description
+  = Blank lines should not have an impact on the actual output
+
+test_content
+=
+{
+  (
+  50.0
+  +
+  25.0
+  )
+
+  /
+
+  (
+  3.1415
+  *
+  2.7182
+  )
+}
+
+expected_tokens
+=
+{
+  LeftParen
+  Number
+  OtherText
+  Number
+  RightParen
+
+  Slash
+
+  LeftParen
+  Number
+  Star
+  Number
+  RightParen
+}

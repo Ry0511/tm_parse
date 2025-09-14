@@ -48,12 +48,11 @@
 #include <unordered_set>
 #include <utility>
 
-using std::int8_t;
 using std::int16_t;
 using std::int32_t;
 using std::int64_t;
+using std::int8_t;
 
-using std::uint8_t;
 using std::uint16_t;
 using std::uint32_t;
 using std::uint8_t;
@@ -63,6 +62,7 @@ using std::uint8_t;
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "tm_parse/lexer/token_type.h"
+#include "tm_parse/util/logging.h"
 
 namespace tm_parse {
 
@@ -74,6 +74,11 @@ using str_char = char;
 using str = std::string;
 using str_view = std::string_view;
 
+using str_istream = std::basic_istream<str_char>;
+using str_fstream = std::basic_fstream<str_char>;
+using str_ifstream = std::basic_ifstream<str_char>;
+using str_stream = std::basic_stringstream<str_char>;
+
 #define TXT(S) S
 
-}
+}  // namespace tm_parse

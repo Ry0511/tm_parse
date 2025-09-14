@@ -17,9 +17,25 @@ struct Token {
    public:
     tk::TokenKind Kind;
     TextRegion Region;
+    int Line{-1};
+    int Column{-1};
+    const str_char* Text{nullptr};
 
+   public:
     constexpr Token() : Kind(tk::TokenKind::EndOfInput) {};
-    constexpr Token(tk::TokenKind kind, const TextRegion& region) noexcept : Kind(kind), Region(region) {};
+
+    constexpr Token(
+        tk::TokenKind kind,
+        const TextRegion& region,
+        int line,
+        int column,
+        const str_char* text = nullptr
+    ) noexcept
+        : Kind(kind),
+          Region(region),
+          Line(line),
+          Column(column),
+          Text(text) {};
 
     ~Token() = default;
 
@@ -27,6 +43,30 @@ struct Token {
     constexpr Token(Token&&) = default;
     constexpr Token& operator=(const Token&) = default;
     constexpr Token& operator=(Token&&) = default;
+
+   public:
+    constexpr str_view token_name() const noexcept { return tm_parse::token_type_name(Kind); }
+
+   public:
+    str to_string() const {
+        return std::format("{:>3}:{:<3} - {}, ( {}, {} )", Line, Column, str{token_name()}, Region.Start, Region.End);
+    }
+
+   public:
+    str_view text() const {
+        if (Text == nullptr) {
+            throw std::runtime_error("token text is unavailable");
+        }
+
+        str_view text{Text + Region.Start, Region.length()};
+        return text;
+    }
+
+   public:
+    constexpr bool is_eof() const noexcept { return Kind == tk::EndOfInput; }
+    constexpr bool is_identifier() const noexcept { return tm_parse::is_identifier(Kind) || is_keyword(); }
+    constexpr bool is_keyword() const noexcept { return tm_parse::is_keyword(Kind); }
+    constexpr bool is_symbol() const noexcept { return tm_parse::is_symbol(Kind); }
 
    public:
     constexpr bool operator==(tk::TokenKind kind) const noexcept { return Kind == kind; }

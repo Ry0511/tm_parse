@@ -1,0 +1,33 @@
+test_type = LexerTest
+
+test_content = {
+  "1234567890"
+  "Hello World"
+  ""
+  "\""
+  "\"Hello\" \"World\""
+  " 1 A
+    _ &
+    -1 -3.1415
+  "
+  "1234567890"
+  "Hello World"
+  ""
+  "\""
+}
+
+expected_tokens = {
+  StringLiteral
+  StringLiteral
+  StringLiteral
+  StringLiteral
+  StringLiteral
+  OtherText Number Identifier
+  Identifier Ampersand
+  Number Number
+  OtherText
+  StringLiteral
+  StringLiteral
+  StringLiteral
+  StringLiteral
+}

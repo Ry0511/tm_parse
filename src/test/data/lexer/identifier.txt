@@ -1,0 +1,19 @@
+test_type = LexerTest
+
+test_content = {
+  Foo Baz Bar
+  _Foo _Baz _Bar
+  _ __ ___ ____
+  _0 _1 _2 _3
+  set level none false true
+  set level none false true
+}
+
+expected_tokens = {
+  Identifier Identifier Identifier
+  Identifier Identifier Identifier
+  Identifier Identifier Identifier Identifier
+  Identifier Identifier Identifier Identifier
+  Identifier Identifier Identifier Identifier Identifier
+  Set Level None False True
+}
