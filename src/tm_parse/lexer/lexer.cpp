@@ -15,6 +15,26 @@ Token Lexer::next_token() {
     return next_token_impl();
 }
 
+Token Lexer::next_real_token() {
+    Token tk{};
+
+    do {
+        tk = next_token_impl();
+
+        switch (tk.Kind) {
+            case tk::BlankLine:
+            case tk::LineComment:
+            case tk::MultiLineComment:
+                continue;
+            default:
+                return tk;
+        }
+
+    } while (tk != tk::EndOfInput);
+
+    return Token{};
+}
+
 Token Lexer::peek_token() {
     Lexer state = save_state();
     Token token = next_token_impl();
@@ -24,10 +44,6 @@ Token Lexer::peek_token() {
 
 void Lexer::skip_whitespace() {
     while (!is_eof() && txt::is_whitespace(peek())) {
-        if (peek() == TXT('\n')) {
-            m_Line++;
-            m_Column = 0;
-        }
         m_Column++;
         m_Pos++;
     }
@@ -101,9 +117,6 @@ Token Lexer::next_token_impl() {
     if (peek() == TXT('\n')) {
         m_Start = m_Pos;
         m_Pos++;
-        while (txt::is_newline(peek())) {
-            advance();
-        }
         return create_token(tk::BlankLine);
     }
 
@@ -146,7 +159,19 @@ Token Lexer::require(tk::TokenKind kind) {
     if (tk != kind) {
         std::string expected = std::string{token_type_name(kind)};
         std::string actual = std::string{token_type_name(tk.Kind)};
-        throw std::runtime_error{std::format("Expecting {} but got {}", expected, actual).c_str()};
+        throw std::runtime_error{std::format("expecting {} but got {}", expected, actual).c_str()};
+    }
+
+    return tk;
+}
+
+Token Lexer::require_next_real(tk::TokenKind kind) {
+    Token tk = next_real_token();
+
+    if (tk != kind) {
+        std::string expected = std::string{token_type_name(kind)};
+        std::string actual = std::string{token_type_name(tk.Kind)};
+        throw std::runtime_error{std::format("expecting {} but got {}", expected, actual).c_str()};
     }
 
     return tk;
@@ -168,7 +193,8 @@ Token Lexer::read_identifier() {
 
     Token tk = create_token(tk::Identifier);
 
-    // If the length of the token content is within the bounds of a keyword see if it matches any known keyword tokens
+    // If the length of the token content is within the bounds of a keyword see if it matches any
+    // known keyword tokens
     constinit static size_t min_len = smallest_keyword_length();
     constinit static size_t max_len = largest_keyword_length();
     size_t len = tk.Region.length();

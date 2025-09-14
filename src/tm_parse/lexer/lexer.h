@@ -28,10 +28,12 @@ class Lexer {
 
    public:
     Token next_token();
+    Token next_real_token();
     Token peek_token();
 
    public:
     Token require(tk::TokenKind kind);
+    Token require_next_real(tk::TokenKind kind);
 
    private:
     Lexer save_state() const noexcept { return *this; }
