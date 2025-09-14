@@ -16,7 +16,7 @@ test_content = {
   "\""
 }
 
-expected_output = {
+expected_tokens = {
   StringLiteral
   StringLiteral
   StringLiteral

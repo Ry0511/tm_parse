@@ -29,7 +29,7 @@ void run_test(const fs::path& test_file) {
 
     using Vec = std::vector<Token>;
     const auto& test_content = test.get<const Vec&>("test_content", Vec{});
-    const auto& expected_output = test.get<const Vec&>("expected_output", Vec{});
+    const auto& expected_output = test.get<const Vec&>("expected_tokens", Vec{});
 
     if (test_content.empty() || expected_output.empty()) {
         throw std::runtime_error{"test_content or expected_output is empty"};

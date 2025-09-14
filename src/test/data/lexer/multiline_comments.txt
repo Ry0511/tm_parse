@@ -11,7 +11,7 @@ test_content = {
   1 2 3 4 5 - - 1
 }
 
-expected_output = {
+expected_tokens = {
   MultiLineComment
   MultiLineComment
   MultiLineComment

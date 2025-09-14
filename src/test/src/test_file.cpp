@@ -74,7 +74,7 @@ TestFile::TestFile(const fs::path& test_file) : m_TestFile(test_file) {
         std::vector<tk::TokenKind> skip_tokens{};
 
         // Skip everything in the expected output block
-        if (key == "expected_output") {
+        if (key == "expected_tokens") {
             skip_tokens = {
                 tk::BlankLine,
                 tk::LineComment,
@@ -96,8 +96,9 @@ TestFile::TestFile(const fs::path& test_file) : m_TestFile(test_file) {
         Token tk = lexer.next_token();
 
         while (tk != tk::RightBrace) {
-            bool skip =
-                std::ranges::any_of(skip_tokens, [&](tk::TokenKind token) { return tk == token; });
+            bool skip = std::ranges::any_of(skip_tokens, [&tk](const tk::TokenKind& token) -> bool {
+                return tk == token;
+            });
 
             if (!skip) {
                 tokens.push_back(tk);

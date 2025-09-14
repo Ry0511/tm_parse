@@ -14,7 +14,7 @@ test_content = {
   --1.000001
 }
 
-expected_output = {
+expected_tokens = {
   Number
   Number
   Number

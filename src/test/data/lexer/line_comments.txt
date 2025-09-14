@@ -9,7 +9,7 @@ test_content = {
   # 3.1415 # This is pi
 }
 
-expected_output = {
+expected_tokens = {
   LineComment
   LineComment
   Number LineComment

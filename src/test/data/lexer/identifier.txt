@@ -9,7 +9,7 @@ test_content = {
   set level none false true
 }
 
-expected_output = {
+expected_tokens = {
   Identifier Identifier Identifier
   Identifier Identifier Identifier
   Identifier Identifier Identifier Identifier
