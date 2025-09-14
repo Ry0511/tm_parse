@@ -15,21 +15,32 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cmake_preset: [ msvc-release, msvc-debug ]
-        arch: [ "x64", "x86" ]
+        cmake_preset: [
+          msvc-release-x86,
+          msvc-debug-x86,
+          msvc-release-x64,
+          msvc-debug-x64,
+        ]
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: TheMrMilchmann/setup-msvc-dev@v3
+      - name: Setup MSVC
+        uses: TheMrMilchmann/setup-msvc-dev@v3
         with:
-          arch: ${{ matrix.arch }}
+          arch: ${{ fromJSON('["x86", "x64"]')[contains(matrix.cmake_preset, 'x64')] }}
 
       - name: Setup CMake and Ninja
         uses: lukka/get-cmake@latest
 
-      - name: Configure CMake
-        run: cmake . --preset ${{ matrix.cmake_preset }}
+      - id: build_project
+        name: Configure & Build
+        run: |
+          cmake . --preset ${{ matrix.cmake_preset }} -G Ninja
+          cmake --build out/build/${{ matrix.cmake_preset }}
 
-      - name: Build
-        run: cmake --build out/build/${{ matrix.cmake_preset }}
+      - name: Run Tests
+        if: ${{ steps.build_project.outcome == 'success' }}
+        run: |
+          cd src/test
+          ../../out/build/${{matrix.cmake_preset}}/tm_parse_tests.exe

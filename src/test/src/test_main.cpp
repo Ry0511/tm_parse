@@ -12,8 +12,8 @@ namespace tm_parse::tests {
 
 namespace {
 
-size_t failure_count = 0;
-size_t success_count = 0;
+int failure_count = 0;
+int success_count = 0;
 bool log_everything = false;
 
 void run_test(const fs::path& test_file) {
@@ -62,4 +62,6 @@ int main() {
     INFO("Hello World");
     WARN("Hello World");
     ERR("Hello World");
+
+    return tests::failure_count;
 }

@@ -6,6 +6,8 @@
 
 #pragma once
 
+#ifdef _WIN32
+
 #define WIN32_LEAN_AND_MEAN
 #define WIN32_NO_STATUS
 #define NOGDI
@@ -15,6 +17,8 @@
 
 #undef WIN32_NO_STATUS
 #include <ntstatus.h>
+
+#endif
 
 #include <algorithm>
 #include <array>
@@ -80,5 +84,14 @@ using str_ifstream = std::basic_ifstream<str_char>;
 using str_stream = std::basic_stringstream<str_char>;
 
 #define TXT(S) S
+
+#if defined(TM_PARSE_ARCH_X64)
+static_assert(sizeof(void*) == 8);
+#elif defined(TM_PARSE_ARCH_X86)
+static_assert(sizeof(void*) == 4);
+#else
+#error "unsupported architecture defined"
+#endif
+
 
 }  // namespace tm_parse

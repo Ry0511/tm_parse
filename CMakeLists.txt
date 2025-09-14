@@ -1,17 +1,5 @@
-cmake_minimum_required(VERSION 3.30)
+cmake_minimum_required(VERSION 3.23)
 project(tm_parse VERSION 1.0.0)
-
-# TODO: Extract this out into toolchain files
-################################################################################
-# | MSVC CRAP |
-################################################################################
-
-if (NOT DEFINED CMAKE_C_COMPILER)
-    set(CMAKE_C_COMPILER cl.exe)
-    set(CMAKE_CXX_COMPILER cl.exe)
-endif ()
-
-add_compile_options("/utf-8")
 
 ################################################################################
 # | TM_PARSE_MAIN |
@@ -44,6 +32,19 @@ message(STATUS "tm_parse source files '${TM_PARSE_SOURCE_FILES}'")
 message(STATUS "tm_parse header files '${TM_PARSE_HEADER_FILES}'")
 
 add_library(tm_parse STATIC ${TM_PARSE_SOURCE_FILES})
+
+if (${TM_PARSE_ARCH} STREQUAL "x86")
+    target_compile_definitions(tm_parse PUBLIC -DTM_PARSE_ARCH_X86=1)
+elseif (${TM_PARSE_ARCH} STRLESS_EQUAL "x64")
+    target_compile_definitions(tm_parse PUBLIC -DTM_PARSE_ARCH_X64=1)
+endif ()
+
 target_include_directories(tm_parse PUBLIC src/)
-target_precompile_headers(tm_parse PRIVATE src/tm_parse/pch.h)
 target_compile_features(tm_parse PRIVATE cxx_std_20)
+target_compile_options(
+        tm_parse
+        PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/W3>
+        $<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra>
+)
+target_precompile_headers(tm_parse PRIVATE src/tm_parse/pch.h)
