@@ -19,7 +19,7 @@ struct Token {
     TextRegion Region;
     int Line{-1};
     int Column{-1};
-    const str_char* Text;
+    const str_char* Text{nullptr};
 
    public:
     constexpr Token() : Kind(tk::TokenKind::EndOfInput) {};
