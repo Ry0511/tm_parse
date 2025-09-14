@@ -24,4 +24,8 @@ bool is_newline(str_char c) noexcept;
 
 bool equal_icase(str_view a, str_view b) noexcept;
 
+str escape_string(str_view str) noexcept;
+
+double parse_number(str_view str) noexcept;
+
 }  // namespace tm_parse::txt

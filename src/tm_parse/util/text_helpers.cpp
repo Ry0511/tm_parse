@@ -41,9 +41,38 @@ bool is_newline(str_char c) noexcept {
 }
 
 bool equal_icase(str_view a, str_view b) noexcept {
-    return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin(), [](auto&& a, auto&& b) {
-               return std::tolower(a) == std::tolower(b);
-           });
+    return a.size() == b.size()
+           && std::equal(a.begin(), a.end(), b.begin(), [](auto&& a, auto&& b) {
+                  return std::tolower(a) == std::tolower(b);
+              });
+}
+
+str escape_string(str_view in) noexcept {
+    str out{};
+    out.reserve(in.size());
+
+    for (char c : in) {
+        switch (c) {
+            case '\n': {
+                out += "\\n";
+                break;
+            }
+            case '\r': {
+                out += "\\r";
+                break;
+            }
+            default: {
+                out += c;
+                break;
+            }
+        }
+    }
+
+    return out;
+}
+
+double parse_number(str_view str) noexcept {
+    return std::stod(std::string{str});
 }
 
 }  // namespace tm_parse::txt
