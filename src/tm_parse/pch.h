@@ -74,9 +74,10 @@ using str_char = char;
 using str = std::string;
 using str_view = std::string_view;
 
-using str_istream = std::istream;
-using str_fstream = std::fstream;
-using str_ifstream = std::ifstream;
+using str_istream = std::basic_istream<str_char>;
+using str_fstream = std::basic_fstream<str_char>;
+using str_ifstream = std::basic_ifstream<str_char>;
+using str_stream = std::basic_stringstream<str_char>;
 
 #define TXT(S) S
 
