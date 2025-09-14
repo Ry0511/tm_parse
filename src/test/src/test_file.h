@@ -17,6 +17,8 @@ class Lexer;
 
 namespace tm_parse::tests {
 
+class TestRunner;
+
 class TestFile {
    private:
     fs::path m_TestFile;
@@ -42,12 +44,18 @@ class TestFile {
     }
 
    public:
+    std::unique_ptr<TestRunner> create_test_runner() const;
+
+   public:
     const fs::path& test_file() const noexcept { return m_TestFile; }
     const str& test_type() const noexcept { return get<const str&>("test_type", str{"Unknown"}); }
 
    public:
     auto begin() const noexcept { return m_TestData.begin(); }
     auto end() const noexcept { return m_TestData.end(); }
+
+   private:
+    void process_lexer_values();
 };
 
 }  // namespace tm_parse::tests

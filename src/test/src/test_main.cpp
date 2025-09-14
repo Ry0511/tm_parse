@@ -5,85 +5,36 @@
 //
 
 #include "tm_parse/pch.h"
-#include "tm_parse/lexer/lexer.h"
-#include "tm_parse/util/text_helpers.h"
-
 #include "test_file.h"
+#include "test_runner.h"
 
 namespace tm_parse::tests {
 
 namespace {
 
+size_t failure_count = 0;
+size_t success_count = 0;
+bool log_everything = false;
+
 void run_test(const fs::path& test_file) {
     TestFile test{test_file};
 
     const str& test_type = test.test_type();
-    INFO("Running test {} of type {}", test_file.filename().string(), test_type);
 
-    const str& desc = test.get<const str&>("description", str{});
-    if (!desc.empty()) {
-        INFO(" - {}", desc);
+    auto runner = test.create_test_runner();
+    if (runner->run(test)) {
+        INFO("[ \033[32m{}\033[0m ] - {}", "TEST PASSED", test_file.filename().string());
+        ++success_count;
+    } else {
+        INFO("[ \033[31m{}\033[0m ] - {}", "TEST FAILED", test_file.filename().string());
+        ++failure_count;
     }
 
-    bool is_skip_mode = test.get<bool>("skip_tokens", true);
-
-    using Vec = std::vector<Token>;
-    const auto& test_content = test.get<const Vec&>("test_content", Vec{});
-    const auto& expected_output = test.get<const Vec&>("expected_tokens", Vec{});
-
-    if (test_content.empty() || expected_output.empty()) {
-        throw std::runtime_error{"test_content or expected_output is empty"};
-    }
-
-    size_t len = std::min(test_content.size(), expected_output.size());
-    if (test_content.size() != expected_output.size()) {
-        WARN("Test content size differs from expected output; Only comparing to smallest length.");
-    }
-
-    std::vector<str> errors{};
-
-    for (size_t i = 0; i < len; ++i) {
-        Token actual = test_content[i];
-
-        Token expected = expected_output[i];
-        expected.Kind = str_to_token_kind(expected.text());
-
-        if (actual == expected || (actual.is_identifier() && expected.is_identifier())) {
-            continue;
-        }
-
-        errors.emplace_back(
-            std::format(
-                "Test content mismatch at index {};"
-                "\n Expected: {}"
-                "\n Actual  : {}, {}"
-                "\nAt position {}:{}",
-                i,
-                expected.token_name(),
-                actual.token_name(),
-                txt::escape_string(actual.text()),
-                actual.Line,
-                actual.Column
-            )
-        );
-    }
-
-    if (errors.empty()) {
-        return;
-    }
-
-    str_stream ss{};
-    for (size_t i = 0; i < errors.size(); ++i) {
-        ss << errors[i];
-
-        if (i != errors.size() - 1) {
-            ss << "\n\n";
-        } else {
-            ss << "\n";
+    if (log_everything || !runner->success()) {
+        for (const str& msg : runner->execution_log()) {
+            INFO("{}", msg);
         }
     }
-
-    throw std::runtime_error{ss.str()};
 }
 
 void run_all_tests(const fs::path& directory) {

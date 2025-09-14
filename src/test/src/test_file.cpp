@@ -4,9 +4,10 @@
 // Author     : -Ry
 //
 
-#include "test_file.h"
+#include "tm_parse/pch.h"
 
-#include <algorithm>
+#include "lexer_test_runner.h"
+#include "test_file.h"
 
 #include "tm_parse/lexer/lexer.h"
 #include "tm_parse/util/text_helpers.h"
@@ -61,6 +62,10 @@ TestFile::TestFile(const fs::path& test_file) : m_TestFile(test_file) {
         }
     }
 
+    process_lexer_values();
+}
+
+void TestFile::process_lexer_values() {
     // Second pass go through any Lexer values and parse the internal data
     for (auto& [key, val] : m_TestData) {
         if (val->type() != typeid(Lexer)) {
@@ -68,9 +73,7 @@ TestFile::TestFile(const fs::path& test_file) : m_TestFile(test_file) {
         }
 
         Lexer lexer = std::any_cast<Lexer>(*val);
-
         std::vector<Token> tokens{};
-
         std::vector<tk::TokenKind> skip_tokens{};
 
         // Skip everything in the expected output block
@@ -94,8 +97,12 @@ TestFile::TestFile(const fs::path& test_file) : m_TestFile(test_file) {
         }
 
         Token tk = lexer.next_token();
-
         while (tk != tk::RightBrace) {
+
+            if (tk == tk::EndOfInput) {
+                throw std::runtime_error{"unexpected end of input when parsing block: Identifier = { ... }"};
+            }
+
             bool skip = std::ranges::any_of(skip_tokens, [&tk](const tk::TokenKind& token) -> bool {
                 return tk == token;
             });
@@ -109,6 +116,16 @@ TestFile::TestFile(const fs::path& test_file) : m_TestFile(test_file) {
 
         *m_TestData[key] = std::move(tokens);
     }
+}
+
+std::unique_ptr<TestRunner> TestFile::create_test_runner() const {
+    const str& test_runner = this->test_type();
+
+    if (txt::equal_icase(test_runner, "LexerTest")) {
+        return std::make_unique<LexerTestRunner>();
+    }
+
+    return nullptr;
 }
 
 const std::any& TestFile::get_impl(const str& key) const {
