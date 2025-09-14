@@ -99,7 +99,7 @@ Token Lexer::create_token(tk::TokenKind kind) {
         kind,
         TextRegion{m_Start, m_Pos},
         m_Line,
-        m_Column,
+        static_cast<int>(static_cast<size_t>(m_Column) - (m_Pos - m_Start)),
         m_Text.data(),
     };
 }
@@ -116,7 +116,7 @@ Token Lexer::next_token_impl() {
     // [\n]+
     if (peek() == TXT('\n')) {
         m_Start = m_Pos;
-        m_Pos++;
+        advance();
         return create_token(tk::BlankLine);
     }
 
