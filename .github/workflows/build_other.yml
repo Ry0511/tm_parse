@@ -1,0 +1,43 @@
+name: build_other
+
+on:
+  workflow_dispatch:
+    branches: [ "master" ]
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    container:
+      image: ghcr.io/ry0511/ubuntu-dev:latest
+
+    strategy:
+      matrix:
+        arch: [ x86, x64 ]
+        build_type: [ release, debug ]
+        build_tool: [ clang ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - id: build_project
+        name: Configure & Build
+        env:
+          CMAKE_PRESET: ${{ matrix.build_tool }}-${{ matrix.build_type }}-${{ matrix.arch }}
+        run: |
+          set -e
+          cmake . --preset "$CMAKE_PRESET" -G Ninja
+          cmake --build out/build/"$CMAKE_PRESET"
+
+      - name: Run Tests
+        if: ${{ steps.build_project.outcome == 'success' }}
+        env:
+          CMAKE_PRESET: ${{ matrix.build_tool }}-${{ matrix.build_type }}-${{ matrix.arch }}
+        run: |
+          cd src/test
+          ../../out/build/"$CMAKE_PRESET"/tm_parse_tests

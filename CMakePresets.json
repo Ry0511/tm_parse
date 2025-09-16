@@ -14,6 +14,20 @@
       "installDir": "${sourceDir}/out/install/${presetName}"
     },
     {
+      "name": "_x86",
+      "hidden": true,
+      "cacheVariables": {
+        "TM_PARSE_ARCH": "x86"
+      }
+    },
+    {
+      "name": "_x64",
+      "hidden": true,
+      "cacheVariables": {
+        "TM_PARSE_ARCH": "x64"
+      }
+    },
+    {
       "name": "_msvc",
       "hidden": true,
       "condition": {
@@ -21,29 +35,130 @@
         "lhs": "${hostSystemName}",
         "rhs": "Windows"
       },
-      "generator": "Ninja"
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "cmake_crap/msvc.cmake"
+      }
     },
     {
-      "name": "msvc-debug",
-      "displayName": "msvc debug",
-      "inherits": [
-        "_base",
-        "_msvc"
-      ],
+      "name": "_clang_x86",
+      "hidden": true,
+      "condition": {
+        "type": "equals",
+        "lhs": "$env{VSINSTALLDIR}",
+        "rhs": ""
+      },
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "cmake_crap/clang_x86.cmake"
+      }
+    },
+    {
+      "name": "_clang_x64",
+      "hidden": true,
+      "condition": {
+        "type": "equals",
+        "lhs": "$env{VSINSTALLDIR}",
+        "rhs": ""
+      },
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "cmake_crap/clang_x64.cmake"
+      }
+    },
+    {
+      "name": "_debug",
+      "hidden": true,
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
-      "name": "msvc-release",
-      "displayName": "msvc release",
-      "inherits": [
-        "_base",
-        "_msvc"
-      ],
+      "name": "_release",
+      "hidden": true,
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
+    },
+    {
+      "name": "msvc-debug-x64",
+      "displayName": "msvc debug x64",
+      "inherits": [
+        "_base",
+        "_msvc",
+        "_debug",
+        "_x64"
+      ]
+    },
+    {
+      "name": "msvc-release-x64",
+      "displayName": "msvc release x64",
+      "inherits": [
+        "_base",
+        "_msvc",
+        "_release",
+        "_x64"
+      ]
+    },
+    {
+      "name": "msvc-debug-x86",
+      "displayName": "msvc debug x86",
+      "inherits": [
+        "_base",
+        "_msvc",
+        "_debug",
+        "_x86"
+      ]
+    },
+    {
+      "name": "msvc-release-x86",
+      "displayName": "msvc release x86",
+      "inherits": [
+        "_base",
+        "_msvc",
+        "_release",
+        "_x86"
+      ]
+    },
+    {
+      "name": "clang-debug-x86",
+      "displayName": "clang debug x86",
+      "inherits": [
+        "_base",
+        "_clang_x86",
+        "_debug",
+        "_x86"
+      ]
+    },
+    {
+      "name": "clang-release-x86",
+      "displayName": "clang release x86",
+      "inherits": [
+        "_base",
+        "_clang_x86",
+        "_release",
+        "_x86"
+      ]
+    },
+    {
+      "name": "clang-debug-x64",
+      "displayName": "clang debug x64",
+      "inherits": [
+        "_base",
+        "_clang_x64",
+        "_debug",
+        "_x64"
+      ]
+    },
+    {
+      "name": "clang-release-x64",
+      "displayName": "clang release x64",
+      "inherits": [
+        "_base",
+        "_clang_x64",
+        "_release",
+        "_x64"
+      ]
     }
   ]
 }
