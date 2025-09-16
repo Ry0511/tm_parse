@@ -11,6 +11,7 @@ bool is_whitespace(str_char c) noexcept {
     switch (c) {
         case TXT('\v'):
         case TXT('\t'):
+        case TXT('\r'):
         case TXT(' '):
             return true;
         default:

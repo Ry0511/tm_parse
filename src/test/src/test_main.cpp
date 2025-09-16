@@ -63,5 +63,12 @@ int main() {
     WARN("Hello World");
     ERR("Hello World");
 
+    INFO(
+        "Tests ran {} - Passed {} - Failed {}",
+        tests::success_count + tests::failure_count,
+        tests::success_count,
+        tests::failure_count
+    );
+
     return tests::failure_count;
 }
