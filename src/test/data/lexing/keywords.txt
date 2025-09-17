@@ -1,0 +1,41 @@
+test_type = LexerTest
+
+test_content = {
+  Set     set     SET
+  None    none    NONE
+  Level   level   LEVEL
+  True    true    TRUE
+  False   false   FALSE
+  Begin   begin   BEGIN
+  Object  object  OBJECT
+  Class   class   CLASS
+  Name    name    NAME
+  Package package PACKAGE
+  End     end     END
+}
+
+expected_token_count = 33
+
+expected_tokens = {
+  Set    Set    Set
+  None   None   None
+  Level  Level  Level
+  True   True   True
+  False  False  False
+  Begin  Begin  Begin
+  Object Object Object
+  Class  Class  Class
+  Name   Name   Name
+}
+
+expected_text = {
+  "Set"    "set"    "SET"
+  "None"   "none"   "NONE"
+  "Level"  "level"  "LEVEL"
+  "True"   "true"   "TRUE"
+  "False"  "false"  "FALSE"
+  "Begin"  "begin"  "BEGIN"
+  "Object" "object" "OBJECT"
+  "Class"  "class"  "CLASS"
+  "Name"   "name"   "NAME"
+}
