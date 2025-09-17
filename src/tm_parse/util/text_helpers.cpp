@@ -52,22 +52,18 @@ str escape_string(str_view in) noexcept {
     str out{};
     out.reserve(in.size());
 
+    // clang-format off
     for (char c : in) {
         switch (c) {
-            case '\n': {
-                out += "\\n";
-                break;
-            }
-            case '\r': {
-                out += "\\r";
-                break;
-            }
-            default: {
-                out += c;
-                break;
-            }
+            case '\t': out += "\\t"; break;
+            case '\v': out += "\\v"; break;
+            case '\n': out += "\\n"; break;
+            case '\r': out += "\\r"; break;
+            case '\0': out += "\\0"; break; // Bit excessive...
+            default  : out += c;     break;
         }
     }
+    // clang-format on
 
     return out;
 }
