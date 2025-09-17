@@ -8,10 +8,20 @@ test_content = {
 
 }
 
+expected_token_count = 5
+
 expected_tokens = {
   BlankLine
   BlankLine
   BlankLine
   BlankLine
   BlankLine
+}
+
+expected_text = {
+  "\n"
+  "\n"
+  "\n"
+  "\n"
+  "\n"
 }

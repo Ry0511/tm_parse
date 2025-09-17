@@ -44,3 +44,17 @@ expected_tokens
   Number
   RightParen
 }
+
+expected_text = {
+  "("
+  "50.0"
+  "+"
+  "25.0"
+  ")"
+  "/"
+  "("
+  "3.1415"
+  "*"
+  "2.7182"
+  ")"
+}

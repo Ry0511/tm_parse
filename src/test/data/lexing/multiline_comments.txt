@@ -19,3 +19,12 @@ expected_tokens = {
   Slash Star
   Number Number Number Number Number OtherText OtherText Number
 }
+
+expected_text = {
+  "/**/"
+  "/* */"
+  "/*\n  */"
+  "/" "*"
+  "/" "*"
+  "1" "2" "3" "4" "5" "-" "-" "1"
+}
