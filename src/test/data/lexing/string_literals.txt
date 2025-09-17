@@ -14,6 +14,7 @@ test_content = {
   "Hello World"
   ""
   "\""
+  """A""AA" "AAA"
 }
 
 expected_tokens = {
@@ -30,4 +31,6 @@ expected_tokens = {
   StringLiteral
   StringLiteral
   StringLiteral
+  StringLiteral
+  StringLiteral StringLiteral StringLiteral StringLiteral
 }
