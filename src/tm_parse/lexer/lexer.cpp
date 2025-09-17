@@ -95,6 +95,10 @@ str_char Lexer::advance() {
 }
 
 Token Lexer::create_token(tk::TokenKind kind) {
+    if (m_Pos < m_Start) {
+        throw std::logic_error{"invalid lexer state"};
+    }
+
     return Token{
         kind,
         TextRegion{m_Start, m_Pos},
@@ -327,7 +331,7 @@ Token Lexer::read_string_literal() {
         return read_other();
     }
 
-    m_Pos++;  // peek() == "
+    // m_Pos++;  // peek() == "
     return create_token(tk::StringLiteral);
 }
 
