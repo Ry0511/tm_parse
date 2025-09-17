@@ -37,7 +37,15 @@ class TestFile {
     T get(const str& key, auto&& def_val = T{}) const {
         try {
             const std::any& val = get_impl(key);
+
+            if constexpr (std::is_same_v<T, float> || std::is_same_v<T, uint32_t>
+                          || std::is_same_v<T, uint64_t> || std::is_same_v<T, int32_t>
+                          || std::is_same_v<T, int64_t>) {
+                return static_cast<T>(std::any_cast<double>(val));
+            }
+
             return std::any_cast<T>(val);
+
         } catch (const std::runtime_error&) {
             return def_val;
         }

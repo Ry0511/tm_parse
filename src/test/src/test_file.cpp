@@ -25,6 +25,8 @@ TestFile::TestFile(const fs::path& test_file) : m_TestFile(test_file) {
 
     Lexer lexer{m_TestContent};
 
+    // TODO: This needs a rewrite, but for now this is fine
+
     while (!lexer.is_eof()) {
         Token id = lexer.next_real_token();
 
@@ -76,8 +78,8 @@ void TestFile::process_lexer_values() {
         std::vector<Token> tokens{};
         std::vector<tk::TokenKind> skip_tokens{};
 
-        // Skip everything in the expected output block
-        if (key == "expected_tokens") {
+        // Skip everything in the expected output blocks
+        if (key.find("expected_") != std::string::npos) {
             skip_tokens = {
                 tk::BlankLine,
                 tk::LineComment,
