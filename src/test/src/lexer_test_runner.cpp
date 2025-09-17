@@ -24,10 +24,7 @@ bool LexerTestRunner::run(TestFile& test) {
     }
 
     assert_expected_tokens(test);
-
-    if (success()) {
-        assert_expected_text(test);
-    }
+    assert_expected_text(test);
 
     return success();
 }
@@ -48,9 +45,17 @@ void LexerTestRunner::assert_expected_tokens(TestFile& test) {
         this->info("test content size differs from expected output; using smallest of the two");
     }
 
+    // Sanity check count of tokens
+    int expected_count = test.get<int>("expected_token_count", -1);
+    if (expected_count != -1 && expected_count != test_content.size()) {
+        this->err(" * expecting token count of {}", expected_count);
+        this->err(" * actual token count {}", test_content.size());
+        m_Success = false;
+        return;
+    }
+
     for (size_t i = 0; i < len; ++i) {
         Token actual = test_content[i];
-
         Token expected = expected_output[i];
         expected.Kind = str_to_token_kind(expected.text());
 
@@ -71,6 +76,10 @@ void LexerTestRunner::assert_expected_tokens(TestFile& test) {
 }
 
 void LexerTestRunner::assert_expected_text(TestFile& test) {
+    if (!success()) {
+        return;
+    }
+
     const auto& actual = test.get<TokenVec>("test_content", TokenVec{});
     const auto& expected = test.get<TokenVec>("expected_text", TokenVec{});
     const bool abort_on_first_error = test.get<bool>("abort_on_first_error", true);
@@ -81,8 +90,8 @@ void LexerTestRunner::assert_expected_text(TestFile& test) {
         Token actual_token = actual[i];
         Token expected_token = expected[i];
 
-        str_view left = txt::escape_string(actual_token.inner_text());
-        str_view right = txt::escape_string(expected_token.inner_text());
+        str left = txt::escape_string(actual_token.inner_text());
+        str right = txt::escape_string(expected_token.inner_text());
 
         if (left != right) {
             this->err("* check failed : '{}' != '{}'", left, right);
