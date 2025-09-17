@@ -7,12 +7,16 @@
 #pragma once
 
 #include "tm_parse/pch.h"
+#include "tm_parse/lexer/token.h"
 
 namespace tm_parse::tests {
 
 class TestFile;
 
 class TestRunner {
+   public:
+    using TokenVec = std::vector<Token>;
+
    protected:
     bool m_Success{true};
     std::vector<str> m_ExecutionLog;
