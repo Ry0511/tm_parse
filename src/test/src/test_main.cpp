@@ -8,6 +8,9 @@
 #include "test_file.h"
 #include "test_runner.h"
 
+#define CATCH_CONFIG_RUNNER
+#include "catch.hpp"
+
 namespace tm_parse::tests {
 
 namespace {
@@ -23,16 +26,16 @@ void run_test(const fs::path& test_file) {
 
     auto runner = test.create_test_runner();
     if (runner->run(test)) {
-        INFO("[ \033[32m{}\033[0m ] - {}", "TEST PASSED", test_file.filename().string());
+        LOG_INFO("[ \033[32m{}\033[0m ] - {}", "TEST PASSED", test_file.filename().string());
         ++success_count;
     } else {
-        INFO("[ \033[31m{}\033[0m ] - {}", "TEST FAILED", test_file.filename().string());
+        LOG_INFO("[ \033[31m{}\033[0m ] - {}", "TEST FAILED", test_file.filename().string());
         ++failure_count;
     }
 
     if (log_everything || !runner->success()) {
         for (const str& msg : runner->execution_log()) {
-            INFO("{}", msg);
+            LOG_INFO("{}", msg);
         }
     }
 }
@@ -43,8 +46,8 @@ void run_all_tests(const fs::path& directory) {
             try {
                 run_test(entry.path());
             } catch (const std::exception& err) {
-                INFO("Error running test {}", entry.path().string());
-                INFO("With message: {}", err.what());
+                LOG_INFO("Error running test {}", entry.path().string());
+                LOG_INFO("With message: {}", err.what());
             }
         }
     }
@@ -56,19 +59,18 @@ void run_all_tests(const fs::path& directory) {
 
 int main() {
     using namespace tm_parse;
+
+    LOG_INFO("Running tm_parse tests...");
     tests::run_all_tests(fs::current_path() / "data");
 
-    TRACE("Hello World");
-    INFO("Hello World");
-    WARN("Hello World");
-    ERR("Hello World");
+    LOG_INFO("Running all catch2 tests...");
+    Catch::Session session{};
+    int res = session.run();
 
-    INFO(
-        "Tests ran {} - Passed {} - Failed {}",
-        tests::success_count + tests::failure_count,
-        tests::success_count,
-        tests::failure_count
-    );
+    if (res != 0) {
+        LOG_ERR("Some catch2 tests failed...");
+        return res;
+    }
 
     return tests::failure_count;
 }

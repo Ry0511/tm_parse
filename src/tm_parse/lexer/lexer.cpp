@@ -158,9 +158,11 @@ Token Lexer::next_token_impl() {
 ////////////////////////////////////////////////////////////////////////////////
 
 Token Lexer::require(tk::TokenKind kind) {
+    Lexer state = save_state();
     Token tk = next_token();
 
     if (tk != kind) {
+        restore_state(state);
         std::string expected = std::string{token_type_name(kind)};
         std::string actual = std::string{token_type_name(tk.Kind)};
         throw std::runtime_error{std::format("expecting {} but got {}", expected, actual).c_str()};

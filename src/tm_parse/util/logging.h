@@ -27,10 +27,10 @@ enum class LogLevel : uint8_t {
     )
 // clang-format on
 
-#define TRACE(...) LOG(Trace, __VA_ARGS__)
-#define INFO(...) LOG(Info, __VA_ARGS__)
-#define WARN(...) LOG(Warn, __VA_ARGS__)
-#define ERR(...) LOG(Err, __VA_ARGS__)
+#define LOG_TRACE(...) LOG(Trace, __VA_ARGS__)
+#define LOG_INFO(...) LOG(Info, __VA_ARGS__)
+#define LOG_WARN(...) LOG(Warn, __VA_ARGS__)
+#define LOG_ERR(...) LOG(Err, __VA_ARGS__)
 
 void log(LogLevel level, std::string_view msg, const std::source_location& src);
 
