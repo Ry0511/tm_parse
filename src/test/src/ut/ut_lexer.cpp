@@ -90,6 +90,7 @@ TEST_CASE("assert Lexer::require usage") {
 TEST_CASE("assert Lexer::require_next_real usage") {
     TestData t{R"(
       # Should be skipped
+      /* Should also be skipped */
       pi = 1.57075 * 2.0;
 
     )"};
