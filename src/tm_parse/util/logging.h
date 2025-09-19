@@ -19,7 +19,7 @@ enum class LogLevel : uint8_t {
 };
 
 // clang-format off
-#define LOG(level, ...)                               \
+#define TM_PARSE_LOG(level, ...)                      \
     ::tm_parse::logging::log(                         \
         ::tm_parse::logging::LogLevel::level,         \
         std::format(__VA_ARGS__) + std::string{"\n"}, \
@@ -27,10 +27,10 @@ enum class LogLevel : uint8_t {
     )
 // clang-format on
 
-#define LOG_TRACE(...) LOG(Trace, __VA_ARGS__)
-#define LOG_INFO(...) LOG(Info, __VA_ARGS__)
-#define LOG_WARN(...) LOG(Warn, __VA_ARGS__)
-#define LOG_ERR(...) LOG(Err, __VA_ARGS__)
+#define LOG_TRACE(...) TM_PARSE_LOG(Trace, __VA_ARGS__)
+#define LOG_INFO(...) TM_PARSE_LOG(Info, __VA_ARGS__)
+#define LOG_WARN(...) TM_PARSE_LOG(Warn, __VA_ARGS__)
+#define LOG_ERR(...) TM_PARSE_LOG(Err, __VA_ARGS__)
 
 void log(LogLevel level, std::string_view msg, const std::source_location& src);
 
