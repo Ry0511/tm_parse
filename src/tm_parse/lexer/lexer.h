@@ -49,6 +49,7 @@ class Lexer {
     Token next_token_impl();
 
    private:
+    Token read_blankline();
     Token read_identifier();
     Token read_number();
     Token read_other();

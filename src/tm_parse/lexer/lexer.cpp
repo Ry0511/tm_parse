@@ -117,11 +117,9 @@ Token Lexer::next_token_impl() {
         return Token{};
     }
 
-    // [\n]+
-    if (peek() == TXT('\n')) {
-        m_Start = m_Pos;
-        advance();
-        return create_token(tk::BlankLine);
+    // [\r\n]+
+    if (txt::is_newline(peek())) {
+        return read_blankline();
     }
 
     // /* ... */
@@ -186,6 +184,20 @@ Token Lexer::require_next_real(tk::TokenKind kind) {
 ////////////////////////////////////////////////////////////////////////////////
 // | READ FUNCTIONS |
 ////////////////////////////////////////////////////////////////////////////////
+
+Token Lexer::read_blankline() {
+    m_Start = m_Pos;
+
+    if (peek() == TXT('\r')) {
+        advance();
+    }
+
+    if (peek() == TXT('\n')) {
+        advance();
+    }
+
+    return create_token(tk::BlankLine);
+}
 
 Token Lexer::read_identifier() {
     m_Start = m_Pos;  // Start token
@@ -277,7 +289,7 @@ Token Lexer::read_other() {
 Token Lexer::read_line_comment() {
     m_Start = m_Pos;
     m_Pos++;
-    while (peek() != TXT('\n')) {
+    while (!txt::is_newline(peek())) {
         advance();
     }
     return create_token(tk::LineComment);
@@ -321,7 +333,7 @@ Token Lexer::read_string_literal() {
         // peek(-1) == c
         terminator_found = (c == TXT('\"')) && peek(-2) != TXT('\\');
 
-        if (c == TXT('\n')) {
+        if (txt::is_newline(c)) {
             restore_state(state);
             return read_other();
         }
