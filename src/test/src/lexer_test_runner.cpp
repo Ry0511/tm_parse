@@ -18,7 +18,7 @@ bool LexerTestRunner::run(TestFile& test) {
     m_Success = true;
 
     // Info log description if exists
-    const str& desc = test.get<const str&>("description", str{});
+    str desc = test.get<str>("description", str{});
     if (!desc.empty()) {
         this->info("- {}", desc);
     }
@@ -30,8 +30,8 @@ bool LexerTestRunner::run(TestFile& test) {
 }
 
 void LexerTestRunner::assert_expected_tokens(TestFile& test) {
-    const auto& test_content = test.get<const TokenVec&>("test_content", TokenVec{});
-    const auto& expected_output = test.get<const TokenVec&>("expected_tokens", TokenVec{});
+    auto test_content = test.get<TokenVec>("test_content", TokenVec{});
+    auto expected_output = test.get<TokenVec>("expected_tokens", TokenVec{});
     const bool abort_on_first_error = test.get<bool>("abort_on_first_error", true);
 
     this->info(
