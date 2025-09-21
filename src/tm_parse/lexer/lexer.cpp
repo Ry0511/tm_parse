@@ -95,6 +95,10 @@ str_char Lexer::advance() {
 }
 
 Token Lexer::create_token(tk::TokenKind kind) {
+    if (m_Pos < m_Start) {
+        throw std::logic_error{"invalid lexer state"};
+    }
+
     return Token{
         kind,
         TextRegion{m_Start, m_Pos},
@@ -113,11 +117,9 @@ Token Lexer::next_token_impl() {
         return Token{};
     }
 
-    // [\n]+
-    if (peek() == TXT('\n')) {
-        m_Start = m_Pos;
-        advance();
-        return create_token(tk::BlankLine);
+    // [\r\n]+
+    if (txt::is_newline(peek())) {
+        return read_blankline();
     }
 
     // /* ... */
@@ -154,9 +156,11 @@ Token Lexer::next_token_impl() {
 ////////////////////////////////////////////////////////////////////////////////
 
 Token Lexer::require(tk::TokenKind kind) {
+    Lexer state = save_state();
     Token tk = next_token();
 
     if (tk != kind) {
+        restore_state(state);
         std::string expected = std::string{token_type_name(kind)};
         std::string actual = std::string{token_type_name(tk.Kind)};
         throw std::runtime_error{std::format("expecting {} but got {}", expected, actual).c_str()};
@@ -180,6 +184,20 @@ Token Lexer::require_next_real(tk::TokenKind kind) {
 ////////////////////////////////////////////////////////////////////////////////
 // | READ FUNCTIONS |
 ////////////////////////////////////////////////////////////////////////////////
+
+Token Lexer::read_blankline() {
+    m_Start = m_Pos;
+
+    if (peek() == TXT('\r')) {
+        advance();
+    }
+
+    if (peek() == TXT('\n')) {
+        advance();
+    }
+
+    return create_token(tk::BlankLine);
+}
 
 Token Lexer::read_identifier() {
     m_Start = m_Pos;  // Start token
@@ -271,7 +289,7 @@ Token Lexer::read_other() {
 Token Lexer::read_line_comment() {
     m_Start = m_Pos;
     m_Pos++;
-    while (peek() != TXT('\n')) {
+    while (!txt::is_newline(peek())) {
         advance();
     }
     return create_token(tk::LineComment);
@@ -315,7 +333,7 @@ Token Lexer::read_string_literal() {
         // peek(-1) == c
         terminator_found = (c == TXT('\"')) && peek(-2) != TXT('\\');
 
-        if (c == TXT('\n')) {
+        if (txt::is_newline(c)) {
             restore_state(state);
             return read_other();
         }
@@ -327,7 +345,7 @@ Token Lexer::read_string_literal() {
         return read_other();
     }
 
-    m_Pos++;  // peek() == "
+    // m_Pos++;  // peek() == "
     return create_token(tk::StringLiteral);
 }
 

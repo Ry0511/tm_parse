@@ -62,6 +62,22 @@ struct Token {
         return text;
     }
 
+    str_view inner_text() const {
+
+        // No inner text, no point in throwing just return the full text, if it exists...
+        if (Kind != tk::StringLiteral) {
+            return text();
+        }
+
+        // Should always be exactly 2
+        str_view text = this->text();
+        if (text.size() <= 2) {
+            return str_view{};
+        }
+
+        return text.substr(1, text.size() - 2);
+    }
+
    public:
     constexpr bool is_eof() const noexcept { return Kind == tk::EndOfInput; }
     constexpr bool is_identifier() const noexcept { return tm_parse::is_identifier(Kind) || is_keyword(); }

@@ -18,6 +18,10 @@ class LexerTestRunner : public TestRunner {
 
    public:
     bool run(TestFile& file) override;
+
+   private:
+    void assert_expected_tokens(TestFile& file);
+    void assert_expected_text(TestFile& file);
 };
 
 }  // namespace tm_parse::tests

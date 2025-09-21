@@ -15,6 +15,6 @@ cmake . --preset "$BUILD_PRESET" -G Ninja
 cmake --build "out/build/$BUILD_PRESET"
 
 cd src/test
-../../out/build/clang-debug-x86/tm_parse_tests
+../../out/build/"$BUILD_PRESET"/tm_parse_tests
 
 cd /git_repos
