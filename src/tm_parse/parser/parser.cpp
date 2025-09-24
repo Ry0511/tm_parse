@@ -3,4 +3,29 @@
 // Project    : tm_parse
 // Author     : -Ry
 //
-#include "parser.h"
+
+#include "tm_parse/pch.h"
+#include "tm_parse/parser/parser.h"
+
+namespace tm_parse {
+
+namespace {
+
+str read_file(const fs::path& file) {
+    using It = std::istream_iterator<str_char>;
+    str_ifstream ifs{file};
+
+    if (!ifs.is_open()) {
+        throw std::runtime_error{"failed to open file"};
+    }
+
+    return str{It{ifs}, It{}};
+}
+
+}  // namespace
+
+Parser::Parser(str text) : m_Text(std::move(text)), m_Lexer(m_Text) {}
+
+Parser::Parser(const fs::path& file) : m_Text(read_file(file)), m_Lexer(m_Text) {}
+
+}  // namespace tm_parse

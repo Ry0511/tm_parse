@@ -9,18 +9,15 @@
 #include "tm_parse/pch.h"
 
 #include "tm_parse/lexer/token.h"
-#include "tm_parse/parser/rule_kind.h"
 #include "tm_parse/util/text_region.h"
 
 namespace tm_parse {
 
 class Parser;
+class ParserRule;
 
-struct SourceInfo {
-    int StartLineNumber;
-    int EndLineNumber;
-    str_view RuleSourceText;
-};
+template <class T>
+concept is_rule_type_v = std::is_base_of_v<ParserRule, T>;
 
 class ParserRule {
    public:
@@ -29,31 +26,54 @@ class ParserRule {
     using Iterator = std::vector<Ptr>::iterator;
 
    protected:
-    Parser* m_Parser;
-    TextRegion m_FullTextRegion;
-    SourceInfo m_SourceInfo;
-    rules::RuleKind m_RuleKind;
+    const str_char* m_TextSource;  // Full text source via Parser::text()
+    TextRegion m_FullTextRegion;   // Full text region for this rule
+    int m_LineNumber;              // Starting line number for this rule
 
    public:
-    ParserRule() = default;
+    ParserRule(const str_char* text_source, const TextRegion& full_text);
     virtual ~ParserRule() = default;
 
    public:
-    const Parser& parser() const noexcept { return *m_Parser; }
     const TextRegion& full_text_region() const noexcept { return m_FullTextRegion; }
-    const SourceInfo& source_info() const noexcept { return m_SourceInfo; }
-    const rules::RuleKind rule_kind() const noexcept { return m_RuleKind; }
-
     str_view full_text() const;
 
    public:
     virtual str rule_name() const noexcept = 0;
-    virtual const Vec* const children() const noexcept { return nullptr; }
-
-   public:  // clang-format off
-    template <class T> const T& as() const { return dynamic_cast<const T&>(*this); }
-    template <class T> T& as() { return dynamic_cast<T&>(*this); }
-    // clang-format on
+    virtual const Vec* children() const noexcept { return nullptr; }
 };
+
+////////////////////////////////////////////////////////////////////////////////
+// | PARSER FACTORY |
+////////////////////////////////////////////////////////////////////////////////
+
+struct ParseError {
+    str Message;       // Failure reason message
+    Token FoundToken;  // The token we failed at
+};
+
+template <typename RuleType>
+struct ParseResult {
+    std::unique_ptr<RuleType> Rule;
+    std::optional<ParseError> Error;
+
+    bool success() const noexcept { return Rule != nullptr; }
+
+    static ParseResult ok(std::unique_ptr<RuleType> rule) noexcept {
+        return ParseResult{std::move(rule), std::nullopt};
+    }
+
+    static ParseResult fail(ParseError error) noexcept {
+        return ParseResult{nullptr, std::make_optional(std::move(error))};
+    }
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// | STATIC API GENERATOR |
+////////////////////////////////////////////////////////////////////////////////
+
+#define RULE_STATIC_API(rule)                     \
+    static bool matches(Parser& parser) noexcept; \
+    static ParseResult<rule> create(Parser& parser) noexcept;
 
 }  // namespace tm_parse

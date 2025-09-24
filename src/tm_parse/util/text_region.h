@@ -20,10 +20,16 @@ struct TextRegion {
     size_t length() const noexcept { return End - Start; }
     bool is_empty() const noexcept { return Start == End; }
 
+    str_view create_str_view(const str_char* txt) const noexcept {
+        return str_view{txt + Start, length()};
+    }
+
     str_view create_str_view(str_view vw) const noexcept { return vw.substr(Start, length()); }
     str create_str(str_view vw) const noexcept { return str{vw.substr(Start, length())}; }
 
-    TextRegion extend(const TextRegion& o) const noexcept { return {std::min(Start, o.Start), std::max(End, o.End)}; }
+    TextRegion extend(const TextRegion& o) const noexcept {
+        return {std::min(Start, o.Start), std::max(End, o.End)};
+    }
     bool operator==(const TextRegion& other) const noexcept {
         return Start == other.Start && End == other.End;
     }

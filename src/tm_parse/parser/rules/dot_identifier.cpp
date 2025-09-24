@@ -10,11 +10,11 @@
 namespace tm_parse {
 
 bool DotIdentifier::matches(Parser& parser) noexcept {
-    return true;
+    return false;
 }
 
-DotIdentifier::ResultType DotIdentifier::create(Parser& parser) noexcept {
-    return ResultType::ok(nullptr);
+ParseResult<DotIdentifier> DotIdentifier::create(Parser& parser) noexcept {
+    return ParseResult<DotIdentifier>::fail({});
 }
 
 }  // namespace tm_parse

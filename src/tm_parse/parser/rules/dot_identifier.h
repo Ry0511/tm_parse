@@ -9,17 +9,16 @@
 #include "tm_parse/pch.h"
 
 #include "tm_parse/parser/parser_rule.h"
-#include "tm_parse/parser/rule_factory.h"
 
 namespace tm_parse {
 
 class DotIdentifier : public ParserRule {
    public:
     DotIdentifier() = default;
-    ~DotIdentifier() = default;
+    ~DotIdentifier() override = default;
 
    public:
-    RULE_FACTORY_STUBS(DotIdentifier);
+    RULE_STATIC_API(DotIdentifier);
 };
 
 }  // namespace tm_parse
