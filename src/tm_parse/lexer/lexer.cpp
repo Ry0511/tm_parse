@@ -5,6 +5,7 @@
 //
 
 #include "tm_parse/lexer/lexer.h"
+#include "tm_parse/lexer/token_error.h"
 #include "tm_parse/util/text_helpers.h"
 
 namespace tm_parse {
@@ -155,27 +156,49 @@ Token Lexer::next_token_impl() {
 // | UTILITY FUNCTIONS |
 ////////////////////////////////////////////////////////////////////////////////
 
-Token Lexer::require(tk::TokenKind kind) {
+Token Lexer::require(tk::TokenKind kind) noexcept(false) {
     Lexer state = save_state();
     Token tk = next_token();
 
     if (tk != kind) {
         restore_state(state);
-        std::string expected = std::string{token_type_name(kind)};
-        std::string actual = std::string{token_type_name(tk.Kind)};
-        throw std::runtime_error{std::format("expecting {} but got {}", expected, actual).c_str()};
+        throw TokenError{std::format("Expecting token of type {}", token_type_name(kind)), tk};
     }
 
     return tk;
 }
 
-Token Lexer::require_next_real(tk::TokenKind kind) {
+Token Lexer::require_next_real(tk::TokenKind kind) noexcept(false) {
+    Lexer state = save_state();
     Token tk = next_real_token();
 
     if (tk != kind) {
-        std::string expected = std::string{token_type_name(kind)};
-        std::string actual = std::string{token_type_name(tk.Kind)};
-        throw std::runtime_error{std::format("expecting {} but got {}", expected, actual).c_str()};
+        restore_state(state);
+        throw TokenError{std::format("Expecting token of type {}", token_type_name(kind)), tk};
+    }
+
+    return tk;
+}
+
+Token Lexer::maybe(tk::TokenKind kind) noexcept {
+    Lexer state = save_state();
+    Token tk = next_token();
+
+    if (tk != kind) {
+        restore_state(state);
+        return Token{tk::InvalidToken};
+    }
+
+    return tk;
+}
+
+Token Lexer::maybe_next_real(tk::TokenKind kind) noexcept {
+    Lexer state = save_state();
+    Token tk = next_real_token();
+
+    if (tk != kind) {
+        restore_state(state);
+        return Token{tk::InvalidToken};
     }
 
     return tk;

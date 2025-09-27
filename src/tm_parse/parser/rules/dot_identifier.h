@@ -18,6 +18,9 @@ class DotIdentifier : public ParserRule {
     ~DotIdentifier() override = default;
 
    public:
+    str rule_name() const noexcept override { return "DotIdentifier"; }
+
+   public:
     RULE_STATIC_API(DotIdentifier);
 };
 

@@ -10,17 +10,19 @@
 
 namespace tm_parse {
 
-ParserRule::ParserRule(const str_char* text_source, const TextRegion& full_text)
-    : m_TextSource(text_source),
-      m_FullTextRegion(full_text),
-      m_LineNumber(0) {} // TODO: Fix
-
 str_view ParserRule::full_text() const {
     if (m_TextSource == nullptr) {
         throw std::runtime_error{"text source is null"};
     }
 
-    return m_FullTextRegion.create_str_view(m_TextSource);
+    return full_text_region().create_str_view(m_TextSource);
+}
+
+void ParserRule::post_init(const Token& first, const Token& last) noexcept {
+    m_TextSource = first.Text;
+    m_FullTextRegion = first.Region.extend(last.Region);
+    m_FirstToken = first;
+    m_LastToken = last;
 }
 
 }  // namespace tm_parse

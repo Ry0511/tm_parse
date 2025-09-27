@@ -23,6 +23,7 @@ struct Token {
 
    public:
     constexpr Token() : Kind(tk::TokenKind::EndOfInput) {};
+    constexpr Token(tk::TokenKind kind) : Kind(kind) {};
 
     constexpr Token(
         tk::TokenKind kind,
@@ -49,7 +50,14 @@ struct Token {
 
    public:
     str to_string() const {
-        return std::format("{:>3}:{:<3} - {}, ( {}, {} )", Line, Column, str{token_name()}, Region.Start, Region.End);
+        return std::format(
+            "{:>3}:{:<3} - {}, ( {}, {} )",
+            Line,
+            Column,
+            str{token_name()},
+            Region.Start,
+            Region.End
+        );
     }
 
    public:
@@ -63,7 +71,6 @@ struct Token {
     }
 
     str_view inner_text() const {
-
         // No inner text, no point in throwing just return the full text, if it exists...
         if (Kind != tk::StringLiteral) {
             return text();
@@ -80,16 +87,22 @@ struct Token {
 
    public:
     constexpr bool is_eof() const noexcept { return Kind == tk::EndOfInput; }
-    constexpr bool is_identifier() const noexcept { return tm_parse::is_identifier(Kind) || is_keyword(); }
+    constexpr bool is_identifier() const noexcept {
+        return tm_parse::is_identifier(Kind) || is_keyword();
+    }
     constexpr bool is_keyword() const noexcept { return tm_parse::is_keyword(Kind); }
     constexpr bool is_symbol() const noexcept { return tm_parse::is_symbol(Kind); }
 
    public:
-    constexpr bool operator==(tk::TokenKind kind) const noexcept { return Kind == kind; }
-    constexpr bool operator!=(tk::TokenKind kind) const noexcept { return Kind != kind; }
+    constexpr bool operator==(tk::TokenKind kind) const noexcept {
+        return Kind == kind || (kind == tk::AnyIdentifier && is_identifier());
+    }
+    constexpr bool operator!=(tk::TokenKind kind) const noexcept { return !operator==(kind); }
 
-    constexpr bool operator==(const Token& other) const noexcept { return Kind == other.Kind; }
-    constexpr bool operator!=(const Token& other) const noexcept { return Kind != other.Kind; }
+    constexpr bool operator==(const Token& other) const noexcept { return operator==(other.Kind); }
+    constexpr bool operator!=(const Token& other) const noexcept { return operator!=(other.Kind); }
+
+    constexpr operator bool() const noexcept { return Kind != tk::InvalidToken; }
 };
 
 }  // namespace tm_parse

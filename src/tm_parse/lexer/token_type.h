@@ -53,6 +53,8 @@ enum TokenKind : token_kind_int {
     MultiLineComment,  // /* ... */
     BlankLine,         // [\n\r]
     EndOfInput,        // EOF
+    InvalidToken,      // Special
+    AnyIdentifier,     // Special; allows keywords to pass as identifiers in equality checks
     TokenKind_Count,   // Keep this last
 };
 }
@@ -113,6 +115,7 @@ constexpr std::array<std::string_view, token_type_count + 1> token_type_names{
     "MultiLineComment",
     "BlankLine",
     "EndOfInput",
+    "InvalidToken",
     "TokenKind_Count",
 };
 

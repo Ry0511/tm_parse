@@ -16,9 +16,6 @@ namespace tm_parse {
 class Parser;
 class ParserRule;
 
-template <class T>
-concept is_rule_type_v = std::is_base_of_v<ParserRule, T>;
-
 class ParserRule {
    public:
     using Ptr = std::unique_ptr<ParserRule>;
@@ -26,13 +23,17 @@ class ParserRule {
     using Iterator = std::vector<Ptr>::iterator;
 
    protected:
-    const str_char* m_TextSource;  // Full text source via Parser::text()
-    TextRegion m_FullTextRegion;   // Full text region for this rule
-    int m_LineNumber;              // Starting line number for this rule
+    const str_char* m_TextSource{nullptr};
+    TextRegion m_FullTextRegion;
+    Token m_FirstToken;
+    Token m_LastToken;
 
    public:
-    ParserRule(const str_char* text_source, const TextRegion& full_text);
+    ParserRule() = default;
     virtual ~ParserRule() = default;
+
+   public:
+    operator bool() const noexcept { return m_FirstToken; }
 
    public:
     const TextRegion& full_text_region() const noexcept { return m_FullTextRegion; }
@@ -41,31 +42,9 @@ class ParserRule {
    public:
     virtual str rule_name() const noexcept = 0;
     virtual const Vec* children() const noexcept { return nullptr; }
-};
 
-////////////////////////////////////////////////////////////////////////////////
-// | PARSER FACTORY |
-////////////////////////////////////////////////////////////////////////////////
-
-struct ParseError {
-    str Message;       // Failure reason message
-    Token FoundToken;  // The token we failed at
-};
-
-template <typename RuleType>
-struct ParseResult {
-    std::unique_ptr<RuleType> Rule;
-    std::optional<ParseError> Error;
-
-    bool success() const noexcept { return Rule != nullptr; }
-
-    static ParseResult ok(std::unique_ptr<RuleType> rule) noexcept {
-        return ParseResult{std::move(rule), std::nullopt};
-    }
-
-    static ParseResult fail(ParseError error) noexcept {
-        return ParseResult{nullptr, std::make_optional(std::move(error))};
-    }
+   protected:
+    void post_init(const Token& first, const Token& last) noexcept;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,6 +53,6 @@ struct ParseResult {
 
 #define RULE_STATIC_API(rule)                     \
     static bool matches(Parser& parser) noexcept; \
-    static ParseResult<rule> create(Parser& parser) noexcept;
+    static std::unique_ptr<rule> create(Parser& parser);
 
 }  // namespace tm_parse
