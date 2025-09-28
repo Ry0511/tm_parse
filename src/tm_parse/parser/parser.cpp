@@ -31,7 +31,7 @@ Parser::Parser(str text) : m_Text(std::move(text)), m_Lexer(m_Text) {}
 Parser::Parser(const fs::path& file) : m_Text(read_file(file)), m_Lexer(m_Text) {}
 
 std::unique_ptr<ParserRule> Parser::parse() {
-    if (auto res = DotIdentifier::create(*this)) {
+    if (auto res = rules::DotIdentifier::create(*this)) {
         return res;
     }
     return nullptr;

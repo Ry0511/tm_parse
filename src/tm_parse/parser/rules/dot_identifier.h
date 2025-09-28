@@ -10,7 +10,7 @@
 
 #include "tm_parse/parser/parser_rule.h"
 
-namespace tm_parse {
+namespace tm_parse::rules {
 
 class DotIdentifier : public ParserRule {
    public:

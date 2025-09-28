@@ -33,11 +33,19 @@ class ParserRule {
     virtual ~ParserRule() = default;
 
    public:
+    ParserRule(const ParserRule&) = default;
+    ParserRule(ParserRule&&) = default;
+    ParserRule& operator=(const ParserRule&) = default;
+    ParserRule& operator=(ParserRule&&) = default;
+
+   public:
     operator bool() const noexcept { return m_FirstToken; }
 
    public:
     const TextRegion& full_text_region() const noexcept { return m_FullTextRegion; }
     str_view full_text() const;
+    const Token& first_token() const noexcept { return m_FirstToken; }
+    const Token& last_token() const noexcept { return m_LastToken; }
 
    public:
     virtual str rule_name() const noexcept = 0;
@@ -45,6 +53,7 @@ class ParserRule {
 
    protected:
     void post_init(const Token& first, const Token& last) noexcept;
+    void copy_state(const ParserRule& other) noexcept;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

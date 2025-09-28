@@ -10,10 +10,14 @@
 #include "tm_parse/lexer/token_error.h"
 #include "tm_parse/parser/parser.h"
 
-namespace tm_parse {
+namespace tm_parse::rules {
 
 bool DotIdentifier::matches(Parser& parser) noexcept {
-    return parser.maybe(tk::Identifier);
+    // TODO: To implement these properly and efficently we need to implement look-ahead
+    //  functionality. The simplest approach is to just copy the lexer and then use that to process
+    //  tokens without modifying the current lexer. The issue with that is that we are doing more
+    //  work than we need to.
+    return true;
 }
 
 std::unique_ptr<DotIdentifier> DotIdentifier::create(Parser& parser) {
@@ -29,4 +33,4 @@ std::unique_ptr<DotIdentifier> DotIdentifier::create(Parser& parser) {
     return std::make_unique<DotIdentifier>(rule);
 }
 
-}  // namespace tm_parse
+}  // namespace tm_parse::rules

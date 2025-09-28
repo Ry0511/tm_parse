@@ -25,4 +25,11 @@ void ParserRule::post_init(const Token& first, const Token& last) noexcept {
     m_LastToken = last;
 }
 
+void ParserRule::copy_state(const ParserRule& other) noexcept {
+    m_TextSource = other.m_TextSource;
+    m_FullTextRegion = other.m_FullTextRegion;
+    m_FirstToken = other.m_FirstToken;
+    m_LastToken = other.m_LastToken;
+}
+
 }  // namespace tm_parse
