@@ -7,7 +7,8 @@
 #include "tm_parse/pch.h"
 #include "tm_parse/parser/parser.h"
 
-#include "tm_parse/parser/rules/dot_identifier.h"
+#include <execution>
+#include "tm_parse/parser/rules/set_command.h"
 
 namespace tm_parse {
 
@@ -31,10 +32,7 @@ Parser::Parser(str text) : m_Text(std::move(text)), m_Lexer(m_Text) {}
 Parser::Parser(const fs::path& file) : m_Text(read_file(file)), m_Lexer(m_Text) {}
 
 std::unique_ptr<ParserRule> Parser::parse() {
-    if (auto res = rules::DotIdentifier::create(*this)) {
-        return res;
-    }
-    return nullptr;
+    return rules::SetCommand::create(*this);
 }
 
 }  // namespace tm_parse

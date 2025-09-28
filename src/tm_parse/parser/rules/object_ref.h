@@ -15,8 +15,8 @@ class DotIdentifier;
 
 class ObjectRef : public ParserRule {
    private:
-    std::unique_ptr<DotIdentifier> MainObject{};  // Required
-    std::unique_ptr<DotIdentifier> SubObject{};   // Optional
+    std::unique_ptr<DotIdentifier> m_MainObject{};  // Required
+    std::unique_ptr<DotIdentifier> m_SubObject{};   // Optional
 
    public:
     ObjectRef() = default;
@@ -28,8 +28,8 @@ class ObjectRef : public ParserRule {
 
    public:
     str rule_name() const noexcept override { return "ObjectRef"; }
+    void visit(const std::function<bool(const ParserRule&)>& func) const noexcept override;
 
-   public:
     RULE_STATIC_API(ObjectRef);
 };
 

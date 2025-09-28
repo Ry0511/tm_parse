@@ -49,7 +49,10 @@ class ParserRule {
 
    public:
     virtual str rule_name() const noexcept = 0;
-    virtual const Vec* children() const noexcept { return nullptr; }
+
+    virtual void visit(const std::function<bool(const ParserRule&)>& func) const noexcept {
+        func(*this);
+    }
 
    protected:
     void post_init(const Token& first, const Token& last) noexcept;
