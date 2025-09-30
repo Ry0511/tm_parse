@@ -15,7 +15,7 @@ using namespace tm_parse;
 
 int main() {
     str source = TXT(R"(
-        set foo.baz:bar property ( A=( X=10,Y=20 ), B = ( Z=-10, W=3) )
+        set foo.baz:bar property.bar ( A=( X=10,Y=20 ), B = ( Z=-10, W=3) )
     )");
 
     Parser parser{source};
