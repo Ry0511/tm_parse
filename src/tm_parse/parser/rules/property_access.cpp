@@ -1,0 +1,28 @@
+//
+// Date       : 30/09/2025
+// Project    : tm_parse
+// Author     : -Ry
+//
+
+#include "tm_parse/pch.h"
+#include "tm_parse/parser/rules/property_access.h"
+
+#include "tm_parse/parser/parser.h"
+#include "tm_parse/parser/rules/dot_identifier.h"
+#include "tm_parse/parser/rules/array_access.h"
+
+namespace tm_parse::rules {
+
+bool PropertyAccess::matches(Parser& parser) noexcept {
+    return true;
+}
+
+std::unique_ptr<PropertyAccess> PropertyAccess::create(Parser& parser) {
+    PropertyAccess rule{};
+
+    rule.m_Property = DotIdentifier::create(parser);
+    rule.copy_state(*rule.m_Property);
+    return std::make_unique<PropertyAccess>(std::move(rule));
+}
+
+}  // namespace tm_parse::rules

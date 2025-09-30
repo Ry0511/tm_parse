@@ -21,9 +21,6 @@ class TokenRule : public ParserRule {
     ~TokenRule() final = default;
 
    public:
-    str rule_name() const noexcept override { return "TokenRule"; }
-
-   public:
     RULE_STATIC_API(TokenRule);
 };
 

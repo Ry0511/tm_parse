@@ -25,11 +25,16 @@ std::unique_ptr<DotIdentifier> DotIdentifier::create(Parser& parser) {
     Token first = parser.require_next_real(tk::AnyIdentifier);
     Token last = first;
 
+    rule.m_NameParts.push_back(first.Region);
+
     while (parser.maybe(tk::Dot)) {
         last = parser.require(tk::AnyIdentifier);
+        rule.m_NameParts.push_back(last.Region);
     }
 
+    rule.m_NameParts.shrink_to_fit();
     rule.post_init(first, last);
+
     return std::make_unique<DotIdentifier>(rule);
 }
 

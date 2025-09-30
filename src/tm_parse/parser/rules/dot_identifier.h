@@ -13,15 +13,24 @@
 namespace tm_parse::rules {
 
 class DotIdentifier : public ParserRule {
+   private:
+    std::vector<TextRegion> m_NameParts;
+
    public:
     DotIdentifier() = default;
     ~DotIdentifier() override = default;
 
    public:
-    str rule_name() const noexcept override { return "DotIdentifier"; }
+    DotIdentifier(const DotIdentifier&) = default;
+    DotIdentifier& operator=(const DotIdentifier&) = default;
+    DotIdentifier(DotIdentifier&&) = default;
+    DotIdentifier& operator=(DotIdentifier&&) = default;
+
+   public:
+    const std::vector<TextRegion>& name_parts() const noexcept { return m_NameParts; }
 
    public:
     RULE_STATIC_API(DotIdentifier);
 };
 
-}  // namespace tm_parse
+}  // namespace tm_parse::rules

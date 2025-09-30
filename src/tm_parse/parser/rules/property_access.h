@@ -1,0 +1,40 @@
+//
+// Date       : 30/09/2025
+// Project    : tm_parse
+// Author     : -Ry
+//
+
+#pragma once
+
+#include "tm_parse/pch.h"
+#include "tm_parse/parser/parser_rule.h"
+
+namespace tm_parse::rules {
+
+class DotIdentifier;
+class ArrayAccess;
+
+class PropertyAccess : public ParserRule {
+   private:
+    std::unique_ptr<DotIdentifier> m_Property;   // mandatory
+    std::unique_ptr<ArrayAccess> m_ArrayAccess;  // nullable
+
+   public:
+    PropertyAccess() = default;
+    ~PropertyAccess() override = default;
+
+   public:
+    PropertyAccess(const PropertyAccess&) = default;
+    PropertyAccess& operator=(const PropertyAccess&) = default;
+    PropertyAccess(PropertyAccess&&) = default;
+    PropertyAccess& operator=(PropertyAccess&&) = default;
+
+   public:
+    const DotIdentifier& property() const noexcept { return *m_Property; }
+    const ArrayAccess* array_access() const noexcept { return m_ArrayAccess.get(); }
+
+   public:
+    RULE_STATIC_API(PropertyAccess);
+};
+
+}  // namespace tm_parse::rules

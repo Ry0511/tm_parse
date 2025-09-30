@@ -64,7 +64,10 @@ class ParserRule {
 ////////////////////////////////////////////////////////////////////////////////
 
 #define RULE_STATIC_API(rule)                     \
+    str rule_name() const noexcept override {     \
+        return TXT(#rule);                        \
+    }                                             \
     static bool matches(Parser& parser) noexcept; \
-    static std::unique_ptr<rule> create(Parser& parser);
+    static std::unique_ptr<rule> create(Parser& parser)
 
 }  // namespace tm_parse

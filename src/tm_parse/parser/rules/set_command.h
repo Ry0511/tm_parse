@@ -12,12 +12,12 @@
 namespace tm_parse::rules {
 
 class ObjectRef;
-class DotIdentifier;
+class PropertyAccess;
 
 class SetCommand : public ParserRule {
    private:
     std::unique_ptr<ObjectRef> m_ObjectRef;
-    std::unique_ptr<DotIdentifier> m_Property;
+    std::unique_ptr<PropertyAccess> m_Property;
 
    public:
     SetCommand() = default;
@@ -30,7 +30,10 @@ class SetCommand : public ParserRule {
     SetCommand& operator=(SetCommand&&) = default;
 
    public:
-    str rule_name() const noexcept override { return "SetCommand"; }
+    const ObjectRef& object_ref() const noexcept { return *m_ObjectRef; };
+    const PropertyAccess& property() const noexcept { return *m_Property; };
+
+   public:
     void visit(const std::function<bool(const ParserRule&)>& func) const noexcept override;
 
    public:

@@ -29,6 +29,7 @@ int main() {
                 ptr->rule_name(),
                 txt::escape_string(ptr->full_text())
             );
+
         } while (!parser.is_eof());
 
     } catch (const TokenError& err) {
