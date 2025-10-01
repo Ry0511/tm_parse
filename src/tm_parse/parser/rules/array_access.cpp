@@ -13,8 +13,8 @@
 namespace tm_parse::rules {
 
 bool ArrayAccess::matches(Matcher& m) noexcept {
-    return (m.maybe_real(tk::LeftParen) && m.maybe(tk::Number) && m.maybe(tk::RightParen))
-           || (m.maybe_real(tk::LeftBracket) && m.maybe(tk::Number) && m.maybe(tk::RightBracket));
+    return (m.maybe(tk::LeftParen) && m.maybe(tk::Number) && m.maybe(tk::RightParen))
+           || (m.maybe(tk::LeftBracket) && m.maybe(tk::Number) && m.maybe(tk::RightBracket));
 }
 
 std::unique_ptr<ArrayAccess> ArrayAccess::create(Parser& parser) {

@@ -23,6 +23,12 @@ std::unique_ptr<PropertyAccess> PropertyAccess::create(Parser& parser) {
     PropertyAccess rule{};
 
     rule.m_Property = DotIdentifier::create(parser);
+
+    Matcher matcher = parser.create_matcher();
+    if (ArrayAccess::matches(matcher)) {
+        rule.m_ArrayAccess = ArrayAccess::create(parser);
+    }
+
     rule.copy_state(*rule.m_Property);
     return std::make_unique<PropertyAccess>(std::move(rule));
 }
