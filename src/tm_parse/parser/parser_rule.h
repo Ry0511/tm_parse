@@ -9,6 +9,7 @@
 #include "tm_parse/pch.h"
 
 #include "tm_parse/lexer/token.h"
+#include "tm_parse/parser/matcher.h"
 #include "tm_parse/util/text_region.h"
 
 namespace tm_parse {
@@ -63,11 +64,11 @@ class ParserRule {
 // | STATIC API GENERATOR |
 ////////////////////////////////////////////////////////////////////////////////
 
-#define RULE_STATIC_API(rule)                     \
-    str rule_name() const noexcept override {     \
-        return TXT(#rule);                        \
-    }                                             \
-    static bool matches(Parser& parser) noexcept; \
+#define RULE_STATIC_API(rule)                       \
+    str rule_name() const noexcept override {       \
+        return TXT(#rule);                          \
+    }                                               \
+    static bool matches(Matcher& matcher) noexcept; \
     static std::unique_ptr<rule> create(Parser& parser)
 
 }  // namespace tm_parse

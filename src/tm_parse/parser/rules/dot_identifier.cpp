@@ -12,11 +12,17 @@
 
 namespace tm_parse::rules {
 
-bool DotIdentifier::matches(Parser& parser) noexcept {
-    // TODO: To implement these properly and efficently we need to implement look-ahead
-    //  functionality. The simplest approach is to just copy the lexer and then use that to process
-    //  tokens without modifying the current lexer. The issue with that is that we are doing more
-    //  work than we need to.
+bool DotIdentifier::matches(Matcher& matcher) noexcept {
+    if (!matcher.maybe_real(tk::AnyIdentifier)) {
+        return false;
+    }
+
+    while (matcher.maybe(tk::Dot)) {
+        if (!matcher.maybe(tk::Identifier)) {
+            return false;
+        }
+    }
+
     return true;
 }
 

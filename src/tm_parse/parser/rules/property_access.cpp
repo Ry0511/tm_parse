@@ -13,8 +13,10 @@
 
 namespace tm_parse::rules {
 
-bool PropertyAccess::matches(Parser& parser) noexcept {
-    return true;
+bool PropertyAccess::matches(Matcher& matcher) noexcept {
+    bool res = DotIdentifier::matches(matcher);
+    ArrayAccess::matches(matcher);
+    return res;
 }
 
 std::unique_ptr<PropertyAccess> PropertyAccess::create(Parser& parser) {

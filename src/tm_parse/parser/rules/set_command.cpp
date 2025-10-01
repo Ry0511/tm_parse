@@ -6,6 +6,7 @@
 
 #include "tm_parse/pch.h"
 
+#include "dot_identifier.h"
 #include "tm_parse/parser/rules/set_command.h"
 
 #include "tm_parse/parser/parser.h"
@@ -18,8 +19,9 @@ void SetCommand::visit(const std::function<bool(const ParserRule&)>& func) const
     ParserRule::visit(func);
 }
 
-bool SetCommand::matches(Parser& parser) noexcept {
-    return true;
+bool SetCommand::matches(Matcher& matcher) noexcept {
+    return matcher.maybe_real(tk::Set) && ObjectRef::matches(matcher)
+           && PropertyAccess::matches(matcher);
 }
 
 std::unique_ptr<SetCommand> SetCommand::create(Parser& parser) {

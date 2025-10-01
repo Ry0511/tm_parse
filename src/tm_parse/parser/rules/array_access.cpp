@@ -12,9 +12,9 @@
 
 namespace tm_parse::rules {
 
-bool ArrayAccess::matches(Parser& parser) noexcept {
-    // TODO: this needs to be implemented
-    return true;
+bool ArrayAccess::matches(Matcher& m) noexcept {
+    return (m.maybe_real(tk::LeftParen) && m.maybe(tk::Number) && m.maybe(tk::RightParen))
+           || (m.maybe_real(tk::LeftBracket) && m.maybe(tk::Number) && m.maybe(tk::RightBracket));
 }
 
 std::unique_ptr<ArrayAccess> ArrayAccess::create(Parser& parser) {
@@ -45,7 +45,7 @@ std::unique_ptr<ArrayAccess> ArrayAccess::create(Parser& parser) {
         rule.m_Index = static_cast<int64_t>(std::strtoll(number_text.data(), nullptr, 10));
         rule.m_IsValidNumber = rule.m_Index >= 0;
     } catch (const std::out_of_range& err) {
-        LOG_TRACE("invalid number in text '{}'", number_text);
+        LOG_TRACE("invalid number in text '{}' with message {}", number_text, err.what());
         rule.m_Index = std::numeric_limits<int64_t>::max();
         rule.m_IsValidNumber = false;
     }

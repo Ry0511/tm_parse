@@ -9,6 +9,7 @@
 #include "tm_parse/pch.h"
 #include "tm_parse/lexer/lexer.h"
 #include "tm_parse/parser/parser_rule.h"
+#include "tm_parse/parser/matcher.h"
 
 namespace tm_parse {
 
@@ -37,6 +38,8 @@ class Parser {
 
    public:
     Token peek(int offset) const noexcept;
+    Matcher create_matcher() const noexcept { return Matcher{*this}; }
+    operator Matcher() const noexcept { return Matcher{*this}; }
 
    public:
     Token next() noexcept;
@@ -45,6 +48,9 @@ class Parser {
     Token require_next_real(tk::TokenKind kind);
     Token maybe(tk::TokenKind kind);
     Token maybe_next_real(tk::TokenKind kind);
+
+   private:
+    friend class Matcher;
 };
 
 }  // namespace tm_parse

@@ -11,7 +11,7 @@
 
 namespace tm_parse {
 
-bool TokenRule::matches(Parser&) noexcept {
+bool TokenRule::matches(Matcher&) noexcept {
     return true;
 }
 

@@ -12,8 +12,16 @@
 
 namespace tm_parse::rules {
 
-bool ObjectRef::matches(Parser& parser) noexcept {
-    return DotIdentifier::matches(parser);
+bool ObjectRef::matches(Matcher& matcher) noexcept {
+    if (!DotIdentifier::matches(matcher)) {
+        return false;
+    }
+
+    if (matcher.maybe(tk::Colon)) {
+        return DotIdentifier::matches(matcher);
+    }
+
+    return true;
 }
 
 std::unique_ptr<ObjectRef> ObjectRef::create(Parser& parser) {
