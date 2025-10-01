@@ -33,4 +33,11 @@ std::unique_ptr<PropertyAccess> PropertyAccess::create(Parser& parser) {
     return std::make_unique<PropertyAccess>(std::move(rule));
 }
 
+void PropertyAccess::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
+    ParserRule::visit(func);
+    if (m_ArrayAccess != nullptr) {
+        m_ArrayAccess->visit(func);
+    }
+}
+
 }  // namespace tm_parse::rules

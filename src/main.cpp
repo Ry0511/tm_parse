@@ -15,7 +15,12 @@ using namespace tm_parse;
 
 int main() {
     str source = TXT(R"(
-        set foo.baz:bar property.bar ( A=( X=10,Y=20 ), B = ( Z=-10, W=3) )
+        set
+          foo.baz:bar
+          property.bar
+          ( A = ( X= 10, Y=20 )
+          , B = ( Z=-10, W=3  )
+          )
     )");
 
     Parser parser{source};
@@ -23,6 +28,11 @@ int main() {
     try {
         do {
             auto ptr = parser.parse();
+
+            // TODO: A way to gauge depth would be nice here
+            ptr->visit([](const auto& node) -> void {
+                LOG_INFO("{} => '{}'", node.rule_name(), txt::escape_string(node.full_text()));
+            });
 
             LOG_INFO(
                 "ParsedRule ~ {} from '{}'",

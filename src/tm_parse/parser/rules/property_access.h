@@ -34,6 +34,9 @@ class PropertyAccess : public ParserRule {
     const ArrayAccess* array_access() const noexcept { return m_ArrayAccess.get(); }
 
    public:
+    void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
+
+   public:
     RULE_STATIC_API(PropertyAccess);
 };
 

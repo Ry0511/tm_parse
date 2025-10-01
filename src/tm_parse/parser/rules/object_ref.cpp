@@ -39,7 +39,7 @@ std::unique_ptr<ObjectRef> ObjectRef::create(Parser& parser) {
     return std::make_unique<ObjectRef>(std::move(ref));
 }
 
-void ObjectRef::visit(const std::function<bool(const ParserRule&)>& func) const noexcept {
+void ObjectRef::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
     func(*this);
     this->m_MainObject->visit(func);
 

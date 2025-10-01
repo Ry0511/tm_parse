@@ -15,8 +15,10 @@
 
 namespace tm_parse::rules {
 
-void SetCommand::visit(const std::function<bool(const ParserRule&)>& func) const noexcept {
+void SetCommand::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
     ParserRule::visit(func);
+    m_ObjectRef->visit(func);
+    m_Property->visit(func);
 }
 
 bool SetCommand::matches(Matcher& matcher) noexcept {

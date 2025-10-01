@@ -29,7 +29,7 @@ class ObjectRef : public ParserRule {
     ObjectRef& operator=(ObjectRef&&) = default;
 
    public:
-    void visit(const std::function<bool(const ParserRule&)>& func) const noexcept override;
+    void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
 
     RULE_STATIC_API(ObjectRef);
 };

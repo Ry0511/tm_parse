@@ -34,7 +34,7 @@ class SetCommand : public ParserRule {
     const PropertyAccess& property() const noexcept { return *m_Property; };
 
    public:
-    void visit(const std::function<bool(const ParserRule&)>& func) const noexcept override;
+    void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
 
    public:
     RULE_STATIC_API(SetCommand);
