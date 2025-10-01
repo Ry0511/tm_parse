@@ -42,8 +42,9 @@ std::unique_ptr<ArrayAccess> ArrayAccess::create(Parser& parser) {
     try {
         // Number is anything matching: -?[0-9]+(\.[0-9]+)*
         // obviously we won't know if its a valid number until we try to parse it
+        // TODO: Replace strtoll with our own utility that takes in str_view or similar
         rule.m_Index = static_cast<int64_t>(std::strtoll(number_text.data(), nullptr, 10));
-        rule.m_IsValidNumber = rule.m_Index >= 0;
+        rule.m_IsValidNumber = true;
     } catch (const std::out_of_range& err) {
         LOG_TRACE("invalid number in text '{}' with message {}", number_text, err.what());
         rule.m_Index = std::numeric_limits<int64_t>::max();
