@@ -18,7 +18,7 @@ bool DotIdentifier::matches(Matcher& matcher) noexcept {
     }
 
     while (matcher.maybe(tk::Dot)) {
-        if (!matcher.maybe(tk::Identifier)) {
+        if (!matcher.maybe(tk::AnyIdentifier)) {
             return false;
         }
     }
