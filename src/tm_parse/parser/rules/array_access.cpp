@@ -18,7 +18,7 @@ bool ArrayAccess::matches(Matcher& m) noexcept {
 }
 
 std::unique_ptr<ArrayAccess> ArrayAccess::create(Parser& parser) {
-    ArrayAccess rule{};
+    auto rule = std::make_unique<ArrayAccess>();
 
     Token first{};
     Token index{};
@@ -27,14 +27,14 @@ std::unique_ptr<ArrayAccess> ArrayAccess::create(Parser& parser) {
     if (first = parser.maybe(tk::LeftParen)) {
         index = parser.require(tk::Number);
         last = parser.require(tk::RightParen);
-        rule.m_IsDynamicAccess = true;
+        rule->m_IsDynamicAccess = true;
     }
     // Static array access
     else {
         first = parser.require(tk::LeftBracket);
         index = parser.require(tk::Number);
         last = parser.require(tk::RightBracket);
-        rule.m_IsDynamicAccess = false;
+        rule->m_IsDynamicAccess = false;
     }
 
     str_view number_text = index.text();
@@ -43,17 +43,17 @@ std::unique_ptr<ArrayAccess> ArrayAccess::create(Parser& parser) {
         // Number is anything matching: -?[0-9]+(\.[0-9]+)*
         // obviously we won't know if its a valid number until we try to parse it
         // TODO: Replace strtoll with our own utility that takes in str_view or similar
-        rule.m_Index = static_cast<int64_t>(std::strtoll(number_text.data(), nullptr, 10));
-        rule.m_IsValidNumber = true;
+        rule->m_Index = static_cast<int64_t>(std::strtoll(number_text.data(), nullptr, 10));
+        rule->m_IsValidNumber = true;
     } catch (const std::out_of_range& err) {
         LOG_TRACE("invalid number in text '{}' with message {}", number_text, err.what());
-        rule.m_Index = std::numeric_limits<int64_t>::max();
-        rule.m_IsValidNumber = false;
+        rule->m_Index = std::numeric_limits<int64_t>::max();
+        rule->m_IsValidNumber = false;
     }
 
-    rule.post_init(first, last);
+    rule->post_init(first, last);
 
-    return std::make_unique<ArrayAccess>(rule);
+    return rule;
 }
 
 }  // namespace tm_parse::rules

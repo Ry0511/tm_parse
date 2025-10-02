@@ -25,18 +25,20 @@ bool ObjectRef::matches(Matcher& matcher) noexcept {
 }
 
 std::unique_ptr<ObjectRef> ObjectRef::create(Parser& parser) {
-    ObjectRef ref{};
+    auto ref = std::make_unique<ObjectRef>();
 
-    ref.m_MainObject = DotIdentifier::create(parser);
+    ref->m_MainObject = DotIdentifier::create(parser);
+    ref->m_MainObject->set_parent(*ref);
 
     if (parser.maybe(tk::Colon)) {
-        ref.m_SubObject = DotIdentifier::create(parser);
-        ref.post_init(ref.m_MainObject->first_token(), ref.m_SubObject->last_token());
+        ref->m_SubObject = DotIdentifier::create(parser);
+        ref->m_SubObject->set_parent(*ref);
+        ref->post_init(ref->m_MainObject->first_token(), ref->m_SubObject->last_token());
     } else {
-        ref.copy_state(*ref.m_MainObject);
+        ref->copy_state(*ref->m_MainObject);
     }
 
-    return std::make_unique<ObjectRef>(std::move(ref));
+    return ref;
 }
 
 void ObjectRef::visit(const std::function<void(const ParserRule&)>& func) const noexcept {

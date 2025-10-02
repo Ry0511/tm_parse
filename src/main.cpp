@@ -29,9 +29,10 @@ int main() {
         do {
             auto ptr = parser.parse();
 
-            // TODO: A way to gauge depth would be nice here
             ptr->visit([](const auto& node) -> void {
-                LOG_INFO("{} => '{}'", node.rule_name(), txt::escape_string(node.full_text()));
+                int depth = node.get_depth();
+                str indent(depth * 2, TXT(' '));
+                LOG_INFO("{}- {}", indent, node.rule_name());
             });
 
             LOG_INFO(

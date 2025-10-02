@@ -20,17 +20,20 @@ bool PropertyAccess::matches(Matcher& matcher) noexcept {
 }
 
 std::unique_ptr<PropertyAccess> PropertyAccess::create(Parser& parser) {
-    PropertyAccess rule{};
+    auto rule = std::make_unique<PropertyAccess>();
 
-    rule.m_Property = DotIdentifier::create(parser);
+    rule->m_Property = DotIdentifier::create(parser);
+    rule->m_Property->set_parent(*rule);
 
     Matcher matcher = parser.create_matcher();
     if (ArrayAccess::matches(matcher)) {
-        rule.m_ArrayAccess = ArrayAccess::create(parser);
+        rule->m_ArrayAccess = ArrayAccess::create(parser);
+        rule->m_ArrayAccess->set_parent(*rule);
     }
 
-    rule.copy_state(*rule.m_Property);
-    return std::make_unique<PropertyAccess>(std::move(rule));
+    rule->copy_state(*rule->m_Property);
+
+    return rule;
 }
 
 void PropertyAccess::visit(const std::function<void(const ParserRule&)>& func) const noexcept {

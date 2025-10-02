@@ -27,14 +27,17 @@ bool SetCommand::matches(Matcher& matcher) noexcept {
 }
 
 std::unique_ptr<SetCommand> SetCommand::create(Parser& parser) {
-    SetCommand rule{};
+    auto rule = std::make_unique<SetCommand>();
 
     Token first = parser.require_next_real(tk::Set);
-    rule.m_ObjectRef = ObjectRef::create(parser);
-    rule.m_Property = PropertyAccess::create(parser);
-    rule.post_init(first, rule.m_Property->last_token());
+    rule->m_ObjectRef = ObjectRef::create(parser);
+    rule->m_Property = PropertyAccess::create(parser);
+    rule->post_init(first, rule->m_Property->last_token());
 
-    return std::make_unique<SetCommand>(std::move(rule));
+    rule->m_ObjectRef->set_parent(*rule);
+    rule->m_Property->set_parent(*rule);
+
+    return rule;
 }
 
 }  // namespace tm_parse::rules

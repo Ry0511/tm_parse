@@ -24,6 +24,7 @@ class ParserRule {
     using Iterator = std::vector<Ptr>::iterator;
 
    protected:
+    ParserRule* m_Parent{nullptr};
     const str_char* m_TextSource{nullptr};
     TextRegion m_FullTextRegion;
     Token m_FirstToken;
@@ -43,8 +44,9 @@ class ParserRule {
     operator bool() const noexcept { return m_FirstToken; }
 
    public:
-    const TextRegion& full_text_region() const noexcept { return m_FullTextRegion; }
+    ParserRule* parent() const noexcept { return m_Parent; }
     str_view full_text() const;
+    const TextRegion& full_text_region() const noexcept { return m_FullTextRegion; }
     const Token& first_token() const noexcept { return m_FirstToken; }
     const Token& last_token() const noexcept { return m_LastToken; }
 
@@ -53,6 +55,15 @@ class ParserRule {
 
     virtual void visit(const std::function<void(const ParserRule&)>& func) const noexcept {
         func(*this);
+    }
+
+    void set_parent(ParserRule& parent) noexcept { m_Parent = &parent; }
+
+    size_t get_depth() const noexcept {
+        if (auto ptr = parent()) {
+            return ptr->get_depth() + 1;
+        }
+        return 0;
     }
 
    protected:
