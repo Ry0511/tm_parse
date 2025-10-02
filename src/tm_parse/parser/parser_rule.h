@@ -60,10 +60,15 @@ class ParserRule {
     void set_parent(ParserRule& parent) noexcept { m_Parent = &parent; }
 
     size_t get_depth() const noexcept {
-        if (auto ptr = parent()) {
-            return ptr->get_depth() + 1;
+        size_t depth = 0;
+        const ParserRule* ptr = parent();
+
+        while (ptr) {
+            ptr = ptr->parent();
+            ++depth;
         }
-        return 0;
+
+        return depth;
     }
 
    protected:
