@@ -5,7 +5,7 @@
 //
 
 #include "tm_parse/pch.h"
-#include "tm_parse/parser/rules/dot_identifier.h"
+#include "dot_identifier.h"
 
 #include "tm_parse/lexer/token_error.h"
 #include "tm_parse/parser/parser.h"

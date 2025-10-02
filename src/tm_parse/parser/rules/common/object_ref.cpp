@@ -8,7 +8,7 @@
 
 #include "dot_identifier.h"
 #include "tm_parse/parser/parser.h"
-#include "tm_parse/parser/rules/object_ref.h"
+#include "tm_parse/parser/rules/common/object_ref.h"
 
 namespace tm_parse::rules {
 

@@ -5,11 +5,11 @@
 //
 
 #include "tm_parse/pch.h"
-#include "tm_parse/parser/rules/property_access.h"
+#include "property_access.h"
 
+#include "array_access.h"
 #include "tm_parse/parser/parser.h"
-#include "tm_parse/parser/rules/dot_identifier.h"
-#include "tm_parse/parser/rules/array_access.h"
+#include "tm_parse/parser/rules/common/dot_identifier.h"
 
 namespace tm_parse::rules {
 

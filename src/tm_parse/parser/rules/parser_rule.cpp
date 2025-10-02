@@ -5,7 +5,7 @@
 //
 
 #include "tm_parse/pch.h"
-#include "tm_parse/parser/parser_rule.h"
+#include "parser_rule.h"
 #include "tm_parse/parser/parser.h"
 
 namespace tm_parse {

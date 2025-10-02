@@ -8,7 +8,7 @@
 
 #include "tm_parse/pch.h"
 
-#include "tm_parse/parser/parser_rule.h"
+#include "../parser_rule.h"
 
 namespace tm_parse::rules {
 

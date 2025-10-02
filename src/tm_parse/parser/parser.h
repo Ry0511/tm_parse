@@ -7,8 +7,8 @@
 #pragma once
 
 #include "tm_parse/pch.h"
+#include "rules/parser_rule.h"
 #include "tm_parse/lexer/lexer.h"
-#include "tm_parse/parser/parser_rule.h"
 #include "tm_parse/parser/matcher.h"
 
 namespace tm_parse {

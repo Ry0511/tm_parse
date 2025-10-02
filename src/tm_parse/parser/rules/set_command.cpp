@@ -6,12 +6,12 @@
 
 #include "tm_parse/pch.h"
 
-#include "dot_identifier.h"
+#include "common/dot_identifier.h"
 #include "tm_parse/parser/rules/set_command.h"
 
 #include "tm_parse/parser/parser.h"
-#include "tm_parse/parser/rules/object_ref.h"
-#include "tm_parse/parser/rules/property_access.h"
+#include "tm_parse/parser/rules/common/object_ref.h"
+#include "tm_parse/parser/rules/common/property_access.h"
 
 namespace tm_parse::rules {
 
