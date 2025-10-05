@@ -7,7 +7,7 @@
 #include "tm_parse/pch.h"
 
 #include "tm_parse/parser/parser.h"
-#include "tm_parse/parser/rules/expr/Expr.h"
+#include "tm_parse/parser/rules/expr/expr.h"
 
 #include "tm_parse/lexer/token_error.h"
 
