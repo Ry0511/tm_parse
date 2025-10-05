@@ -18,7 +18,7 @@ class TokenRule : public ParserRule {
 
    public:
     TokenRule() = default;
-    ~TokenRule() final = default;
+    ~TokenRule() override = default;
 
    public:
     RULE_STATIC_API(TokenRule);
