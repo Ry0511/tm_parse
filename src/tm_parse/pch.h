@@ -51,6 +51,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
+#include <variant>
 
 using std::int16_t;
 using std::int32_t;
@@ -92,6 +93,5 @@ static_assert(sizeof(void*) == 4);
 #else
 #error "unsupported architecture defined"
 #endif
-
 
 }  // namespace tm_parse

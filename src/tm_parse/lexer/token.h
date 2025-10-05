@@ -13,6 +13,9 @@
 
 namespace tm_parse {
 
+// TODO: There is a plan to replace str_char* Text with a custom TextSource* or Ref<TextSource> at
+//  somepoint so that a few guarantees can be made about the text.
+
 struct Token {
    public:
     tk::TokenKind Kind;
@@ -83,6 +86,14 @@ struct Token {
         }
 
         return text.substr(1, text.size() - 2);
+    }
+
+   public:
+    bool has_radix() const noexcept {
+        if (Text == nullptr || !Region) {
+            return false;
+        }
+        return this->text().find_first_of(TXT('.')) != str_view::npos;
     }
 
    public:

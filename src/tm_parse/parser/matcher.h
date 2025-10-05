@@ -25,6 +25,7 @@ class Matcher {
    public:
     const std::span<const Token>& tokens() const noexcept { return m_Tokens; }
     size_t position() const noexcept { return m_Position; }
+    void set_position(size_t position) noexcept { m_Position = position; }
 
    public:
     Matcher(const Matcher&) = default;
@@ -34,6 +35,10 @@ class Matcher {
 
    public:
     bool is_eof() const noexcept { return m_Position >= m_Tokens.size(); }
+
+   public:
+    bool try_match(std::span<const tk::TokenKind> kinds) noexcept;
+    bool try_match_real(std::span<const tk::TokenKind> kinds) noexcept;
 
    public:
     Token next() noexcept;

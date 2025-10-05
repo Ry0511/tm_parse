@@ -1,0 +1,34 @@
+//
+// Date       : 04/10/2025
+// Project    : tm_parse
+// Author     : -Ry
+//
+
+#pragma once
+
+#include "tm_parse/pch.h"
+#include "tm_parse/parser/rules/expr/expr.h"
+
+namespace tm_parse::rules {
+
+class AssignmentExpr;
+
+class AssignmentExprList : public Expr {
+   private:
+    std::vector<std::unique_ptr<AssignmentExpr>> m_Assignments;
+
+   public:
+    AssignmentExprList() = default;
+    ~AssignmentExprList() override = default;
+
+   public:
+    AssignmentExprList(const AssignmentExprList&) = default;
+    AssignmentExprList& operator=(const AssignmentExprList&) = default;
+    AssignmentExprList(AssignmentExprList&&) = default;
+    AssignmentExprList& operator=(AssignmentExprList&&) = default;
+
+   public:
+    RULE_STATIC_API(AssignmentExprList);
+};
+
+}  // namespace tm_parse::rules

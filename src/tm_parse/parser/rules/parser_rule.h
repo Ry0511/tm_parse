@@ -73,6 +73,8 @@ class ParserRule {
 
    protected:
     void post_init(const Token& first, const Token& last) noexcept;
+    void post_init(const Token& first) noexcept;
+    void post_init(const ParserRule& first, const ParserRule& last) noexcept;
     void copy_state(const ParserRule& other) noexcept;
 };
 

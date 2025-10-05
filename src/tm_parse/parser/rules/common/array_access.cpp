@@ -13,8 +13,9 @@
 namespace tm_parse::rules {
 
 bool ArrayAccess::matches(Matcher& m) noexcept {
-    return (m.maybe(tk::LeftParen) && m.maybe(tk::Number) && m.maybe(tk::RightParen))
-           || (m.maybe(tk::LeftBracket) && m.maybe(tk::Number) && m.maybe(tk::RightBracket));
+    constexpr tk::TokenKind dynamic_access[]{tk::LeftParen, tk::Number, tk::RightParen};
+    constexpr tk::TokenKind static_access[]{tk::LeftBracket, tk::Number, tk::RightBracket};
+    return m.try_match(dynamic_access) || m.try_match(static_access);
 }
 
 std::unique_ptr<ArrayAccess> ArrayAccess::create(Parser& parser) {
