@@ -24,10 +24,10 @@ class PropertyAccess : public ParserRule {
     ~PropertyAccess() override;
 
    public:
-    PropertyAccess(const PropertyAccess&) = default;
-    PropertyAccess& operator=(const PropertyAccess&) = default;
-    PropertyAccess(PropertyAccess&&) = default;
-    PropertyAccess& operator=(PropertyAccess&&) = default;
+    PropertyAccess(const PropertyAccess&) = delete;
+    PropertyAccess& operator=(const PropertyAccess&) = delete;
+    PropertyAccess(PropertyAccess&&);
+    PropertyAccess& operator=(PropertyAccess&&);
 
    public:
     const DotIdentifier& property() const noexcept { return *m_Property; }

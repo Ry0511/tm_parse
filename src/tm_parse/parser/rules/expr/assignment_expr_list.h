@@ -22,10 +22,10 @@ class AssignmentExprList : public Expr {
     ~AssignmentExprList() override;
 
    public:
-    AssignmentExprList(const AssignmentExprList&) = default;
-    AssignmentExprList& operator=(const AssignmentExprList&) = default;
-    AssignmentExprList(AssignmentExprList&&) = default;
-    AssignmentExprList& operator=(AssignmentExprList&&) = default;
+    AssignmentExprList(const AssignmentExprList&) = delete;
+    AssignmentExprList& operator=(const AssignmentExprList&) = delete;
+    AssignmentExprList(AssignmentExprList&&);
+    AssignmentExprList& operator=(AssignmentExprList&&);
 
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;

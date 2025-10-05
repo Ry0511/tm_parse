@@ -42,6 +42,8 @@ std::unique_ptr<ObjectRef> ObjectRef::create(Parser& parser) {
 }
 
 ObjectRef::~ObjectRef() = default;
+ObjectRef::ObjectRef(ObjectRef&&) = default;
+ObjectRef& ObjectRef::operator=(ObjectRef&&) = default;
 
 void ObjectRef::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
     func(*this);

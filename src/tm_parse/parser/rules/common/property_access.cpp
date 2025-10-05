@@ -37,6 +37,8 @@ std::unique_ptr<PropertyAccess> PropertyAccess::create(Parser& parser) {
 }
 
 PropertyAccess::~PropertyAccess() = default;
+PropertyAccess::PropertyAccess(PropertyAccess&&) = default;
+PropertyAccess& PropertyAccess::operator=(PropertyAccess&&) = default;
 
 void PropertyAccess::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
     ParserRule::visit(func);

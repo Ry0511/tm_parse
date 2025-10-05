@@ -133,6 +133,8 @@ std::unique_ptr<ObjectDefinition> ObjectDefinition::create(Parser& parser) {
 }
 
 ObjectDefinition::~ObjectDefinition() = default;
+ObjectDefinition::ObjectDefinition(ObjectDefinition&&) = default;
+ObjectDefinition& ObjectDefinition::operator=(ObjectDefinition&&) = default;
 
 void ObjectDefinition::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
     ParserRule::visit(func);

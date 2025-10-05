@@ -45,5 +45,7 @@ void SetCommand::visit(const std::function<void(const ParserRule&)>& func) const
 }
 
 SetCommand::~SetCommand() = default;
+SetCommand::SetCommand(SetCommand&&) = default;
+SetCommand& SetCommand::operator=(SetCommand&&) = default;
 
 }  // namespace tm_parse::rules

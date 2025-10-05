@@ -24,10 +24,10 @@ class ObjectDefinition : public ParserRule {
     ~ObjectDefinition() override;
 
    public:
-    ObjectDefinition(const ObjectDefinition&) = default;
-    ObjectDefinition& operator=(const ObjectDefinition&) = default;
-    ObjectDefinition(ObjectDefinition&&) = default;
-    ObjectDefinition& operator=(ObjectDefinition&&) = default;
+    ObjectDefinition(const ObjectDefinition&) = delete;
+    ObjectDefinition& operator=(const ObjectDefinition&) = delete;
+    ObjectDefinition(ObjectDefinition&&);
+    ObjectDefinition& operator=(ObjectDefinition&&);
 
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;

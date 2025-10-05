@@ -28,8 +28,8 @@ class SetCommand : public ParserRule {
    public:
     SetCommand(const SetCommand&) = delete;
     SetCommand& operator=(const SetCommand&) = delete;
-    SetCommand(SetCommand&&) = default;
-    SetCommand& operator=(SetCommand&&) = default;
+    SetCommand(SetCommand&&);
+    SetCommand& operator=(SetCommand&&);
 
    public:
     const ObjectRef& object_ref() const noexcept { return *m_ObjectRef; };

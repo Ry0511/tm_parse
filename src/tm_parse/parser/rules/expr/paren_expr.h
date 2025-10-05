@@ -20,10 +20,10 @@ class ParenExpr : public Expr {
     ~ParenExpr() override;
 
    public:
-    ParenExpr(const ParenExpr&) = default;
-    ParenExpr& operator=(const ParenExpr&) = default;
-    ParenExpr(ParenExpr&&) = default;
-    ParenExpr& operator=(ParenExpr&&) = default;
+    ParenExpr(const ParenExpr&) = delete;
+    ParenExpr& operator=(const ParenExpr&) = delete;
+    ParenExpr(ParenExpr&&);
+    ParenExpr& operator=(ParenExpr&&);
 
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
