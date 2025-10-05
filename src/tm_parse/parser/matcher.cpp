@@ -14,6 +14,8 @@ namespace tm_parse {
 
 Matcher::Matcher(const Parser& parser) : m_Position(parser.position()), m_Tokens(parser.m_Tokens) {}
 
+Matcher::Matcher(Parser& parser) : m_Position(parser.position()), m_Tokens(parser.m_Tokens) {}
+
 bool Matcher::try_match(std::span<const tk::TokenKind> kinds) noexcept {
     return std::ranges::all_of(kinds, [this](const auto& kind) -> bool {
         return this->maybe(kind);
@@ -70,6 +72,34 @@ Token Matcher::maybe_real(tk::TokenKind kind) noexcept {
 
     if (tk == kind) {
         return tk;
+    }
+
+    m_Position = pos;
+    return Token{tk::InvalidToken};
+}
+
+Token Matcher::any(std::span<const tk::TokenKind> kinds) noexcept {
+    size_t pos = m_Position;
+    Token tk = next();
+
+    for (const auto& kind : kinds) {
+        if (tk == kind) {
+            return tk;
+        }
+    }
+
+    m_Position = pos;
+    return Token{tk::InvalidToken};
+}
+
+Token Matcher::any_real(std::span<const tk::TokenKind> kinds) noexcept {
+    size_t pos = m_Position;
+    Token tk = next_real();
+
+    for (const auto& kind : kinds) {
+        if (tk == kind) {
+            return tk;
+        }
     }
 
     m_Position = pos;

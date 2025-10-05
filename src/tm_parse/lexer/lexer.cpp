@@ -350,7 +350,7 @@ Token Lexer::read_string_literal() {
 
     bool terminator_found = false;
 
-    // Consume until we reach the terminating sequence */ or the end of the input
+    // Consume until we reach the terminating sequence " or the end of the input
     while (!is_eof() && !terminator_found) {
         str_char c = advance();
         // peek(-1) == c

@@ -13,11 +13,13 @@ namespace tm_parse::rules {
 
 class ObjectRef;
 class PropertyAccess;
+class Expr;
 
 class SetCommand : public ParserRule {
    private:
     std::unique_ptr<ObjectRef> m_ObjectRef;
     std::unique_ptr<PropertyAccess> m_Property;
+    std::unique_ptr<Expr> m_Expr;
 
    public:
     SetCommand() = default;
@@ -32,6 +34,7 @@ class SetCommand : public ParserRule {
    public:
     const ObjectRef& object_ref() const noexcept { return *m_ObjectRef; };
     const PropertyAccess& property() const noexcept { return *m_Property; };
+    const Expr& expr() const noexcept { return *m_Expr; };
 
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;

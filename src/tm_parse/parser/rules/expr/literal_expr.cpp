@@ -13,8 +13,8 @@
 namespace tm_parse::rules {
 
 bool LiteralExpr::matches(Matcher& matcher) noexcept {
-    const Token t = matcher.next_real();
-    return t == tk::Number || t == tk::StringLiteral || t == tk::True || t == tk::False;
+    constexpr tk::TokenKind literals[]{tk::Number, tk::StringLiteral, tk::True, tk::False};
+    return matcher.any_real(literals);
 }
 
 std::unique_ptr<LiteralExpr> LiteralExpr::create(Parser& parser) {
@@ -41,6 +41,7 @@ std::unique_ptr<LiteralExpr> LiteralExpr::create(Parser& parser) {
                 // NOLINTNEXTLINE
                 rule->m_Value = static_cast<int64_t>(std::strtoll(number_text.data(), nullptr, 10));
             }
+            break;
         }
 
         default: {

@@ -41,7 +41,7 @@ std::unique_ptr<AssignmentExprList> AssignmentExprList::create(Parser& parser) {
     do {
         const auto& expr = rule->m_Assignments.emplace_back(AssignmentExpr::create(parser));
         expr->set_parent(*rule);
-    } while (parser.require_next_real(tk::Comma));
+    } while (parser.maybe_next_real(tk::Comma));
 
     Token last = parser.require_next_real(tk::RightParen);
     rule->post_init(first, last);

@@ -19,6 +19,7 @@ class Matcher {
     size_t m_Position;
 
    public:
+    Matcher(Parser& parser);
     Matcher(const Parser& parser);
     ~Matcher() = default;
 
@@ -45,6 +46,8 @@ class Matcher {
     Token next_real() noexcept;
     Token maybe(tk::TokenKind kind) noexcept;
     Token maybe_real(tk::TokenKind kind) noexcept;
+    Token any(std::span<const tk::TokenKind> kinds) noexcept;
+    Token any_real(std::span<const tk::TokenKind> kinds) noexcept;
     Token require(tk::TokenKind kind);
     Token require_real(tk::TokenKind kind);
 };

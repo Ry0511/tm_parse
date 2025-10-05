@@ -31,8 +31,15 @@ int main() {
 
             ptr->visit([](const auto& node) -> void {
                 int depth = node.get_depth();
-                str indent(depth * 2, TXT(' '));
-                LOG_INFO("{}- {}", indent, node.rule_name());
+                str indent(depth, TXT(' '));
+                int full_pad = std::max(0, 30 - depth);
+                LOG_INFO(
+                    "{}- {:<{}} text='{}'",
+                    indent,
+                    node.rule_name(),
+                    full_pad,
+                    txt::escape_string(node.full_text(), true)
+                );
             });
 
             LOG_INFO(
