@@ -45,6 +45,8 @@ bool Expr::matches(Matcher& matcher) noexcept {
     TRY_MATCH_RULE(ParenExpr);
     TRY_MATCH_RULE(AssignmentExpr);
     TRY_MATCH_RULE(LiteralExpr);
+
+    return false;
 }
 
 std::unique_ptr<Expr> Expr::create(Parser& parser) {

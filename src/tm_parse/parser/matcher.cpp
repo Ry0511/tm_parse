@@ -17,15 +17,35 @@ Matcher::Matcher(const Parser& parser) : m_Position(parser.position()), m_Tokens
 Matcher::Matcher(Parser& parser) : m_Position(parser.position()), m_Tokens(parser.m_Tokens) {}
 
 bool Matcher::try_match(std::span<const tk::TokenKind> kinds) noexcept {
-    return std::ranges::all_of(kinds, [this](const auto& kind) -> bool {
-        return this->maybe(kind);
+
+    auto pos = position();
+
+    bool res =  std::ranges::all_of(kinds, [this](const auto& kind) -> bool {
+        return this->next() == kind;
     });
+
+    if (!res) {
+        m_Position = pos;
+        return false;
+    }
+
+    return true;
 }
 
 bool Matcher::try_match_real(std::span<const tk::TokenKind> kinds) noexcept {
-    return std::ranges::all_of(kinds, [this](const auto& kind) -> bool {
-        return this->maybe_real(kind);
+
+    auto pos = position();
+
+    bool res =  std::ranges::all_of(kinds, [this](const auto& kind) -> bool {
+        return this->next_real() == kind;
     });
+
+    if (!res) {
+        m_Position = pos;
+        return false;
+    }
+
+    return true;
 }
 
 Token Matcher::next() noexcept {

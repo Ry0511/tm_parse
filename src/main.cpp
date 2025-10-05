@@ -14,13 +14,27 @@
 using namespace tm_parse;
 
 int main() {
+    // str source = TXT(R"(
+    //     set
+    //       foo.baz:bar
+    //       property.bar(1)
+    //       ( A = ( X= 10, Y=20 )
+    //       , B = ( Z=-10, W=3  )
+    //       , C = ( D=(A=FALSE,B=TRUE,C=True,D=False) )
+    //       )
+    // )");
+
     str source = TXT(R"(
-        set
-          foo.baz:bar
-          property.bar
-          ( A = ( X= 10, Y=20 )
-          , B = ( Z=-10, W=3  )
-          )
+      Begin Object Class=SomeClass Name=SomeName
+
+        Begin Object Class=Child Name=Child_00
+          A=(B=10, C=20, D="Some String")
+        End Object
+
+        B="My String"
+        C=(B=10, C=20, D="Some String", E=(X = 10, Y = 20, Z = (W = "String!")))
+
+      End Object
     )");
 
     Parser parser{source};
@@ -30,22 +44,15 @@ int main() {
             auto ptr = parser.parse();
 
             ptr->visit([](const auto& node) -> void {
-                int depth = node.get_depth();
+                int depth = node.get_depth() * 2;
                 str indent(depth, TXT(' '));
-                int full_pad = std::max(0, 30 - depth);
-                LOG_INFO(
-                    "{}- {:<{}} text='{}'",
-                    indent,
-                    node.rule_name(),
-                    full_pad,
-                    txt::escape_string(node.full_text(), true)
-                );
+                LOG_INFO("{}{}", indent, node.rule_name());
             });
 
             LOG_INFO(
                 "ParsedRule ~ {} from '{}'",
                 ptr->rule_name(),
-                txt::escape_string(ptr->full_text())
+                txt::escape_string(ptr->full_text(), true)
             );
 
         } while (!parser.is_eof());

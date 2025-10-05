@@ -7,7 +7,7 @@
 #pragma once
 
 #include "tm_parse/pch.h"
-#include "parser_rule.h"
+#include "tm_parse/parser/rules/parser_rule.h"
 
 namespace tm_parse::rules {
 

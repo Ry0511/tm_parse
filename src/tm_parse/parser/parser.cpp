@@ -7,8 +7,9 @@
 #include "tm_parse/pch.h"
 #include "tm_parse/parser/parser.h"
 
+#include "rules/primary/object_definition.h"
+#include "rules/primary/set_command.h"
 #include "tm_parse/lexer/token_error.h"
-#include "tm_parse/parser/rules/set_command.h"
 
 namespace tm_parse {
 
@@ -46,7 +47,13 @@ Parser::Parser(str text)
 Parser::Parser(const fs::path& file) : m_Text(read_file(file)), m_Lexer(m_Text) {}
 
 std::unique_ptr<ParserRule> Parser::parse() {
-    return rules::SetCommand::create(*this);
+    Matcher m = *this;
+
+    if (rules::SetCommand::matches(m)) {
+        return rules::SetCommand::create(*this);
+    }
+
+    return rules::ObjectDefinition::create(*this);
 }
 
 Token Parser::peek(int offset) const noexcept {
