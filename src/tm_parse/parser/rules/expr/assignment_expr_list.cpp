@@ -34,7 +34,6 @@ bool AssignmentExprList::matches(Matcher& matcher) noexcept {
 }
 
 std::unique_ptr<AssignmentExprList> AssignmentExprList::create(Parser& parser) {
-
     auto rule = std::make_unique<AssignmentExprList>();
 
     Token first = parser.require_next_real(tk::LeftParen);
@@ -48,6 +47,13 @@ std::unique_ptr<AssignmentExprList> AssignmentExprList::create(Parser& parser) {
     rule->post_init(first, last);
 
     return rule;
+}
+
+void AssignmentExprList::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
+    Expr::visit(func);
+    for (const auto& rule : m_Assignments) {
+        rule->visit(func);
+    }
 }
 
 }  // namespace tm_parse::rules

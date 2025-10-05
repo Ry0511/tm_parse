@@ -26,6 +26,8 @@ class ParenExpr : public Expr {
     ParenExpr& operator=(ParenExpr&&) = default;
 
    public:
+    void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
+
     RULE_STATIC_API(ParenExpr);
 };
 

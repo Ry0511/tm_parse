@@ -29,6 +29,9 @@ class AssignmentExpr : public Expr {
     AssignmentExpr& operator=(AssignmentExpr&&) = default;
 
    public:
+    void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
+
+   public:
     RULE_STATIC_API(AssignmentExpr);
 };
 

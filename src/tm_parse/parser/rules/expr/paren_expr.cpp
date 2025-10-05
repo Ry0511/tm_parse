@@ -19,7 +19,6 @@ bool ParenExpr::matches(Matcher& matcher) noexcept {
 }
 
 std::unique_ptr<ParenExpr> ParenExpr::create(Parser& parser) {
-
     auto ptr = std::make_unique<ParenExpr>();
 
     Token first = parser.require_next_real(tk::LeftParen);
@@ -30,6 +29,11 @@ std::unique_ptr<ParenExpr> ParenExpr::create(Parser& parser) {
     ptr->m_Inner->set_parent(*ptr);
 
     return ptr;
+}
+
+void ParenExpr::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
+    Expr::visit(func);
+    m_Inner->visit(func);
 }
 
 }  // namespace tm_parse::rules

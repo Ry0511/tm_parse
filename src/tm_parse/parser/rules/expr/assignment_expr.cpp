@@ -31,4 +31,10 @@ std::unique_ptr<AssignmentExpr> AssignmentExpr::create(Parser& parser) {
     return rule;
 }
 
+void AssignmentExpr::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
+    Expr::visit(func);
+    m_Property->visit(func);
+    m_Expr->visit(func);
+}
+
 }  // namespace tm_parse::rules
