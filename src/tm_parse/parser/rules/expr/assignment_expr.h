@@ -20,7 +20,7 @@ class AssignmentExpr : public Expr {
 
    public:
     AssignmentExpr() = default;
-    ~AssignmentExpr() override = default;
+    ~AssignmentExpr() override;
 
    public:
     AssignmentExpr(const AssignmentExpr&) = default;

@@ -21,7 +21,7 @@ class ObjectDefinition : public ParserRule {
 
    public:
     ObjectDefinition() = default;
-    ~ObjectDefinition() override = default;
+    ~ObjectDefinition() override;
 
    public:
     ObjectDefinition(const ObjectDefinition&) = default;
@@ -31,6 +31,7 @@ class ObjectDefinition : public ParserRule {
 
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
+
 
     RULE_STATIC_API(ObjectDefinition);
 };

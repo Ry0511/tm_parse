@@ -44,4 +44,6 @@ void SetCommand::visit(const std::function<void(const ParserRule&)>& func) const
     m_Expr->visit(func);
 }
 
+SetCommand::~SetCommand() = default;
+
 }  // namespace tm_parse::rules

@@ -36,6 +36,8 @@ std::unique_ptr<PropertyAccess> PropertyAccess::create(Parser& parser) {
     return rule;
 }
 
+PropertyAccess::~PropertyAccess() = default;
+
 void PropertyAccess::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
     ParserRule::visit(func);
     if (m_ArrayAccess != nullptr) {

@@ -19,7 +19,7 @@ class AssignmentExprList : public Expr {
 
    public:
     AssignmentExprList() = default;
-    ~AssignmentExprList() override = default;
+    ~AssignmentExprList() override;
 
    public:
     AssignmentExprList(const AssignmentExprList&) = default;

@@ -12,9 +12,9 @@
 
 namespace tm_parse {
 
-Matcher::Matcher(const Parser& parser) : m_Position(parser.position()), m_Tokens(parser.m_Tokens) {}
+Matcher::Matcher(const Parser& parser) : m_Tokens(parser.m_Tokens), m_Position(parser.position()) {}
 
-Matcher::Matcher(Parser& parser) : m_Position(parser.position()), m_Tokens(parser.m_Tokens) {}
+Matcher::Matcher(Parser& parser) : m_Tokens(parser.m_Tokens), m_Position(parser.position()) {}
 
 bool Matcher::try_match(std::span<const tk::TokenKind> kinds) noexcept {
 

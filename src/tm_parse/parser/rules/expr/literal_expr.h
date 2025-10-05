@@ -18,7 +18,7 @@ class LiteralExpr : public Expr {
 
    public:
     LiteralExpr() = default;
-    ~LiteralExpr() override = default;
+    ~LiteralExpr() override;
 
    public:
     LiteralExpr(const LiteralExpr&) = default;

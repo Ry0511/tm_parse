@@ -37,4 +37,6 @@ void AssignmentExpr::visit(const std::function<void(const ParserRule&)>& func) c
     m_Expr->visit(func);
 }
 
+AssignmentExpr::~AssignmentExpr() = default;
+
 }  // namespace tm_parse::rules

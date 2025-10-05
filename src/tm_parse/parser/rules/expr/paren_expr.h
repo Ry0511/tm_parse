@@ -17,7 +17,7 @@ class ParenExpr : public Expr {
 
    public:
     ParenExpr() = default;
-    ~ParenExpr() override = default;
+    ~ParenExpr() override;
 
    public:
     ParenExpr(const ParenExpr&) = default;

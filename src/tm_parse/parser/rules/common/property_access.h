@@ -21,7 +21,7 @@ class PropertyAccess : public ParserRule {
 
    public:
     PropertyAccess() = default;
-    ~PropertyAccess() override = default;
+    ~PropertyAccess() override;
 
    public:
     PropertyAccess(const PropertyAccess&) = default;

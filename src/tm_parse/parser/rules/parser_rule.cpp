@@ -44,4 +44,6 @@ void ParserRule::copy_state(const ParserRule& other) noexcept {
     m_LastToken = other.m_LastToken;
 }
 
+ParserRule::~ParserRule() = default;
+
 }  // namespace tm_parse

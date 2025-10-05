@@ -44,4 +44,6 @@ std::unique_ptr<DotIdentifier> DotIdentifier::create(Parser& parser) {
     return rule;
 }
 
+DotIdentifier::~DotIdentifier() = default;
+
 }  // namespace tm_parse::rules

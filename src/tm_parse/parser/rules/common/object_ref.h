@@ -20,7 +20,7 @@ class ObjectRef : public ParserRule {
 
    public:
     ObjectRef() = default;
-    ~ObjectRef() override = default;
+    ~ObjectRef() override;
 
    public:
     ObjectRef(const ObjectRef&) = delete;

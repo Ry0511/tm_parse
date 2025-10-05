@@ -31,6 +31,8 @@ std::unique_ptr<ParenExpr> ParenExpr::create(Parser& parser) {
     return ptr;
 }
 
+ParenExpr::~ParenExpr() = default;
+
 void ParenExpr::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
     Expr::visit(func);
     m_Inner->visit(func);

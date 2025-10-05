@@ -20,7 +20,7 @@ enum class ExprType : int {
 class Expr : public ParserRule {
    public:
     Expr() = default;
-    ~Expr() override = default;
+    ~Expr() override;
 
    public:
     Expr(const Expr&) = default;

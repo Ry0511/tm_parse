@@ -65,4 +65,6 @@ std::unique_ptr<Expr> Expr::create(Parser& parser) {
     throw TokenError("could not create any expression", m.next_real());
 }
 
+Expr::~Expr() = default;
+
 }  // namespace tm_parse::rules

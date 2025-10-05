@@ -54,4 +54,6 @@ std::unique_ptr<LiteralExpr> LiteralExpr::create(Parser& parser) {
     return rule;
 }
 
+LiteralExpr::~LiteralExpr() = default;
+
 }  // namespace tm_parse::rules

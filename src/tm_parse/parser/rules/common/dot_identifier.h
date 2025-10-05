@@ -18,7 +18,7 @@ class DotIdentifier : public ParserRule {
 
    public:
     DotIdentifier() = default;
-    ~DotIdentifier() override = default;
+    ~DotIdentifier() override;
 
    public:
     DotIdentifier(const DotIdentifier&) = default;

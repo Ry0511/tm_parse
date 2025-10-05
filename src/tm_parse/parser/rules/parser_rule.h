@@ -32,7 +32,7 @@ class ParserRule {
 
    public:
     ParserRule() = default;
-    virtual ~ParserRule() = default;
+    virtual ~ParserRule();
 
    public:
     ParserRule(const ParserRule&) = default;

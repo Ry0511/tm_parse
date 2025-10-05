@@ -19,7 +19,7 @@ class ArrayAccess : public ParserRule {
 
    public:
     ArrayAccess() = default;
-    ~ArrayAccess() override = default;
+    ~ArrayAccess() override;
 
    public:
     ArrayAccess(const ArrayAccess&) = default;

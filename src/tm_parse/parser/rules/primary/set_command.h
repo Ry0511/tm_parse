@@ -23,7 +23,7 @@ class SetCommand : public ParserRule {
 
    public:
     SetCommand() = default;
-    ~SetCommand() override = default;
+    ~SetCommand() override;
 
    public:
     SetCommand(const SetCommand&) = delete;

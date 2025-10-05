@@ -25,7 +25,7 @@ std::unique_ptr<ArrayAccess> ArrayAccess::create(Parser& parser) {
     Token index{};
     Token last{};
 
-    if (first = parser.maybe(tk::LeftParen)) {
+    if ((first = parser.maybe(tk::LeftParen))) {
         index = parser.require(tk::Number);
         last = parser.require(tk::RightParen);
         rule->m_IsDynamicAccess = true;
@@ -56,5 +56,7 @@ std::unique_ptr<ArrayAccess> ArrayAccess::create(Parser& parser) {
 
     return rule;
 }
+
+ArrayAccess::~ArrayAccess() = default;
 
 }  // namespace tm_parse::rules
