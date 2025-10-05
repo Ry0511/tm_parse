@@ -48,12 +48,27 @@ bool equal_icase(str_view a, str_view b) noexcept {
               });
 }
 
-str escape_string(str_view in) noexcept {
+str escape_string(str_view in, bool flatten_whitespace) noexcept {
     str out{};
     out.reserve(in.size());
 
+    bool last_was_ws = false;
+
     // clang-format off
     for (char c : in) {
+
+        // bit confusing but if flatten whitespace is enabled we only want the last occurence of
+        // whitespace to be appended to the returned string
+        if (flatten_whitespace && c == TXT(' ')) {
+            last_was_ws = true;
+            continue;
+        }
+
+        if (flatten_whitespace && last_was_ws && c != TXT(' ')) {
+            out.push_back(TXT(' '));
+            last_was_ws = false;
+        }
+
         switch (c) {
             case '\t': { out += "\\t"; break; }
             case '\v': { out += "\\v"; break; }
