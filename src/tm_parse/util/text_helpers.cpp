@@ -50,7 +50,7 @@ bool equal_icase(str_view a, str_view b) noexcept {
 
 str escape_string(str_view in, bool flatten_whitespace) noexcept {
     str out{};
-    out.reserve(in.size());
+    out.reserve(in.size() * 2);
 
     bool last_was_ws = false;
 
@@ -79,6 +79,8 @@ str escape_string(str_view in, bool flatten_whitespace) noexcept {
         }
     }
     // clang-format on
+
+    out.shrink_to_fit();
 
     return out;
 }

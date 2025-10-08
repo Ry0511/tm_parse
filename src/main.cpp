@@ -33,6 +33,9 @@ int main() {
 
         B="My String"
         C=(B=10, C=20, D="Some String", E=(X = 10, Y = 20, Z = (W = "String!")))
+        D=(E=$(my_option.value), F=$(wpc.Pawn.Location))
+
+        E = $(SYS.Globals)
 
       End Object
     )");

@@ -13,7 +13,10 @@
 
 #include "tm_parse/parser/rules/expr/assignment_expr.h"
 #include "tm_parse/parser/rules/expr/assignment_expr_list.h"
+#include "tm_parse/parser/rules/expr/identifier_ref_expr.h"
 #include "tm_parse/parser/rules/expr/literal_expr.h"
+#include "tm_parse/parser/rules/expr/log_info_expr.h"
+#include "tm_parse/parser/rules/expr/meta_var_expr.h"
 #include "tm_parse/parser/rules/expr/paren_expr.h"
 
 namespace tm_parse::rules {
@@ -41,10 +44,13 @@ bool Expr::matches(Matcher& matcher) noexcept {
         }                                       \
     }
 
-    TRY_MATCH_RULE(AssignmentExprList);
+    TRY_MATCH_RULE(LogInfoExpr);
+    TRY_MATCH_RULE(MetaVarExpr);
     TRY_MATCH_RULE(ParenExpr);
+    TRY_MATCH_RULE(AssignmentExprList);
     TRY_MATCH_RULE(AssignmentExpr);
     TRY_MATCH_RULE(LiteralExpr);
+    TRY_MATCH_RULE(IdentifierRefExpr);
 
     return false;
 }
@@ -57,10 +63,13 @@ std::unique_ptr<Expr> Expr::create(Parser& parser) {
         return ptr;                              \
     }
 
-    TRY_CREATE_RULE(AssignmentExprList);
+    TRY_CREATE_RULE(LogInfoExpr);
+    TRY_CREATE_RULE(MetaVarExpr);
     TRY_CREATE_RULE(ParenExpr);
+    TRY_CREATE_RULE(AssignmentExprList);
     TRY_CREATE_RULE(AssignmentExpr);
     TRY_CREATE_RULE(LiteralExpr);
+    TRY_CREATE_RULE(IdentifierRefExpr);
 
     throw TokenError("could not create any expression", m.next_real());
 }

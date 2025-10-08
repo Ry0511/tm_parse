@@ -15,47 +15,53 @@ using token_kind_int = uint8_t;
 
 namespace tk {
 enum TokenKind : token_kind_int {
-    Set = 0,           // Set
-    None,              // None
-    Level,             // level
-    True,              // True
-    False,             // False
-    Begin,             // Begin
-    Object,            // Object
-    Class,             // Class
-    Name,              // Name
-    Package,           // Package
-    End,               // End
-    Keyword_Count,     // Count of keywords
-    LeftParen,         // (
-    RightParen,        // )
-    Dot,               // .
-    Colon,             // :
-    Slash,             // /
-    Star,              // *
-    Comma,             // ,
-    LeftBracket,       // [
-    RightBracket,      // ]
-    Equal,             // =
-    SingleQuote,       // '
-    QuestionMark,      // ?
-    DollarSign,        // $
-    LeftBrace,         // {
-    RightBrace,        // }
-    Ampersand,         // &
-    Symbol_Count,      // Keep this last
-    Number,            // [0-9]+ ( \. [0-9]+ )?
-    Identifier,        // [a-zA-Z_][\w\d_]+
-    StringLiteral,     // ".*?"
-    NameLiteral,       // '.*?'
-    OtherText,         // Any unhandled/unknown text literal
-    LineComment,       // # ...
-    MultiLineComment,  // /* ... */
-    BlankLine,         // [\n\r]
-    EndOfInput,        // EOF
-    InvalidToken,      // Special
-    AnyIdentifier,     // Special; allows keywords to pass as identifiers in equality checks
-    TokenKind_Count,   // Keep this last
+    Set = 0,                // Set
+    None,                   // None
+    Level,                  // level
+    True,                   // True
+    False,                  // False
+    Begin,                  // Begin
+    Object,                 // Object
+    Class,                  // Class
+    Name,                   // Name
+    Package,                // Package
+    End,                    // End
+    On,                     // on
+    LogInfo,                // log_info
+    CreateMod,              // create_mod
+    PreCall,                // PRE
+    PostCall,               // POST
+    PostUnconditionalCall,  // POST_UNCONDITIONAL
+    Keyword_Count,          // Count of keywords
+    LeftParen,              // (
+    RightParen,             // )
+    Dot,                    // .
+    Colon,                  // :
+    Slash,                  // /
+    Star,                   // *
+    Comma,                  // ,
+    LeftBracket,            // [
+    RightBracket,           // ]
+    Equal,                  // =
+    SingleQuote,            // '
+    QuestionMark,           // ?
+    DollarSign,             // $
+    LeftBrace,              // {
+    RightBrace,             // }
+    Ampersand,              // &
+    Symbol_Count,           // Keep this last
+    Number,                 // [0-9]+ ( \. [0-9]+ )?
+    Identifier,             // [a-zA-Z_][\w\d_]+
+    StringLiteral,          // ".*?"
+    NameLiteral,            // '.*?'
+    OtherText,              // Any unhandled/unknown text literal
+    LineComment,            // # ...
+    MultiLineComment,       // /* ... */
+    BlankLine,              // [\n\r]
+    EndOfInput,             // EOF
+    InvalidToken,           // Special
+    AnyIdentifier,          // Special; allows keywords to pass as identifiers in equality checks
+    TokenKind_Count,        // Keep this last
 };
 }
 
@@ -86,6 +92,12 @@ constexpr std::array<std::string_view, token_type_count + 1> token_type_names{
     "Name",
     "Package",
     "End",
+    "on",
+    "log_info",
+    "create_mod",
+    "PRE",
+    "POST",
+    "POST_UNCONDITIONAL",
     "Keyword_Count",
 
     "LeftParen",
