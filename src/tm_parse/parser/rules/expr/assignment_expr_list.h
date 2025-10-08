@@ -24,8 +24,8 @@ class AssignmentExprList : public Expr {
    public:
     AssignmentExprList(const AssignmentExprList&) = delete;
     AssignmentExprList& operator=(const AssignmentExprList&) = delete;
-    AssignmentExprList(AssignmentExprList&&);
-    AssignmentExprList& operator=(AssignmentExprList&&);
+    AssignmentExprList(AssignmentExprList&&) noexcept;
+    AssignmentExprList& operator=(AssignmentExprList&&) noexcept;
 
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;

@@ -8,9 +8,17 @@
 
 #include "tm_parse/pch.h"
 
-#include "../parser_rule.h"
+#include "tm_parse/parser/rules/parser_rule.h"
 
 namespace tm_parse::rules {
+
+// TODO: Originally I thought that a rule satisfying:
+//    Identifier ( Dot Identifier )*
+//  would have been enough but when creating some example programs I noticed that there was/could
+//  be a need for some more extended variants such as the following
+//    $(Globals.ExpScaleByLevelDifference(0).HigherLevelEnemyExpScale)
+//  which I don't need to explain what it does.
+//
 
 class DotIdentifier : public ParserRule {
    private:

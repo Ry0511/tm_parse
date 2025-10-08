@@ -25,8 +25,8 @@ class Expr : public ParserRule {
    public:
     Expr(const Expr&) = default;
     Expr& operator=(const Expr&) = default;
-    Expr(Expr&&) = default;
-    Expr& operator=(Expr&&) = default;
+    Expr(Expr&&) noexcept = default;
+    Expr& operator=(Expr&&) noexcept = default;
 
    public:
     RULE_STATIC_API(Expr);

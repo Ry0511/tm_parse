@@ -62,7 +62,7 @@ void AssignmentExprList::visit(const std::function<void(const ParserRule&)>& fun
 }
 
 AssignmentExprList::~AssignmentExprList() = default;
-AssignmentExprList::AssignmentExprList(AssignmentExprList&&) = default;
-AssignmentExprList& AssignmentExprList::operator=(AssignmentExprList&&) = default;
+AssignmentExprList::AssignmentExprList(AssignmentExprList&&) noexcept = default;
+AssignmentExprList& AssignmentExprList::operator=(AssignmentExprList&&) noexcept = default;
 
 }  // namespace tm_parse::rules

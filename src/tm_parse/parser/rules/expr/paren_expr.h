@@ -22,8 +22,8 @@ class ParenExpr : public Expr {
    public:
     ParenExpr(const ParenExpr&) = delete;
     ParenExpr& operator=(const ParenExpr&) = delete;
-    ParenExpr(ParenExpr&&);
-    ParenExpr& operator=(ParenExpr&&);
+    ParenExpr(ParenExpr&&) noexcept;
+    ParenExpr& operator=(ParenExpr&&) noexcept;
 
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;

@@ -38,7 +38,7 @@ void AssignmentExpr::visit(const std::function<void(const ParserRule&)>& func) c
 }
 
 AssignmentExpr::~AssignmentExpr() = default;
-AssignmentExpr::AssignmentExpr(AssignmentExpr&&) = default;
-AssignmentExpr& AssignmentExpr::operator=(AssignmentExpr&&) = default;
+AssignmentExpr::AssignmentExpr(AssignmentExpr&&) noexcept = default;
+AssignmentExpr& AssignmentExpr::operator=(AssignmentExpr&&) noexcept = default;
 
 }  // namespace tm_parse::rules

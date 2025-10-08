@@ -23,8 +23,8 @@ class LiteralExpr : public Expr {
    public:
     LiteralExpr(const LiteralExpr&) = default;
     LiteralExpr& operator=(const LiteralExpr&) = default;
-    LiteralExpr(LiteralExpr&&) = default;
-    LiteralExpr& operator=(LiteralExpr&&) = default;
+    LiteralExpr(LiteralExpr&&) noexcept = default;
+    LiteralExpr& operator=(LiteralExpr&&) noexcept = default;
 
    public:
     template <class T>

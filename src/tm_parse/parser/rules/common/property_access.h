@@ -7,7 +7,7 @@
 #pragma once
 
 #include "tm_parse/pch.h"
-#include "../parser_rule.h"
+#include "tm_parse/parser/rules/parser_rule.h"
 
 namespace tm_parse::rules {
 
@@ -26,8 +26,8 @@ class PropertyAccess : public ParserRule {
    public:
     PropertyAccess(const PropertyAccess&) = delete;
     PropertyAccess& operator=(const PropertyAccess&) = delete;
-    PropertyAccess(PropertyAccess&&);
-    PropertyAccess& operator=(PropertyAccess&&);
+    PropertyAccess(PropertyAccess&&) noexcept;
+    PropertyAccess& operator=(PropertyAccess&&) noexcept;
 
    public:
     const DotIdentifier& property() const noexcept { return *m_Property; }
