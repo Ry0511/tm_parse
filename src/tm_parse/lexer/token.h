@@ -97,6 +97,9 @@ struct Token {
     }
 
    public:
+    TextRegion extend(const Token& other) const noexcept { return Region.extend(other.Region); }
+
+   public:
     constexpr bool is_eof() const noexcept { return Kind == tk::EndOfInput; }
     constexpr bool is_identifier() const noexcept {
         return tm_parse::is_identifier(Kind) || is_keyword();
