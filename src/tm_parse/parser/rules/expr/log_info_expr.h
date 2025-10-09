@@ -4,6 +4,8 @@
 // Author     : -Ry
 //
 
+#pragma once
+
 #include "tm_parse/pch.h"
 #include "tm_parse/parser/rules/expr/expr.h"
 
