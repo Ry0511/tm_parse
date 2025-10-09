@@ -39,6 +39,8 @@ enum TokenKind : token_kind_int {
     Colon,                  // :
     Slash,                  // /
     Star,                   // *
+    Plus,                   // +
+    Minus,                  // -
     Comma,                  // ,
     LeftBracket,            // [
     RightBracket,           // ]
@@ -106,6 +108,8 @@ constexpr std::array<std::string_view, token_type_count + 1> token_type_names{
     "Colon",
     "Slash",
     "Star",
+    "Plus",
+    "Minus",
     "Comma",
     "LeftBracket",
     "RightBracket",

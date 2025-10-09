@@ -296,6 +296,8 @@ Token Lexer::read_other() {
         case TXT(':'):  return _create_token(tk::Colon);
         case TXT('/'):  return _create_token(tk::Slash);
         case TXT('*'):  return _create_token(tk::Star);
+        case TXT('+'):  return _create_token(tk::Plus);
+        case TXT('-'):  return _create_token(tk::Minus);
         case TXT(','):  return _create_token(tk::Comma);
         case TXT('='):  return _create_token(tk::Equal);
         case TXT('\''): return _create_token(tk::SingleQuote);

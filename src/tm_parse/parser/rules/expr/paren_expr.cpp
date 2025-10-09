@@ -12,8 +12,8 @@
 namespace tm_parse::rules {
 
 bool ParenExpr::matches(Matcher& matcher) noexcept {
-    if (matcher.maybe(tk::LeftParen)) {
-        return Expr::matches(matcher) && matcher.maybe(tk::RightParen);
+    if (matcher.maybe_real(tk::LeftParen)) {
+        return Expr::matches(matcher) && matcher.maybe_real(tk::RightParen);
     }
     return false;
 }
