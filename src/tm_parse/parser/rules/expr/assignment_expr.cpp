@@ -12,6 +12,10 @@
 
 namespace tm_parse::rules {
 
+AssignmentExpr::~AssignmentExpr() = default;
+AssignmentExpr::AssignmentExpr(AssignmentExpr&&) noexcept = default;
+AssignmentExpr& AssignmentExpr::operator=(AssignmentExpr&&) noexcept = default;
+
 bool AssignmentExpr::matches(Matcher& matcher) noexcept {
     return PropertyAccess::matches(matcher) && matcher.maybe_real(tk::Equal)
            && Expr::matches(matcher);
@@ -37,8 +41,10 @@ void AssignmentExpr::visit(const std::function<void(const ParserRule&)>& func) c
     m_Expr->visit(func);
 }
 
-AssignmentExpr::~AssignmentExpr() = default;
-AssignmentExpr::AssignmentExpr(AssignmentExpr&&) noexcept = default;
-AssignmentExpr& AssignmentExpr::operator=(AssignmentExpr&&) noexcept = default;
+void AssignmentExpr::cascade_assign_parents(ParserRule* parent) noexcept {
+    Expr::cascade_assign_parents(parent);
+    m_Property->cascade_assign_parents(this);
+    m_Expr->cascade_assign_parents(this);
+}
 
 }  // namespace tm_parse::rules

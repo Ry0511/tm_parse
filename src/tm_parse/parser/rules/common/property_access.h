@@ -35,8 +35,7 @@ class PropertyAccess : public ParserRule {
 
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
-
-   public:
+    void cascade_assign_parents(ParserRule* parent) noexcept override;
     RULE_STATIC_API(PropertyAccess);
 };
 

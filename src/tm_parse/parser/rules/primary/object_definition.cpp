@@ -56,6 +56,10 @@ bool is_assignment_seq(Matcher& m) noexcept {
 
 }  // namespace
 
+ObjectDefinition::~ObjectDefinition() = default;
+ObjectDefinition::ObjectDefinition(ObjectDefinition&&) noexcept = default;
+ObjectDefinition& ObjectDefinition::operator=(ObjectDefinition&&) noexcept = default;
+
 bool ObjectDefinition::matches(Matcher& matcher) noexcept {
     if (!matcher.try_match_real(obj_def_start_seq)) {
         return false;
@@ -132,10 +136,6 @@ std::unique_ptr<ObjectDefinition> ObjectDefinition::create(Parser& parser) {
     return rule;
 }
 
-ObjectDefinition::~ObjectDefinition() = default;
-ObjectDefinition::ObjectDefinition(ObjectDefinition&&) = default;
-ObjectDefinition& ObjectDefinition::operator=(ObjectDefinition&&) = default;
-
 void ObjectDefinition::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
     ParserRule::visit(func);
 
@@ -145,6 +145,18 @@ void ObjectDefinition::visit(const std::function<void(const ParserRule&)>& func)
 
     for (const auto& property : m_PropertyWrites) {
         property->visit(func);
+    }
+}
+
+void ObjectDefinition::cascade_assign_parents(ParserRule* parent) noexcept {
+    ParserRule::cascade_assign_parents(parent);
+
+    for (const auto& child : m_ChildObjects) {
+        child->cascade_assign_parents(this);
+    }
+
+    for (const auto& assign : m_PropertyWrites) {
+        assign->cascade_assign_parents(this);
     }
 }
 

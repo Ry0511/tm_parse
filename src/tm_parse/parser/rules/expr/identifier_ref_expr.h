@@ -30,6 +30,10 @@ class IdentifierRefExpr : public Expr {
 
    public:
     RULE_STATIC_API(IdentifierRefExpr);
+
+   public:
+    void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
+    void cascade_assign_parents(ParserRule* parent) noexcept override;
 };
 
 }  // namespace tm_parse::rules

@@ -33,6 +33,7 @@ class UnaryOpExpr : public Expr {
 
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
+    void cascade_assign_parents(ParserRule* parent) noexcept override;
     str rule_name() const noexcept override { return "UnaryOpExpr"; }
 };
 
@@ -55,6 +56,7 @@ class BinaryOpExpr : public Expr {
 
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
+    void cascade_assign_parents(ParserRule* parent) noexcept override;
     str rule_name() const noexcept override { return "BinaryOpExpr"; }
 };
 
@@ -74,6 +76,7 @@ class ComposedExpr : public Expr {
 
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
+    void cascade_assign_parents(ParserRule* parent) noexcept override;
     RULE_STATIC_API(ComposedExpr);
 
    private:

@@ -28,8 +28,8 @@ class SetCommand : public ParserRule {
    public:
     SetCommand(const SetCommand&) = delete;
     SetCommand& operator=(const SetCommand&) = delete;
-    SetCommand(SetCommand&&);
-    SetCommand& operator=(SetCommand&&);
+    SetCommand(SetCommand&&) noexcept ;
+    SetCommand& operator=(SetCommand&&) noexcept ;
 
    public:
     const ObjectRef& object_ref() const noexcept { return *m_ObjectRef; };
@@ -38,8 +38,7 @@ class SetCommand : public ParserRule {
 
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
-
-   public:
+    void cascade_assign_parents(ParserRule* parent) noexcept override;
     RULE_STATIC_API(SetCommand);
 };
 

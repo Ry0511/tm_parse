@@ -55,6 +55,22 @@ void ComposedExpr::visit(const std::function<void(const ParserRule&)>& func) con
     m_Expr->visit(func);
 }
 
+void UnaryOpExpr::cascade_assign_parents(ParserRule* parent) noexcept {
+    Expr::cascade_assign_parents(parent);
+    m_Operand->cascade_assign_parents(this);
+}
+
+void BinaryOpExpr::cascade_assign_parents(ParserRule* parent) noexcept {
+    Expr::cascade_assign_parents(parent);
+    m_Left->cascade_assign_parents(this);
+    m_Right->cascade_assign_parents(this);
+}
+
+void ComposedExpr::cascade_assign_parents(ParserRule* parent) noexcept {
+    Expr::cascade_assign_parents(parent);
+    m_Expr->cascade_assign_parents(this);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // | IMPLEMENTATION |
 ////////////////////////////////////////////////////////////////////////////////
@@ -143,15 +159,21 @@ std::unique_ptr<ComposedExpr> ComposedExpr::create(Parser& parser) {
     return parse_expr(parser);
 }
 
-// TODO: The child nodes need to have their parent post initialised ( also setting the parents as well )
+// TODO: The child nodes need to have their parent post initialised ( also setting the parents as
+// well )
 
 std::unique_ptr<ComposedExpr> ComposedExpr::parse_expr(Parser& parser) {
     Operator unary_op = Operator::Unknown;
 
-    if (parser.maybe_next_real(tk::Plus)) {
+    Token first = parser.maybe_next_real(tk::Plus);
+
+    if (first) {
         unary_op = Operator::Positive;
-    } else if (parser.maybe_next_real(tk::Minus)) {
-        unary_op = Operator::Negate;
+    } else {
+        first = parser.maybe_next_real(tk::Minus);
+        if (first) {
+            unary_op = Operator::Negate;
+        }
     }
 
     std::unique_ptr<Expr> node = parse_term(parser);
@@ -160,6 +182,7 @@ std::unique_ptr<ComposedExpr> ComposedExpr::parse_expr(Parser& parser) {
         auto unary = std::make_unique<UnaryOpExpr>();
         unary->m_Operator = unary_op;
         unary->m_Operand = std::move(node);
+        unary->post_init(first, unary->m_Operand->last_token());
         node = std::move(unary);
     }
 
@@ -177,12 +200,14 @@ std::unique_ptr<ComposedExpr> ComposedExpr::parse_expr(Parser& parser) {
         binary_op->m_Operator = op;
         binary_op->m_Left = std::move(node);
         binary_op->m_Right = std::move(right);
+        binary_op->post_init(*binary_op->m_Left, *binary_op->m_Right);
 
         node = std::move(binary_op);
     }
 
     auto rule = std::make_unique<ComposedExpr>();
     rule->m_Expr = std::move(node);
+    rule->copy_state(*rule->m_Expr);
     return rule;
 }
 
@@ -202,6 +227,7 @@ std::unique_ptr<Expr> ComposedExpr::parse_term(Parser& parser) {
         binary_op->m_Operator = op;
         binary_op->m_Left = std::move(node);
         binary_op->m_Right = std::move(right);
+        binary_op->post_init(*binary_op->m_Left, *binary_op->m_Right);
         node = std::move(binary_op);
     }
 
@@ -229,13 +255,25 @@ std::unique_ptr<Expr> ComposedExpr::parse_factor(Parser& parser) {
 
     // sub expression
     matcher = parser;
-    if (parser.maybe_next_real(tk::LeftParen)) {
+    if (Token first = parser.maybe_next_real(tk::LeftParen)) {
         auto node = parse_expr(parser);
-        parser.require_next_real(tk::RightParen);
+        Token last = parser.require_next_real(tk::RightParen);
+        node->post_init(first, last);
         return node;
     }
 
-    matcher = parser;
+    if (Token first = parser.maybe_next_real(tk::Plus)) {
+        auto rule = parse_expr(parser);
+        rule->post_init(first, rule->last_token());
+        return rule;
+    }
+
+    if (Token first = parser.maybe_next_real(tk::Minus)) {
+        auto rule = parse_expr(parser);
+        rule->post_init(first, rule->last_token());
+        return rule;
+    }
+
     if (parser.maybe_next_real(tk::Minus) || parser.maybe_next_real(tk::Plus)) {
         return parse_expr(parser);
     }

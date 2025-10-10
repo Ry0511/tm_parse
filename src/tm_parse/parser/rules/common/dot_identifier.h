@@ -37,7 +37,6 @@ class DotIdentifier : public ParserRule {
    public:
     const std::vector<TextRegion>& name_parts() const noexcept { return m_NameParts; }
 
-   public:
     RULE_STATIC_API(DotIdentifier);
 };
 

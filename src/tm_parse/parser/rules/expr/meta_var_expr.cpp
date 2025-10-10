@@ -38,4 +38,14 @@ std::unique_ptr<MetaVarExpr> MetaVarExpr::create(Parser& parser) {
     return rule;
 }
 
+void MetaVarExpr::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
+    Expr::visit(func);
+    m_Identifier->visit(func);
+}
+
+void MetaVarExpr::cascade_assign_parents(ParserRule* parent) noexcept {
+    Expr::cascade_assign_parents(parent);
+    m_Identifier->cascade_assign_parents(this);
+}
+
 }  // namespace tm_parse::rules

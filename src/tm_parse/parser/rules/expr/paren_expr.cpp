@@ -40,4 +40,9 @@ void ParenExpr::visit(const std::function<void(const ParserRule&)>& func) const 
     m_Inner->visit(func);
 }
 
+void ParenExpr::cascade_assign_parents(ParserRule* parent) noexcept {
+    Expr::cascade_assign_parents(parent);
+    m_Inner->cascade_assign_parents(this);
+}
+
 }  // namespace tm_parse::rules

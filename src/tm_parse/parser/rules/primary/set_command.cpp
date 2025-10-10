@@ -15,6 +15,10 @@
 
 namespace tm_parse::rules {
 
+SetCommand::~SetCommand() = default;
+SetCommand::SetCommand(SetCommand&&) noexcept = default;
+SetCommand& SetCommand::operator=(SetCommand&&) noexcept = default;
+
 bool SetCommand::matches(Matcher& matcher) noexcept {
     return matcher.maybe_real(tk::Set) && ObjectRef::matches(matcher)
            && PropertyAccess::matches(matcher);
@@ -44,8 +48,11 @@ void SetCommand::visit(const std::function<void(const ParserRule&)>& func) const
     m_Expr->visit(func);
 }
 
-SetCommand::~SetCommand() = default;
-SetCommand::SetCommand(SetCommand&&) = default;
-SetCommand& SetCommand::operator=(SetCommand&&) = default;
+void SetCommand::cascade_assign_parents(ParserRule* parent) noexcept {
+    ParserRule::cascade_assign_parents(parent);
+    m_ObjectRef->cascade_assign_parents(this);
+    m_Property->cascade_assign_parents(this);
+    m_Expr->cascade_assign_parents(this);
+}
 
 }  // namespace tm_parse::rules

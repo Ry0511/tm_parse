@@ -8,6 +8,7 @@
 
 #include "tm_parse/pch.h"
 
+#include "parser_rule.h"
 #include "tm_parse/lexer/token.h"
 #include "tm_parse/parser/matcher.h"
 #include "tm_parse/util/text_region.h"
@@ -77,8 +78,8 @@ class ParserRule {
     void post_init(const ParserRule& first, const ParserRule& last) noexcept;
     void copy_state(const ParserRule& other) noexcept;
 
-   protected:
-    virtual void assign_parent_to_children() noexcept {};
+   public:
+    virtual void cascade_assign_parents(ParserRule* parent) noexcept { m_Parent = parent; };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

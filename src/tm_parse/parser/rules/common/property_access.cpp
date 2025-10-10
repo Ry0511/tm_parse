@@ -13,6 +13,10 @@
 
 namespace tm_parse::rules {
 
+PropertyAccess::~PropertyAccess() = default;
+PropertyAccess::PropertyAccess(PropertyAccess&&) noexcept = default;
+PropertyAccess& PropertyAccess::operator=(PropertyAccess&&) noexcept = default;
+
 bool PropertyAccess::matches(Matcher& matcher) noexcept {
     bool res = DotIdentifier::matches(matcher);
     ArrayAccess::matches(matcher);
@@ -36,14 +40,19 @@ std::unique_ptr<PropertyAccess> PropertyAccess::create(Parser& parser) {
     return rule;
 }
 
-PropertyAccess::~PropertyAccess() = default;
-PropertyAccess::PropertyAccess(PropertyAccess&&) noexcept = default;
-PropertyAccess& PropertyAccess::operator=(PropertyAccess&&) noexcept = default;
-
 void PropertyAccess::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
     ParserRule::visit(func);
     if (m_ArrayAccess != nullptr) {
         m_ArrayAccess->visit(func);
+    }
+}
+
+void PropertyAccess::cascade_assign_parents(ParserRule* parent) noexcept {
+    ParserRule::cascade_assign_parents(parent);
+    m_Property->cascade_assign_parents(this);
+
+    if (m_ArrayAccess != nullptr) {
+        m_ArrayAccess->cascade_assign_parents(this);
     }
 }
 

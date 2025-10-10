@@ -13,10 +13,9 @@
 
 namespace tm_parse::rules {
 
-// TODO: With how this is currently implemented its possible for there to be a single assignment
-//  inside an expression list. Since fundamentally A=(B=10) is A being set via an
-//  AssignmentExprList. Potentially, this is an ambiguity between a ParenExpr as (1) would be a
-//  ParenExpr but (A=1) is not.
+AssignmentExprList::~AssignmentExprList() = default;
+AssignmentExprList::AssignmentExprList(AssignmentExprList&&) noexcept = default;
+AssignmentExprList& AssignmentExprList::operator=(AssignmentExprList&&) noexcept = default;
 
 bool AssignmentExprList::matches(Matcher& matcher) noexcept {
     if (!matcher.maybe_real(tk::LeftParen)) {
@@ -61,8 +60,11 @@ void AssignmentExprList::visit(const std::function<void(const ParserRule&)>& fun
     }
 }
 
-AssignmentExprList::~AssignmentExprList() = default;
-AssignmentExprList::AssignmentExprList(AssignmentExprList&&) noexcept = default;
-AssignmentExprList& AssignmentExprList::operator=(AssignmentExprList&&) noexcept = default;
+void AssignmentExprList::cascade_assign_parents(ParserRule* parent) noexcept {
+    Expr::cascade_assign_parents(parent);
+    for (const auto& ptr : m_Assignments) {
+        ptr->cascade_assign_parents(this);
+    }
+}
 
 }  // namespace tm_parse::rules

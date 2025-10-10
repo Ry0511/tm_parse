@@ -13,7 +13,7 @@ namespace tm_parse::rules {
 
 class LogInfoExpr : public Expr {
    private:
-    str m_Text{};
+    str m_Text;
 
    public:
     LogInfoExpr() noexcept;

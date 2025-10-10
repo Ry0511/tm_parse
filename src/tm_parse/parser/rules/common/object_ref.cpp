@@ -12,6 +12,10 @@
 
 namespace tm_parse::rules {
 
+ObjectRef::~ObjectRef() = default;
+ObjectRef::ObjectRef(ObjectRef&&) noexcept = default;
+ObjectRef& ObjectRef::operator=(ObjectRef&&) noexcept = default;
+
 bool ObjectRef::matches(Matcher& matcher) noexcept {
     if (!DotIdentifier::matches(matcher)) {
         return false;
@@ -41,16 +45,20 @@ std::unique_ptr<ObjectRef> ObjectRef::create(Parser& parser) {
     return ref;
 }
 
-ObjectRef::~ObjectRef() = default;
-ObjectRef::ObjectRef(ObjectRef&&) noexcept = default;
-ObjectRef& ObjectRef::operator=(ObjectRef&&) noexcept = default;
-
 void ObjectRef::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
     func(*this);
     this->m_MainObject->visit(func);
 
     if (this->m_SubObject != nullptr) {
         this->m_SubObject->visit(func);
+    }
+}
+
+void ObjectRef::cascade_assign_parents(ParserRule* parent) noexcept {
+    ParserRule::cascade_assign_parents(parent);
+    m_MainObject->cascade_assign_parents(this);
+    if (m_SubObject != nullptr) {
+        m_SubObject->cascade_assign_parents(this);
     }
 }
 

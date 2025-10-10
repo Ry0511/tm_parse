@@ -26,13 +26,12 @@ class ObjectDefinition : public ParserRule {
    public:
     ObjectDefinition(const ObjectDefinition&) = delete;
     ObjectDefinition& operator=(const ObjectDefinition&) = delete;
-    ObjectDefinition(ObjectDefinition&&);
-    ObjectDefinition& operator=(ObjectDefinition&&);
+    ObjectDefinition(ObjectDefinition&&) noexcept;
+    ObjectDefinition& operator=(ObjectDefinition&&) noexcept;
 
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
-
-
+    void cascade_assign_parents(ParserRule* parent) noexcept override;
     RULE_STATIC_API(ObjectDefinition);
 };
 
