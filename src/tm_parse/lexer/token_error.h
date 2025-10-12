@@ -14,10 +14,19 @@ namespace tm_parse {
 class TokenError : public std::runtime_error {
    private:
     Token m_Token;
+    std::source_location m_SourceLocation;
 
    public:
-    TokenError(const Token& token);
-    TokenError(const std::string& msg, const Token& token);
+    TokenError(
+        const Token& token,
+        const std::source_location& loc = std::source_location::current()
+    );
+
+    TokenError(
+        const std::string& msg,
+        const Token& token,
+        const std::source_location& loc = std::source_location::current()
+    );
     ~TokenError() = default;
 
    public:
