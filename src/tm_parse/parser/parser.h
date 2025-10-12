@@ -24,7 +24,8 @@ class Parser {
     Parser(const fs::path& file);
     ~Parser() = default;
 
-   public:
+   public:  // TODO: need to consider if the only tokens on the stream are skip tokens since
+            //  next_real will return eof in that case
     bool is_eof() const { return m_Matcher.is_eof(); }
 
    public:
@@ -41,7 +42,7 @@ class Parser {
     // TODO: replace this by inheriting Matcher. Only delaying this since the above conversion
     //  operator and some other places make a bunch of rules fail to parse. Once proper testing is
     //  being done it will be easier to figure out what will get broken.
-   public: // clang-format off
+   public:  // clang-format off
     Token next()                                         noexcept { return m_Matcher.next();             }
     Token next_real()                                    noexcept { return m_Matcher.next_real();        }
     Token maybe(tk::TokenKind kind)                      noexcept { return m_Matcher.maybe(kind);        }
@@ -50,7 +51,7 @@ class Parser {
     Token any_real(std::span<const tk::TokenKind> kinds) noexcept { return m_Matcher.any_real(kinds);    }
     Token require(tk::TokenKind kind)                             { return m_Matcher.require(kind);      }
     Token require_real(tk::TokenKind kind)                        { return m_Matcher.require_real(kind); }
-    // clang-format on
+            // clang-format on
 
    private:
     friend class Matcher;
