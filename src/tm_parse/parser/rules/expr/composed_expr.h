@@ -18,7 +18,7 @@ class ComposedExpr;
 class UnaryOpExpr : public Expr {
    private:
     friend ComposedExpr;
-    Operator m_Operator{Operator::Unknown};
+    Operator m_Operator{Operator::Unknown}; // TODO: this is always going to be Negate
     std::unique_ptr<Expr> m_Operand;
 
    public:
@@ -80,7 +80,7 @@ class ComposedExpr : public Expr {
     RULE_STATIC_API(ComposedExpr);
 
    private:
-    static std::unique_ptr<ComposedExpr> parse_expr(Parser& parser);
+    static std::unique_ptr<Expr> parse_expr(Parser& parser);
     static std::unique_ptr<Expr> parse_term(Parser& parser);
     static std::unique_ptr<Expr> parse_factor(Parser& parser);
 };

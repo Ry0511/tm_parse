@@ -77,37 +77,33 @@ void ComposedExpr::cascade_assign_parents(ParserRule* parent) noexcept {
 
 //
 // Broadly following: https://en.wikipedia.org/wiki/Recursive_descent_parser#Example_parser
-//   So we have
-//     Expression ::= expression = ["+"|"-"] term {("+"|"-") term} .
-//     Term       ::= term = factor {("*"|"/") factor} .
-//     Factor     ::= ident | number | "(" expression ")" .
+// extended to support unary operations i.e., -( A + B ) and -( -A + +B ) albeit +B is just for
+// symmetry, it does nothing ( omitted from the parsed result as well ).
 //
-// Note
-//   - [ X ]  means X is optional
-//   -  "X"   means X must appear exactly as is
-//   - { X }  means X is a repeating sequence similar to X* (zero or more)
-//   - ( X )  is a generic grouping
-//   -  X|Y   means one of X or Y
+//   i.e, for C++ ( and presumably every other language )
+//     int a = -10;
+//     int b = +a;  // -10
+//     int c = -a;  // 10
 //
-// So: expression = ["+"|"-"] term {("+"|"-") term} .
-//   Is: [+-]? term ([+-] term)*
+// see: extended_text_mods.g4 as a simpler outline of how the rules should be processed. But do
+// note that this implementation will produce a slightly different tree as it also cleans the
+// emitted results.
 //
 
 namespace {
+
+constinit tk::TokenKind op_unary_operators[]{tk::Plus, tk::Minus};
+constinit tk::TokenKind op_low_precedence[]{tk::Plus, tk::Minus};
+constinit tk::TokenKind op_high_precedence[]{tk::Star, tk::Slash};
 
 bool match_expr(Matcher& matcher);
 bool match_term(Matcher& matcher);
 bool match_factor(Matcher& matcher);
 
 bool match_expr(Matcher& matcher) {
-    bool has_unary = matcher.maybe_real(tk::Plus) || matcher.maybe_real(tk::Minus);
-    (void)has_unary;
-
     match_term(matcher);
 
-    constexpr tk::TokenKind valid_tokens[]{tk::Plus, tk::Minus};
-
-    while (matcher.any_real(valid_tokens)) {
+    while (matcher.any_real(op_low_precedence)) {
         if (!match_term(matcher)) {
             return false;
         }
@@ -121,9 +117,7 @@ bool match_term(Matcher& matcher) {
         return false;
     }
 
-    constexpr tk::TokenKind valid_tokens[]{tk::Star, tk::Slash};
-
-    while (matcher.any_real(valid_tokens)) {
+    while (matcher.any_real(op_high_precedence)) {
         if (!match_factor(matcher)) {
             return false;
         }
@@ -143,10 +137,10 @@ bool match_factor(Matcher& matcher) {
         if (!match_expr(matcher)) {
             return false;
         }
-        return matcher.require_real(tk::RightParen);
+        return matcher.maybe_real(tk::RightParen);
     }
 
-    return false;
+    return matcher.any_real(op_unary_operators);
 }
 
 }  // namespace
@@ -156,79 +150,50 @@ bool ComposedExpr::matches(Matcher& matcher) noexcept {
 }
 
 std::unique_ptr<ComposedExpr> ComposedExpr::create(Parser& parser) {
-    return parse_expr(parser);
-}
-
-// TODO: The child nodes need to have their parent post initialised ( also setting the parents as
-// well )
-
-std::unique_ptr<ComposedExpr> ComposedExpr::parse_expr(Parser& parser) {
-    Operator unary_op = Operator::Unknown;
-
-    Token first = parser.maybe_next_real(tk::Plus);
-
-    if (first) {
-        unary_op = Operator::Positive;
-    } else {
-        first = parser.maybe_next_real(tk::Minus);
-        if (first) {
-            unary_op = Operator::Negate;
-        }
-    }
-
-    std::unique_ptr<Expr> node = parse_term(parser);
-
-    if (unary_op == Operator::Positive || unary_op == Operator::Negate) {
-        auto unary = std::make_unique<UnaryOpExpr>();
-        unary->m_Operator = unary_op;
-        unary->m_Operand = std::move(node);
-        unary->post_init(first, unary->m_Operand->last_token());
-        node = std::move(unary);
-    }
-
-    constexpr tk::TokenKind valid_tokens[]{tk::Plus, tk::Minus};
-    Matcher m = parser;
-
-    while (Token cur = m.any_real(valid_tokens)) {
-        Operator op = (cur == tk::Plus) ? Operator::Add : Operator::Subtract;
-
-        parser.set_position(m.position());
-        std::unique_ptr<Expr> right = parse_term(parser);
-        m.set_position(parser.position());
-
-        auto binary_op = std::make_unique<BinaryOpExpr>();
-        binary_op->m_Operator = op;
-        binary_op->m_Left = std::move(node);
-        binary_op->m_Right = std::move(right);
-        binary_op->post_init(*binary_op->m_Left, *binary_op->m_Right);
-
-        node = std::move(binary_op);
-    }
-
     auto rule = std::make_unique<ComposedExpr>();
-    rule->m_Expr = std::move(node);
+    rule->m_Expr = parse_expr(parser);
     rule->copy_state(*rule->m_Expr);
     return rule;
 }
 
-std::unique_ptr<Expr> ComposedExpr::parse_term(Parser& parser) {
-    auto node = parse_factor(parser);
-
-    constexpr tk::TokenKind valid_tokens[]{tk::Star, tk::Slash};
+std::unique_ptr<Expr> ComposedExpr::parse_expr(Parser& parser) {
+    std::unique_ptr<Expr> node = parse_term(parser);
     Matcher m = parser;
 
-    while (Token cur = m.any_real(valid_tokens)) {
-        Operator op = (cur == tk::Star) ? Operator::Multiply : Operator::Divide;
+    // TODO: Need to introduce the same api for parser as we do for matcher
+    while (Token cur = m.any_real(op_low_precedence)) {
+        Operator op = (cur == tk::Plus) ? Operator::Add : Operator::Subtract;
         parser.set_position(m.position());
-        auto right = parse_factor(parser);
-        m.set_position(parser.position());
 
         auto binary_op = std::make_unique<BinaryOpExpr>();
         binary_op->m_Operator = op;
         binary_op->m_Left = std::move(node);
-        binary_op->m_Right = std::move(right);
+        binary_op->m_Right = parse_term(parser);
         binary_op->post_init(*binary_op->m_Left, *binary_op->m_Right);
+
         node = std::move(binary_op);
+        m.set_position(parser.position());
+    }
+
+    return node;
+}
+
+std::unique_ptr<Expr> ComposedExpr::parse_term(Parser& parser) {
+    auto node = parse_factor(parser);
+    Matcher m = parser;
+
+    while (Token cur = m.any_real(op_high_precedence)) {
+        Operator op = (cur == tk::Star) ? Operator::Multiply : Operator::Divide;
+        parser.set_position(m.position());
+
+        auto binary_op = std::make_unique<BinaryOpExpr>();
+        binary_op->m_Operator = op;
+        binary_op->m_Left = std::move(node);
+        binary_op->m_Right = parse_factor(parser);
+        binary_op->post_init(*binary_op->m_Left, *binary_op->m_Right);
+
+        node = std::move(binary_op);
+        m.set_position(parser.position());
     }
 
     return node;
@@ -254,7 +219,6 @@ std::unique_ptr<Expr> ComposedExpr::parse_factor(Parser& parser) {
     }
 
     // sub expression
-    matcher = parser;
     if (Token first = parser.maybe_next_real(tk::LeftParen)) {
         auto node = parse_expr(parser);
         Token last = parser.require_next_real(tk::RightParen);
@@ -262,20 +226,21 @@ std::unique_ptr<Expr> ComposedExpr::parse_factor(Parser& parser) {
         return node;
     }
 
+    // unary operator + is generally ignored/no op and only done for symmetry, its only usage/change
+    // is that the rules full text region will include it
     if (Token first = parser.maybe_next_real(tk::Plus)) {
-        auto rule = parse_expr(parser);
-        rule->post_init(first, rule->last_token());
-        return rule;
+        auto node = parse_factor(parser);
+        node->post_init(first, node->last_token());
+        return node;
     }
 
+    // negation is just sugar that allows -(A * B) to be equal to (A * B) * -1
     if (Token first = parser.maybe_next_real(tk::Minus)) {
-        auto rule = parse_expr(parser);
-        rule->post_init(first, rule->last_token());
-        return rule;
-    }
-
-    if (parser.maybe_next_real(tk::Minus) || parser.maybe_next_real(tk::Plus)) {
-        return parse_expr(parser);
+        auto unary = std::make_unique<UnaryOpExpr>();
+        unary->m_Operator = Operator::Negate;
+        unary->m_Operand = parse_factor(parser);
+        unary->post_init(first, unary->m_Operand->last_token());
+        return unary;
     }
 
     // Don't know what this is
