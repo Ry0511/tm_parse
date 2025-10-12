@@ -8,7 +8,6 @@
 
 #include "tm_parse/pch.h"
 
-#include "parser_rule.h"
 #include "tm_parse/lexer/token.h"
 #include "tm_parse/parser/matcher.h"
 #include "tm_parse/util/text_region.h"
@@ -72,7 +71,7 @@ class ParserRule {
         return depth;
     }
 
-   protected:
+   public:
     void post_init(const Token& first, const Token& last) noexcept;
     void post_init(const Token& first) noexcept;
     void post_init(const ParserRule& first, const ParserRule& last) noexcept;
@@ -85,6 +84,10 @@ class ParserRule {
 ////////////////////////////////////////////////////////////////////////////////
 // | STATIC API GENERATOR |
 ////////////////////////////////////////////////////////////////////////////////
+
+// TODO: This works well for simple rules but doesn't always match nicely for complex rules as seen
+//  with ComposedExpr. Primarily speaking in regards to the `matches` function as this effectively
+//  requires us to duplicate the create code just without the allocations...
 
 #define RULE_STATIC_API(rule)                       \
     str rule_name() const noexcept override {       \
