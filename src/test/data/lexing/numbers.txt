@@ -7,6 +7,9 @@ test_content = {
   -1
   -1.0
   -1.000001
+  +1
+  +1.0
+  +1.000001
   000012340000
   -000012340000
   --1
@@ -23,9 +26,12 @@ expected_tokens = {
   Number
   Number
   Number
-  OtherText Number
-  OtherText Number
-  OtherText Number
+  Number
+  Number
+  Number
+  Minus Number
+  Minus Number
+  Minus Number
 }
 
 expected_text = {
@@ -35,6 +41,9 @@ expected_text = {
   "-1"
   "-1.0"
   "-1.000001"
+  "+1"
+  "+1.0"
+  "+1.000001"
   "000012340000"
   "-000012340000"
   "-" "-1"

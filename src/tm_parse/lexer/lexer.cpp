@@ -138,8 +138,9 @@ Token Lexer::next_token_impl() {
         return read_string_literal();
     }
 
-    // -?\d+(\.\d+)?
-    if (txt::is_digit(peek()) || (peek() == TXT('-') && txt::is_digit(peek(1)))) {
+    // [+-]?\d+(\.\d+)?
+    bool has_prefix = (peek() == TXT('-') || peek() == TXT('+'));
+    if (txt::is_digit(peek()) || (has_prefix && txt::is_digit(peek(1)))) {
         return read_number();
     }
 
@@ -258,7 +259,7 @@ Token Lexer::read_identifier() {
 Token Lexer::read_number() {
     m_Start = m_Pos;  // Start token
 
-    if (peek() == TXT('-')) {
+    if (peek() == TXT('-') || peek() == TXT('+')) {
         advance();
     }
 
