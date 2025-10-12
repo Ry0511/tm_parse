@@ -68,7 +68,7 @@ bool ObjectDefinition::matches(Matcher& matcher) noexcept {
     bool exit_found = false;
 
     while (!exit_found) {
-        Matcher m = matcher;
+        Matcher m{matcher};
 
         // check for child objects first
         if (m.try_match_real(obj_def_start_seq)) {
@@ -110,7 +110,7 @@ std::unique_ptr<ObjectDefinition> ObjectDefinition::create(Parser& parser) {
     bool exit_found = false;
 
     while (!exit_found) {
-        Matcher m = parser;
+        Matcher m = parser.create_matcher();
 
         // child object
         if (m.try_match_real(obj_def_start_seq)) {

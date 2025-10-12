@@ -158,7 +158,7 @@ std::unique_ptr<ComposedExpr> ComposedExpr::create(Parser& parser) {
 
 std::unique_ptr<Expr> ComposedExpr::parse_expr(Parser& parser) {
     std::unique_ptr<Expr> node = parse_term(parser);
-    Matcher m = parser;
+    Matcher m = parser.create_matcher();
 
     // TODO: Need to introduce the same api for parser as we do for matcher
     while (Token cur = m.any_real(op_low_precedence)) {
@@ -180,7 +180,7 @@ std::unique_ptr<Expr> ComposedExpr::parse_expr(Parser& parser) {
 
 std::unique_ptr<Expr> ComposedExpr::parse_term(Parser& parser) {
     auto node = parse_factor(parser);
-    Matcher m = parser;
+    Matcher m = parser.create_matcher();
 
     while (Token cur = m.any_real(op_high_precedence)) {
         Operator op = (cur == tk::Star) ? Operator::Multiply : Operator::Divide;
@@ -201,19 +201,20 @@ std::unique_ptr<Expr> ComposedExpr::parse_term(Parser& parser) {
 
 std::unique_ptr<Expr> ComposedExpr::parse_factor(Parser& parser) {
     // simple literal
-    Matcher matcher = parser;
+    Matcher matcher = parser.create_matcher();
+    size_t pos = matcher.position();
     if (LiteralExpr::matches(matcher)) {
         return LiteralExpr::create(parser);
     }
 
     // simple variable
-    matcher = parser;
+    matcher.set_position(pos);
     if (IdentifierRefExpr::matches(matcher)) {
         return IdentifierRefExpr::create(parser);
     }
 
     // meta var via $(foo.baz.bar)
-    matcher = parser;
+    matcher.set_position(pos);
     if (MetaVarExpr::matches(matcher)) {
         return MetaVarExpr::create(parser);
     }

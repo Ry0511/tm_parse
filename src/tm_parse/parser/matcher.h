@@ -19,9 +19,9 @@ class Matcher {
     size_t m_Position;
 
    public:
-    Matcher(Parser& parser) noexcept;
-    Matcher(const Parser& parser) noexcept;
-    Matcher(std::span<const Token> parser, size_t pos = 0) noexcept;
+    explicit Matcher(Parser& parser) noexcept;
+    explicit Matcher(const Parser& parser) noexcept;
+    explicit Matcher(std::span<const Token> parser, size_t pos = 0) noexcept;
     ~Matcher() noexcept = default;
 
    public:
@@ -30,9 +30,9 @@ class Matcher {
     void set_position(size_t position) noexcept { m_Position = position; }
 
    public:
-    Matcher(const Matcher&) = default;
+    explicit Matcher(const Matcher&) = default;
     Matcher& operator=(const Matcher&) = default;
-    Matcher(Matcher&&) = default;
+    explicit Matcher(Matcher&&) = default;
     Matcher& operator=(Matcher&&) = default;
 
    public:

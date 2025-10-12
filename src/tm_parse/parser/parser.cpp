@@ -37,7 +37,7 @@ Parser::Parser(str text)
       m_Matcher(m_Tokens) {}
 
 std::unique_ptr<ParserRule> Parser::parse() {
-    Matcher m = *this;
+    Matcher m = create_matcher();
 
     if (rules::SetCommand::matches(m)) {
         return rules::SetCommand::create(*this);

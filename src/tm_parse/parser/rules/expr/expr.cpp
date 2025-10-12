@@ -26,7 +26,7 @@ namespace {
 
 template <class T>
 std::unique_ptr<T> match_create(Parser& parser) {
-    Matcher matcher = parser;
+    Matcher matcher = parser.create_matcher();
     if (T::matches(matcher)) {
         return T::create(parser);
     }
@@ -58,7 +58,7 @@ bool Expr::matches(Matcher& matcher) noexcept {
 }
 
 std::unique_ptr<Expr> Expr::create(Parser& parser) {
-    Matcher m = parser;
+    Matcher m = parser.create_matcher();
 
 #define TRY_CREATE_RULE(rule)                    \
     if (auto ptr = match_create<rule>(parser)) { \

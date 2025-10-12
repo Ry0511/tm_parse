@@ -37,7 +37,6 @@ class Parser {
 
    public:
     Matcher create_matcher() const noexcept { return Matcher{*this}; }
-    operator Matcher() const noexcept { return Matcher{*this}; }
 
     // TODO: replace this by inheriting Matcher. Only delaying this since the above conversion
     //  operator and some other places make a bunch of rules fail to parse. Once proper testing is
