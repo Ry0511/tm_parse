@@ -11,6 +11,20 @@
 
 namespace tm_parse::rules {
 
+ParenExpr::~ParenExpr() = default;
+ParenExpr::ParenExpr(ParenExpr&&) noexcept = default;
+ParenExpr& ParenExpr::operator=(ParenExpr&&) noexcept = default;
+
+void ParenExpr::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
+    Expr::visit(func);
+    m_Inner->visit(func);
+}
+
+void ParenExpr::cascade_assign_parents(ParserRule* parent) noexcept {
+    Expr::cascade_assign_parents(parent);
+    m_Inner->cascade_assign_parents(this);
+}
+
 bool ParenExpr::matches(Matcher& matcher) noexcept {
     if (matcher.maybe_real(tk::LeftParen)) {
         return Expr::matches(matcher) && matcher.maybe_real(tk::RightParen);
@@ -29,20 +43,6 @@ std::unique_ptr<ParenExpr> ParenExpr::create(Parser& parser) {
     ptr->m_Inner->set_parent(*ptr);
 
     return ptr;
-}
-
-ParenExpr::~ParenExpr() = default;
-ParenExpr::ParenExpr(ParenExpr&&) noexcept = default;
-ParenExpr& ParenExpr::operator=(ParenExpr&&) noexcept = default;
-
-void ParenExpr::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
-    Expr::visit(func);
-    m_Inner->visit(func);
-}
-
-void ParenExpr::cascade_assign_parents(ParserRule* parent) noexcept {
-    Expr::cascade_assign_parents(parent);
-    m_Inner->cascade_assign_parents(this);
 }
 
 }  // namespace tm_parse::rules
