@@ -10,6 +10,7 @@
 
 #include "tm_parse/lexer/token.h"
 #include "tm_parse/parser/matcher.h"
+#include "tm_parse/parser/rules/parser_kind.h"
 #include "tm_parse/util/text_region.h"
 
 namespace tm_parse {
@@ -51,7 +52,8 @@ class ParserRule {
     const Token& last_token() const noexcept { return m_LastToken; }
 
    public:
-    virtual str rule_name() const noexcept = 0;
+    virtual str_view rule_name() const noexcept = 0;
+    virtual rkind::ParserRuleKind rule_kind() const noexcept = 0;
 
     virtual void visit(const std::function<void(const ParserRule&)>& func) const noexcept {
         func(*this);
@@ -59,8 +61,8 @@ class ParserRule {
 
     void set_parent(ParserRule& parent) noexcept { m_Parent = &parent; }
 
-    size_t get_depth() const noexcept {
-        size_t depth = 0;
+    int get_depth() const noexcept {
+        int depth = 0;
         const ParserRule* ptr = parent();
 
         while (ptr) {
@@ -69,6 +71,22 @@ class ParserRule {
         }
 
         return depth;
+    }
+
+   public:
+    template <class T>
+        requires std::is_base_of_v<ParserRule, T>
+    const T* is() const noexcept {
+        return (rule_kind() == T::KIND) ? static_cast<const T*>(this) : nullptr;
+    }
+
+    template <class T>
+        requires std::is_base_of_v<ParserRule, T>
+    const T* as() const {
+        if (const T* ptr = is<T>()) {
+            return ptr;
+        }
+        throw std::runtime_error{std::format("can not cast {} to {}", rule_name(), T::NAME)};
     }
 
    public:
@@ -89,10 +107,18 @@ class ParserRule {
 //  with ComposedExpr. Primarily speaking in regards to the `matches` function as this effectively
 //  requires us to duplicate the create code just without the allocations...
 
+#define RULE_STATIC_CONSTANTS(rule)                                                    \
+    constexpr static ::tm_parse::rkind::ParserRuleKind KIND = ::tm_parse::rkind::rule; \
+    constexpr static str_view NAME = TXT(#rule);                                       \
+    str_view rule_name() const noexcept override {                                     \
+        return NAME;                                                                   \
+    }                                                                                  \
+    ::tm_parse::rkind::ParserRuleKind rule_kind() const noexcept override {            \
+        return KIND;                                                                   \
+    }
+
 #define RULE_STATIC_API(rule)                       \
-    str rule_name() const noexcept override {       \
-        return TXT(#rule);                          \
-    }                                               \
+    RULE_STATIC_CONSTANTS(rule);                    \
     static bool matches(Matcher& matcher) noexcept; \
     static std::unique_ptr<rule> create(Parser& parser)
 

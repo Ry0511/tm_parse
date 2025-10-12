@@ -12,6 +12,7 @@
 #include "tm_parse/util/text_helpers.h"
 
 #include "tm_parse/parser/rules/expr/composed_expr.h"
+#include "tm_parse/parser/rules/primary/object_definition.h"
 
 using namespace tm_parse;
 
@@ -43,19 +44,43 @@ int main() {
             auto ptr = parser.parse();
             ptr->cascade_assign_parents(nullptr);
 
-            ptr->visit([](const auto& node) -> void {
+            ptr->visit([](const ParserRule& node) -> void {
+
                 int depth = node.get_depth() * 2;
-                str indent(depth, TXT(' '));
-
                 int len = std::max(0, 36 - depth);
+                str indent(depth, TXT(' '));
+                str suffix{};
 
-                LOG_INFO(
-                    "{}{:<{}} ~ {}",
-                    indent,
-                    node.rule_name(),
-                    len,
-                    txt::escape_string(node.full_text()).substr(0, 50)
-                );
+                if (const auto* ptr = node.is<BinaryOpExpr>()) {
+                    // clang-format off
+                    switch (ptr->op()) {
+                        case Operator::Add:      { suffix += TXT(" + "); break; }
+                        case Operator::Subtract: { suffix += TXT(" - "); break; }
+                        case Operator::Divide:   { suffix += TXT(" / "); break; }
+                        case Operator::Multiply: { suffix += TXT(" * "); break; }
+                        default:                 { suffix += TXT(" ? "); break; }
+                    }
+                    // clang-format on
+
+                    LOG_INFO(
+                        "{}{:<{}} ~ ({}){}({})",
+                        indent,
+                        str{node.rule_name()} + suffix,
+                        len,
+                        txt::escape_string(ptr->left().full_text()).substr(0, 50),
+                        suffix,
+                        txt::escape_string(ptr->right().full_text()).substr(0, 50)
+                    );
+
+                } else {
+                    LOG_INFO(
+                        "{}{:<{}} ~ {}",
+                        indent,
+                        str{node.rule_name()} + suffix,
+                        len,
+                        txt::escape_string(node.full_text()).substr(0, 50)
+                    );
+                }
             });
 
             LOG_INFO(

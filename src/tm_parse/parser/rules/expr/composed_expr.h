@@ -18,7 +18,7 @@ class ComposedExpr;
 class UnaryOpExpr : public Expr {
    private:
     friend ComposedExpr;
-    Operator m_Operator{Operator::Unknown}; // TODO: this is always going to be Negate
+    Operator m_Operator{Operator::Unknown};  // TODO: this is always going to be Negate
     std::unique_ptr<Expr> m_Operand;
 
    public:
@@ -32,9 +32,15 @@ class UnaryOpExpr : public Expr {
     UnaryOpExpr& operator=(UnaryOpExpr&&) noexcept;
 
    public:
+    Operator op() const noexcept { return m_Operator; };
+    const Expr& operand() const noexcept { return *m_Operand; };
+
+   public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
     void cascade_assign_parents(ParserRule* parent) noexcept override;
-    str rule_name() const noexcept override { return "UnaryOpExpr"; }
+
+   public:
+    RULE_STATIC_CONSTANTS(UnaryOpExpr);
 };
 
 class BinaryOpExpr : public Expr {
@@ -55,9 +61,16 @@ class BinaryOpExpr : public Expr {
     BinaryOpExpr& operator=(BinaryOpExpr&&) noexcept;
 
    public:
+    Operator op() const noexcept { return m_Operator; }
+    const Expr& left() const noexcept { return *m_Left; }
+    const Expr& right() const noexcept { return *m_Right; }
+
+   public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
     void cascade_assign_parents(ParserRule* parent) noexcept override;
-    str rule_name() const noexcept override { return "BinaryOpExpr"; }
+
+   public:
+    RULE_STATIC_CONSTANTS(BinaryOpExpr);
 };
 
 class ComposedExpr : public Expr {
@@ -73,6 +86,9 @@ class ComposedExpr : public Expr {
     ComposedExpr& operator=(const ComposedExpr&) = delete;
     ComposedExpr(ComposedExpr&&) noexcept;
     ComposedExpr& operator=(ComposedExpr&&) noexcept;
+
+   public:
+    const Expr& expr() const noexcept { return *m_Expr; }
 
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
