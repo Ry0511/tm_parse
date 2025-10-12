@@ -23,8 +23,8 @@ void run_test(const fs::path& test_file) {
     TestFile test{test_file};
 
     const str& test_type = test.test_type();
-
     auto runner = test.create_test_runner();
+
     if (runner->run(test)) {
         LOG_INFO("[ \033[32m{}\033[0m ] - {}", "TEST PASSED", test_file.filename().string());
         ++success_count;

@@ -21,6 +21,7 @@
 #endif
 
 #include <algorithm>
+#include <any>
 #include <array>
 #include <atomic>
 #include <cctype>
@@ -36,6 +37,7 @@
 #include <initializer_list>
 #include <iostream>
 #include <limits>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <optional>
