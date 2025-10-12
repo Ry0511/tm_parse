@@ -25,13 +25,13 @@ bool MetaVarExpr::matches(Matcher& matcher) noexcept {
 }
 
 std::unique_ptr<MetaVarExpr> MetaVarExpr::create(Parser& parser) {
-    Token first = parser.require_next_real(tk::DollarSign);
-    parser.require_next_real(tk::LeftParen);
+    Token first = parser.require_real(tk::DollarSign);
+    parser.require_real(tk::LeftParen);
 
     auto rule = std::make_unique<MetaVarExpr>();
     rule->m_Identifier = DotIdentifier::create(parser);
 
-    Token last = parser.require_next_real(tk::RightParen);
+    Token last = parser.require_real(tk::RightParen);
 
     rule->post_init(first, last);
 

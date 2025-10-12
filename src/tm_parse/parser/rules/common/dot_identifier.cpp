@@ -28,7 +28,7 @@ bool DotIdentifier::matches(Matcher& matcher) noexcept {
 
 std::unique_ptr<DotIdentifier> DotIdentifier::create(Parser& parser) {
     auto rule = std::make_unique<DotIdentifier>();
-    Token first = parser.require_next_real(tk::AnyIdentifier);
+    Token first = parser.require_real(tk::AnyIdentifier);
     Token last = first;
 
     rule->m_NameParts.push_back(first.Region);

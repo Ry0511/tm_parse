@@ -89,6 +89,11 @@ int main() {
                 txt::escape_string(ptr->full_text(), true)
             );
 
+            // TODO: Fix
+            if (parser.maybe_real(tk::EndOfInput)) {
+                break;
+            }
+
         } while (!parser.is_eof());
 
     } catch (const TokenError& err) {

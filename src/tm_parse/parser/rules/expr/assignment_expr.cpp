@@ -25,7 +25,7 @@ std::unique_ptr<AssignmentExpr> AssignmentExpr::create(Parser& parser) {
     auto rule = std::make_unique<AssignmentExpr>();
 
     rule->m_Property = PropertyAccess::create(parser);
-    parser.require_next_real(tk::Equal);
+    parser.require_real(tk::Equal);
     rule->m_Expr = Expr::create(parser);
 
     rule->post_init(*rule->m_Property, *rule->m_Expr);

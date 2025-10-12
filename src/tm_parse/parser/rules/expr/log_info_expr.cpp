@@ -29,8 +29,8 @@ bool LogInfoExpr::matches(Matcher& matcher) noexcept {
 std::unique_ptr<LogInfoExpr> LogInfoExpr::create(Parser& parser) {
     // TODO: Strings are not unescaped currently so will want to convert \n and what not into their
     //  actual character
-    Token first = parser.require_next_real(tk::LogInfo);
-    Token last = parser.require_next_real(tk::StringLiteral);
+    Token first = parser.require_real(tk::LogInfo);
+    Token last = parser.require_real(tk::StringLiteral);
 
     auto rule = std::make_unique<LogInfoExpr>();
     rule->m_Text = str{last.inner_text()};

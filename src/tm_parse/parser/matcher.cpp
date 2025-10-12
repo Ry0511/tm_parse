@@ -12,15 +12,22 @@
 
 namespace tm_parse {
 
-Matcher::Matcher(const Parser& parser) : m_Tokens(parser.m_Tokens), m_Position(parser.position()) {}
+Matcher::Matcher(const Parser& parser) noexcept
+    : m_Tokens(parser.m_Tokens),
+      m_Position(parser.position()) {}
 
-Matcher::Matcher(Parser& parser) : m_Tokens(parser.m_Tokens), m_Position(parser.position()) {}
+Matcher::Matcher(Parser& parser) noexcept
+    : m_Tokens(parser.m_Tokens),
+      m_Position(parser.position()) {}
+
+Matcher::Matcher(std::span<const Token> tokens, size_t pos) noexcept
+    : m_Tokens(tokens),
+      m_Position(pos) {}
 
 bool Matcher::try_match(std::span<const tk::TokenKind> kinds) noexcept {
-
     auto pos = position();
 
-    bool res =  std::ranges::all_of(kinds, [this](const auto& kind) -> bool {
+    bool res = std::ranges::all_of(kinds, [this](const auto& kind) -> bool {
         return this->next() == kind;
     });
 
@@ -33,10 +40,9 @@ bool Matcher::try_match(std::span<const tk::TokenKind> kinds) noexcept {
 }
 
 bool Matcher::try_match_real(std::span<const tk::TokenKind> kinds) noexcept {
-
     auto pos = position();
 
-    bool res =  std::ranges::all_of(kinds, [this](const auto& kind) -> bool {
+    bool res = std::ranges::all_of(kinds, [this](const auto& kind) -> bool {
         return this->next_real() == kind;
     });
 

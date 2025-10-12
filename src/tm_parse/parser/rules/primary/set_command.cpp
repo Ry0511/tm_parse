@@ -27,7 +27,7 @@ bool SetCommand::matches(Matcher& matcher) noexcept {
 std::unique_ptr<SetCommand> SetCommand::create(Parser& parser) {
     auto rule = std::make_unique<SetCommand>();
 
-    Token first = parser.require_next_real(tk::Set);
+    Token first = parser.require_real(tk::Set);
     rule->m_ObjectRef = ObjectRef::create(parser);
     rule->m_Property = PropertyAccess::create(parser);
     rule->m_Expr = Expr::create(parser);

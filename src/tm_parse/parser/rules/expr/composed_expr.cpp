@@ -219,23 +219,23 @@ std::unique_ptr<Expr> ComposedExpr::parse_factor(Parser& parser) {
     }
 
     // sub expression
-    if (Token first = parser.maybe_next_real(tk::LeftParen)) {
+    if (Token first = parser.maybe_real(tk::LeftParen)) {
         auto node = parse_expr(parser);
-        Token last = parser.require_next_real(tk::RightParen);
+        Token last = parser.require_real(tk::RightParen);
         node->post_init(first, last);
         return node;
     }
 
     // unary operator + is generally ignored/no op and only done for symmetry, its only usage/change
     // is that the rules full text region will include it
-    if (Token first = parser.maybe_next_real(tk::Plus)) {
+    if (Token first = parser.maybe_real(tk::Plus)) {
         auto node = parse_factor(parser);
         node->post_init(first, node->last_token());
         return node;
     }
 
     // negation is just sugar that allows -(A * B) to be equal to (A * B) * -1
-    if (Token first = parser.maybe_next_real(tk::Minus)) {
+    if (Token first = parser.maybe_real(tk::Minus)) {
         auto unary = std::make_unique<UnaryOpExpr>();
         unary->m_Operator = Operator::Negate;
         unary->m_Operand = parse_factor(parser);

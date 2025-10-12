@@ -94,18 +94,18 @@ bool ObjectDefinition::matches(Matcher& matcher) noexcept {
 std::unique_ptr<ObjectDefinition> ObjectDefinition::create(Parser& parser) {
     auto rule = std::make_unique<ObjectDefinition>();
 
-    Token first = parser.require_next_real(tk::Begin);
-    parser.require_next_real(tk::Object);
+    Token first = parser.require_real(tk::Begin);
+    parser.require_real(tk::Object);
 
     // Class=\w+
-    parser.require_next_real(tk::Class);
-    parser.require_next_real(tk::Equal);
-    Token obj_class = parser.require_next_real(tk::AnyIdentifier);
+    parser.require_real(tk::Class);
+    parser.require_real(tk::Equal);
+    Token obj_class = parser.require_real(tk::AnyIdentifier);
 
     // Name=\w+
-    parser.require_next_real(tk::Name);
-    parser.require_next_real(tk::Equal);
-    Token obj_name = parser.require_next_real(tk::AnyIdentifier);
+    parser.require_real(tk::Name);
+    parser.require_real(tk::Equal);
+    Token obj_name = parser.require_real(tk::AnyIdentifier);
 
     bool exit_found = false;
 
@@ -126,8 +126,8 @@ std::unique_ptr<ObjectDefinition> ObjectDefinition::create(Parser& parser) {
         }
     }
 
-    parser.require_next_real(tk::End);
-    Token last = parser.require_next_real(tk::Object);
+    parser.require_real(tk::End);
+    Token last = parser.require_real(tk::Object);
 
     rule->post_init(first, last);
     rule->m_ClassName = str{obj_class.text()};

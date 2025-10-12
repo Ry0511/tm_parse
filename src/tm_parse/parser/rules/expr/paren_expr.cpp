@@ -35,9 +35,9 @@ bool ParenExpr::matches(Matcher& matcher) noexcept {
 std::unique_ptr<ParenExpr> ParenExpr::create(Parser& parser) {
     auto ptr = std::make_unique<ParenExpr>();
 
-    Token first = parser.require_next_real(tk::LeftParen);
+    Token first = parser.require_real(tk::LeftParen);
     ptr->m_Inner = Expr::create(parser);
-    Token last = parser.require_next_real(tk::RightParen);
+    Token last = parser.require_real(tk::RightParen);
 
     ptr->post_init(first, last);
     ptr->m_Inner->set_parent(*ptr);
