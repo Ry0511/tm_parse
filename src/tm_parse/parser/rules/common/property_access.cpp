@@ -33,9 +33,11 @@ std::unique_ptr<PropertyAccess> PropertyAccess::create(Parser& parser) {
     if (ArrayAccess::matches(matcher)) {
         rule->m_ArrayAccess = ArrayAccess::create(parser);
         rule->m_ArrayAccess->set_parent(*rule);
-    }
 
-    rule->copy_state(*rule->m_Property);
+        rule->post_init(*rule->m_Property, *rule->m_ArrayAccess);
+    } else {
+        rule->copy_state(*rule->m_Property);
+    }
 
     return rule;
 }

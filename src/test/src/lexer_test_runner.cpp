@@ -10,6 +10,7 @@
 #include "test_file.h"
 #include "tm_parse/lexer/lexer.h"
 #include "tm_parse/util/text_helpers.h"
+#include "tm_parse/parser/parser.h"
 
 namespace tm_parse::tests {
 

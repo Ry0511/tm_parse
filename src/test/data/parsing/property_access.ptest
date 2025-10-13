@@ -1,0 +1,27 @@
+test_type = ParserTest
+
+test_content = {
+  foo
+  foo(+1.0)
+  foo[-1.0]
+  # Hacky but array access assumes next token is ( or [ without skipping anything
+  X[0](-1.0)[+1.0]
+}
+
+expected_parse_content = {
+  PropertyAccess
+  PropertyAccess
+  PropertyAccess
+  PropertyAccess
+  ArrayAccess
+  ArrayAccess
+}
+
+expected_text = {
+  "foo"
+  "foo(+1.0)"
+  "foo[-1.0]"
+  "X[0]"
+  "(-1.0)"
+  "[+1.0]"
+}

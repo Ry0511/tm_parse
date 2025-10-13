@@ -20,8 +20,8 @@ class Parser {
     Matcher m_Matcher;
 
    public:
-    Parser(str text);
-    Parser(const fs::path& file);
+    explicit Parser(str text);
+    explicit Parser(const fs::path& file);
     ~Parser() = default;
 
    public:  // TODO: need to consider if the only tokens on the stream are skip tokens since

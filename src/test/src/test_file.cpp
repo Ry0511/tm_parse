@@ -7,6 +7,7 @@
 #include "tm_parse/pch.h"
 
 #include "lexer_test_runner.h"
+#include "parser_test_runner.h"
 #include "test_file.h"
 
 #include "tm_parse/lexer/token_error.h"
@@ -43,7 +44,11 @@ std::unique_ptr<TestRunner> TestFile::create_test_runner() const {
         return std::make_unique<LexerTestRunner>();
     }
 
-    return nullptr;
+    if (txt::equal_icase(test_runner, "ParserTest")) {
+        return std::make_unique<ParserTestRunner>();
+    }
+
+    throw std::runtime_error{std::format("no runner for test type {}", test_file().filename().c_str()).c_str()};
 }
 
 void TestFile::read_values(Parser& parser) {
@@ -111,27 +116,28 @@ std::any TestFile::read_simple(Parser& parser) {
 
     if (cur == tk::Number) {
         const str_char* data = cur.text().data();
-        return std::make_any<double>(static_cast<double>(std::strtod(data, nullptr)));
+        return std::make_any<double>(std::strtod(data, nullptr));
     }
 
     throw std::runtime_error{std::format("unsupported token {}", cur.token_name())};
 }
 
 std::any TestFile::read_block(str_view id, Parser& parser) {
-    // clang-format off
     if (id == TXT("test_content")) {
         return read_test_content(parser);
     }
-    else if (id == TXT("expected_tokens")) {
+
+    if (id == TXT("expected_tokens")) {
         return read_expected_tokens(parser);
     }
-    else if (id == TXT("expected_text")) {
+
+    if (id == TXT("expected_text")) {
         return read_expected_text(parser);
     }
-    else if (id == TXT("expected_parse_content")) {
+
+    if (id == TXT("expected_parse_content")) {
         return read_expected_parse_content(parser);
     }
-    // clang-format on
 
     throw std::runtime_error{std::format("unknown test block item '{}'", id)};
 }
@@ -152,7 +158,10 @@ std::any TestFile::read_test_content(Parser& parser) {
         skip_tokens.emplace_back(tk::MultiLineComment);
     }
 
-    return read_generic_block(skip_tokens, parser);
+    str_view text{};
+    std::any ret = read_generic_block(skip_tokens, parser, &text);
+    m_TestData["test_content_str"] = text;
+    return ret;
 }
 
 std::any TestFile::read_expected_tokens(Parser& parser) {
@@ -164,10 +173,14 @@ std::any TestFile::read_expected_text(Parser& parser) {
 }
 
 std::any TestFile::read_expected_parse_content(Parser& parser) {
-    throw std::runtime_error{"not implemented"};
+    return read_generic_block(default_skip_tokens, parser);
 }
 
-std::any TestFile::read_generic_block(std::span<const tk::TokenKind> skip_tokens, Parser& parser) {
+std::any TestFile::read_generic_block(
+    std::span<const tk::TokenKind> skip_tokens,
+    Parser& parser,
+    str_view* out_text
+) {
     bool should_exit = false;
     std::vector<Token> tokens{};
     tokens.reserve(512);
@@ -180,8 +193,16 @@ std::any TestFile::read_generic_block(std::span<const tk::TokenKind> skip_tokens
         }
     }
 
+    Token first{tk::InvalidToken};
+    Token last{tk::InvalidToken};
+
     do {
         Token cur = parser.next();
+
+        if (!first) {
+            first = cur;
+        }
+        last = cur;
 
         bool should_skip = false;
         for (const auto& kind : skip_tokens) {
@@ -204,6 +225,10 @@ std::any TestFile::read_generic_block(std::span<const tk::TokenKind> skip_tokens
     } while (!should_exit);
 
     tokens.shrink_to_fit();
+
+    if (out_text != nullptr) {
+        *out_text = first.extend(last).create_str_view(m_TestContent);
+    }
 
     return tokens;
 }

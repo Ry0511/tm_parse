@@ -107,7 +107,49 @@ class ParserRule {
 //  with ComposedExpr. Primarily speaking in regards to the `matches` function as this effectively
 //  requires us to duplicate the create code just without the allocations...
 
+// TODO: Need to extract this out an put it into the tests section, only need two of the macros here
+#define TM_PARSE_TESTS
+
+#ifdef TM_PARSE_TESTS
+
+namespace tests {
+
+struct RuleFactory {
+    std::function<bool(Matcher& matcher)> matches;
+    std::function<std::unique_ptr<ParserRule>(Parser& matcher)> create;
+};
+
+struct RuleTestApi {
+    static std::unordered_map<str_view, RuleFactory>& rule_factory() noexcept {
+        static std::unordered_map<str_view, RuleFactory> rule_factory{};
+        return rule_factory;
+    }
+
+    template <class T>
+    static void add_rule() noexcept {
+        rule_factory()[T::NAME] = RuleFactory{&T::matches, &T::create};
+    }
+
+    static const RuleFactory& get_factory(str_view rule) { return rule_factory()[rule]; }
+};
+
+// clang-format off
+template <class T> struct RuleRegister { RuleRegister() { RuleTestApi::add_rule<T>(); } };
+// clang-format on
+
+}  // namespace tests
+
+#define TM_PARSE_TEST_API(rule) \
+    inline static const ::tm_parse::tests::RuleRegister<rule> RULE_REGISTER {}
+
+#else
+
+#define TM_PARSE_TEST_API(...)
+
+#endif
+
 #define RULE_STATIC_CONSTANTS(rule)                                                    \
+    TM_PARSE_TEST_API(rule);                                                           \
     constexpr static ::tm_parse::rkind::ParserRuleKind KIND = ::tm_parse::rkind::rule; \
     constexpr static str_view NAME = TXT(#rule);                                       \
     str_view rule_name() const noexcept override {                                     \

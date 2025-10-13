@@ -38,7 +38,7 @@ class TestFile {
 
    public:
     template <class T>
-    T get(const str& key, auto&& def_val = T{}) const {
+    T get(const str& key, T dflt = T{}) const {
         try {
             const std::any& val = get_impl(key);
 
@@ -57,13 +57,13 @@ class TestFile {
             return std::any_cast<T>(val);
 
         } catch (const std::runtime_error&) {
-            return def_val;
+            return dflt;
         }
     }
 
    private:
     void read_values(Parser& parser);
-    std::any read_simple(Parser& parser);
+    static std::any read_simple(Parser& parser);
     std::any read_block(str_view id, Parser& parser);
 
    private:
@@ -72,7 +72,11 @@ class TestFile {
     std::any read_expected_text(Parser& parser);
     std::any read_expected_parse_content(Parser& parser);
 
-    std::any read_generic_block(std::span<const tk::TokenKind> skip_tokens, Parser& parser);
+    std::any read_generic_block(
+        std::span<const tk::TokenKind> skip_tokens,
+        Parser& parser,
+        str_view* out_text = nullptr
+    );
     const std::any& get_impl(const str& key) const;
 };
 
