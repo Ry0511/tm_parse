@@ -8,10 +8,10 @@ test_content = {
 }
 
 expected_parse_content = {
-  ObjectRef
-  ObjectRef
-  ObjectRef
-  ObjectRef
+  ObjectRef = ( DotIdentifier )
+  ObjectRef = ( DotIdentifier )
+  ObjectRef = ( DotIdentifier DotIdentifier )
+  ObjectRef = ( DotIdentifier DotIdentifier )
 }
 
 expected_text = {

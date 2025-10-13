@@ -48,7 +48,9 @@ std::unique_ptr<TestRunner> TestFile::create_test_runner() const {
         return std::make_unique<ParserTestRunner>();
     }
 
-    throw std::runtime_error{std::format("no runner for test type {}", test_file().filename().c_str()).c_str()};
+    throw std::runtime_error{
+        std::format("no runner for test type {}", test_file().filename().c_str()).c_str()
+    };
 }
 
 void TestFile::read_values(Parser& parser) {
@@ -173,7 +175,31 @@ std::any TestFile::read_expected_text(Parser& parser) {
 }
 
 std::any TestFile::read_expected_parse_content(Parser& parser) {
-    return read_generic_block(default_skip_tokens, parser);
+
+    std::vector<ParserTestEntry> test_entries{};
+
+    while (!parser.maybe_real(tk::EndOfInput)) {
+
+        // TODO: implement peek and peek_real to check the next N tokens forward
+        Matcher m = parser.create_matcher();
+        if (m.maybe_real(tk::RightBrace)) {
+            break;
+        }
+
+        ParserTestEntry& entry = test_entries.emplace_back();
+        entry.Class = parser.require_real(tk::AnyIdentifier);
+
+        if (!parser.maybe_real(tk::Equal)) {
+            continue;
+        }
+
+        parser.require_real(tk::LeftParen);
+        while (!parser.maybe_real(tk::RightParen)) {
+            entry.VisitorTree.emplace_back(parser.require_real(tk::AnyIdentifier));
+        }
+    }
+
+    return test_entries;
 }
 
 std::any TestFile::read_generic_block(

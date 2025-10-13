@@ -18,6 +18,11 @@ namespace tm_parse::tests {
 
 class TestRunner;
 
+struct ParserTestEntry {
+    Token Class;
+    std::vector<Token> VisitorTree;
+};
+
 class TestFile {
    private:
     fs::path m_TestFile;

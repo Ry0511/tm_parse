@@ -17,21 +17,19 @@ namespace tm_parse::tests {
 using namespace tm_parse::rules;
 
 bool ParserTestRunner::run(TestFile& file) {
-
     // TODO: This is a first pass implementation needs to be revised a bit but generally seems like
     //  it will work. Already caught some bugs such as with PropertyAccess not extending full text
     //  to include the array if present.
 
     m_Success = true;
     auto text = file.get<str_view>("test_content_str");
-    auto expected_rules = file.get<TokenVec>("expected_parse_content");
+    auto expected_rules = file.get<std::vector<ParserTestEntry>>("expected_parse_content");
     auto expected_text = file.get<TokenVec>("expected_text");
 
     Parser parser{str{text}};
     size_t pos = 0;
 
     for (const auto& expected : expected_rules) {
-
         {
             Matcher m = parser.create_matcher();
             if (m.maybe_real(tk::EndOfInput)) {
@@ -39,19 +37,21 @@ bool ParserTestRunner::run(TestFile& file) {
             }
         }
 
-        const RuleFactory& factory = RuleTestApi::get_factory(expected.text());
+        const RuleFactory& factory = RuleTestApi::get_factory(expected.Class.text());
+        info("* RuleFactory of {}", expected.Class.text());
 
         Matcher m = parser.create_matcher();
         if (!factory.matches(m)) {
-            err("* {}::matches check failed", expected.text());
+            err("* {}::matches check failed", expected.Class.text());
             m_Success = false;
             continue;
         }
 
         auto rule = factory.create(parser);
+        info("* Rule='{}'", txt::escape_string(rule->full_text(), true).substr(0, 50));
 
         if (!rule) {
-            err("* {}::create check failed", expected.text());
+            err("* {}::create check failed", expected.Class.text());
         }
 
         str left = txt::escape_string(rule->full_text());
@@ -60,6 +60,53 @@ bool ParserTestRunner::run(TestFile& file) {
 
         if (left != right) {
             err("* '{}' != '{}'", left, right);
+            m_Success = false;
+        }
+
+        // TODO: The general idea is implemented but this needs to be cleaned up and extracted out
+        //  to separate functions.
+        if (expected.VisitorTree.empty()) {
+            continue;
+        }
+
+        bool all_matching = true;
+        bool skip_first = true;
+        size_t index = 0;
+        size_t checked_rules = 0;
+        rule->visit(
+            [this, &skip_first, &checked_rules, &all_matching, &expected, &index](
+                const auto& rule
+            ) -> void {
+                if (skip_first) {
+                    skip_first = false;
+                    return;
+                }
+
+                if (index >= expected.VisitorTree.size()) {
+                    m_Success = false;
+                    return;
+                }
+
+                ++checked_rules;
+                const auto expected_rule = expected.VisitorTree[index].text();
+                ++index;
+
+                if (rule.rule_name() != expected_rule) {
+                    all_matching = false;
+                    err("* {} != {}", rule.rule_name(), expected_rule);
+                }
+            }
+        );
+
+        if (!all_matching) {
+            err("* not all rules rules matched as expected");
+            m_Success = false;
+        }
+
+        if (checked_rules != expected.VisitorTree.size()) {
+            err("* expected {} nodes in parse result but got {}",
+                expected.VisitorTree.size(),
+                checked_rules);
             m_Success = false;
         }
     }

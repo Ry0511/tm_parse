@@ -8,8 +8,8 @@ test_content = {
 
 expected_parse_content = {
   PropertyAccess
-  PropertyAccess
-  PropertyAccess
+  PropertyAccess = (ArrayAccess)
+  PropertyAccess = (ArrayAccess)
 }
 
 expected_text = {
