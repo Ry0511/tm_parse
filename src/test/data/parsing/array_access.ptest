@@ -1,0 +1,22 @@
+test_type = ParserTest
+
+# array access does not skip tokens so Identifier BlankLine LeftParen Number RightParen would fail
+test_content = {(-1)(1)(+1)[-1][1][+1]}
+
+expected_parse_content = {
+  ArrayAccess
+  ArrayAccess
+  ArrayAccess
+  ArrayAccess
+  ArrayAccess
+  ArrayAccess
+}
+
+expected_text = {
+  "(-1)"
+  "(1)"
+  "(+1)"
+  "[-1]"
+  "[1]"
+  "[+1]"
+}

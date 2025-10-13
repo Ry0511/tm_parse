@@ -1,0 +1,22 @@
+test_type = ParserTest
+
+test_content = {
+  foo
+  foo.baz
+  foo:baz
+  foo.baz:bar
+}
+
+expected_parse_content = {
+  ObjectRef
+  ObjectRef
+  ObjectRef
+  ObjectRef
+}
+
+expected_text = {
+  "foo"
+  "foo.baz"
+  "foo:baz"
+  "foo.baz:bar"
+}
