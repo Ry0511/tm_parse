@@ -19,8 +19,8 @@ namespace tm_parse::tests {
 class TestRunner;
 
 struct ParserTestEntry {
-    Token Class;
-    std::vector<Token> VisitorTree;
+    str Class;
+    std::vector<std::tuple<str, str>> VisitorTree;
 };
 
 class TestFile {

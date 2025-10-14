@@ -4,16 +4,19 @@ test_content = {
   foo
   foo(+1.0)
   foo[-1.0]
+  foo.baz(0.5)
 }
 
 expected_parse_content = {
   PropertyAccess
-  PropertyAccess = (ArrayAccess)
-  PropertyAccess = (ArrayAccess)
+  PropertyAccess = (ArrayAccess["(+1.0)"])
+  PropertyAccess = (ArrayAccess["[-1.0]"])
+  PropertyAccess = (ArrayAccess["(0.5)"])
 }
 
 expected_text = {
   "foo"
   "foo(+1.0)"
   "foo[-1.0]"
+  "foo.baz(0.5)"
 }

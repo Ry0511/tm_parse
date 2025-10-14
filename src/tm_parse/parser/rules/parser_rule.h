@@ -130,7 +130,14 @@ struct RuleTestApi {
         rule_factory()[T::NAME] = RuleFactory{&T::matches, &T::create};
     }
 
-    static const RuleFactory& get_factory(str_view rule) { return rule_factory()[rule]; }
+    static const RuleFactory& get_factory(str_view rule) {
+        auto& factory = rule_factory();
+        auto it = factory.find(rule);
+        if (it == factory.end()) {
+            throw std::runtime_error{std::format("rule '{}' does not exist", rule)};
+        }
+        return it->second;
+    }
 };
 
 // clang-format off

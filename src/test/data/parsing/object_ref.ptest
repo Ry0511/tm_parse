@@ -7,11 +7,13 @@ test_content = {
   foo.baz:bar
 }
 
+# TODO: will want to test the text held by the rule as well so something like:
+# ObjectRef = ( DotIdentifier["foo.baz"] DotIdentifier["bar"] )
 expected_parse_content = {
-  ObjectRef = ( DotIdentifier )
-  ObjectRef = ( DotIdentifier )
-  ObjectRef = ( DotIdentifier DotIdentifier )
-  ObjectRef = ( DotIdentifier DotIdentifier )
+  ObjectRef = ( DotIdentifier["foo"] )
+  ObjectRef = ( DotIdentifier["foo.baz"] )
+  ObjectRef = ( DotIdentifier["foo"] DotIdentifier["baz"] )
+  ObjectRef = ( DotIdentifier["foo.baz"] DotIdentifier["bar"] )
 }
 
 expected_text = {

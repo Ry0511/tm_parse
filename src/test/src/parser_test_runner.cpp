@@ -37,21 +37,19 @@ bool ParserTestRunner::run(TestFile& file) {
             }
         }
 
-        const RuleFactory& factory = RuleTestApi::get_factory(expected.Class.text());
-        info("* RuleFactory of {}", expected.Class.text());
+        const RuleFactory& factory = RuleTestApi::get_factory(expected.Class);
 
         Matcher m = parser.create_matcher();
         if (!factory.matches(m)) {
-            err("* {}::matches check failed", expected.Class.text());
+            err("* {}::matches check failed", expected.Class);
             m_Success = false;
             continue;
         }
 
         auto rule = factory.create(parser);
-        info("* Rule='{}'", txt::escape_string(rule->full_text(), true).substr(0, 50));
 
         if (!rule) {
-            err("* {}::create check failed", expected.Class.text());
+            err("* {}::create check failed", expected.Class);
         }
 
         str left = txt::escape_string(rule->full_text());
@@ -59,7 +57,7 @@ bool ParserTestRunner::run(TestFile& file) {
         ++pos;
 
         if (left != right) {
-            err("* '{}' != '{}'", left, right);
+            err("* {} != {}", left, right);
             m_Success = false;
         }
 
@@ -69,46 +67,38 @@ bool ParserTestRunner::run(TestFile& file) {
             continue;
         }
 
-        bool all_matching = true;
-        bool skip_first = true;
-        size_t index = 0;
-        size_t checked_rules = 0;
-        rule->visit(
-            [this, &skip_first, &checked_rules, &all_matching, &expected, &index](
-                const auto& rule
-            ) -> void {
-                if (skip_first) {
-                    skip_first = false;
-                    return;
-                }
+        struct {
+            bool First{true};
+            size_t Index{0};
+        } state;
 
-                if (index >= expected.VisitorTree.size()) {
-                    m_Success = false;
-                    return;
-                }
+        rule->visit([this, &state, &expected](const auto& rule) -> void {
 
-                ++checked_rules;
-                const auto expected_rule = expected.VisitorTree[index].text();
-                ++index;
-
-                if (rule.rule_name() != expected_rule) {
-                    all_matching = false;
-                    err("* {} != {}", rule.rule_name(), expected_rule);
-                }
+            if (state.Index >= expected.VisitorTree.size()) {
+                return;
             }
-        );
 
-        if (!all_matching) {
-            err("* not all rules rules matched as expected");
-            m_Success = false;
-        }
+            // skip entry rule
+            if (state.First) {
+                state.First = false;
+                return;
+            }
 
-        if (checked_rules != expected.VisitorTree.size()) {
-            err("* expected {} nodes in parse result but got {}",
-                expected.VisitorTree.size(),
-                checked_rules);
-            m_Success = false;
-        }
+            str_view rule_name = rule.rule_name();
+            str rule_text = txt::escape_string(rule.full_text());
+            const auto&[name, text] = expected.VisitorTree.at(state.Index);
+            ++state.Index;
+
+            if (rule_name != name) {
+                err("* {} != {}", rule_name, name);
+                m_Success = false;
+            }
+
+            if (rule_text != text) {
+                err("* {} != {}", rule_text, text);
+                m_Success = false;
+            }
+        });
     }
 
     return success();

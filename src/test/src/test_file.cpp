@@ -175,28 +175,42 @@ std::any TestFile::read_expected_text(Parser& parser) {
 }
 
 std::any TestFile::read_expected_parse_content(Parser& parser) {
-
     std::vector<ParserTestEntry> test_entries{};
 
     while (!parser.maybe_real(tk::EndOfInput)) {
-
         // TODO: implement peek and peek_real to check the next N tokens forward
         Matcher m = parser.create_matcher();
         if (m.maybe_real(tk::RightBrace)) {
             break;
         }
 
-        ParserTestEntry& entry = test_entries.emplace_back();
-        entry.Class = parser.require_real(tk::AnyIdentifier);
+        ParserTestEntry entry{};
+        entry.Class = str{parser.require_real(tk::AnyIdentifier).text()};
 
         if (!parser.maybe_real(tk::Equal)) {
+            test_entries.push_back(entry);
             continue;
         }
 
         parser.require_real(tk::LeftParen);
-        while (!parser.maybe_real(tk::RightParen)) {
-            entry.VisitorTree.emplace_back(parser.require_real(tk::AnyIdentifier));
+        while (!parser.is_eof()) {
+
+            if (parser.maybe_real(tk::RightParen)) {
+                break;
+            }
+
+            Token id = parser.require_real(tk::AnyIdentifier);
+
+            if (parser.maybe(tk::LeftBracket)) {
+                Token text = parser.require_real(tk::StringLiteral);
+                parser.maybe(tk::RightBracket);
+                entry.VisitorTree.emplace_back(str{id.text()}, str{text.inner_text()});
+            } else {
+                entry.VisitorTree.emplace_back(str{id.text()}, str{});
+            }
         }
+
+        test_entries.push_back(entry);
     }
 
     return test_entries;
