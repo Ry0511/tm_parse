@@ -73,7 +73,6 @@ bool ParserTestRunner::run(TestFile& file) {
         } state;
 
         rule->visit([this, &state, &expected](const auto& rule) -> void {
-
             if (state.Index >= expected.VisitorTree.size()) {
                 return;
             }
@@ -86,15 +85,17 @@ bool ParserTestRunner::run(TestFile& file) {
 
             str_view rule_name = rule.rule_name();
             str rule_text = txt::escape_string(rule.full_text());
-            const auto&[name, text] = expected.VisitorTree.at(state.Index);
+            const auto& [name, text] = expected.VisitorTree.at(state.Index);
             ++state.Index;
 
             if (rule_name != name) {
+                info("* {} <> {}", rule.rule_name(), rule.full_text());
                 err("* {} != {}", rule_name, name);
                 m_Success = false;
             }
 
-            if (rule_text != text) {
+            if (!text.empty() && rule_text != text) {
+                info("* {} <> {}", rule.rule_name(), rule.full_text());
                 err("* {} != {}", rule_text, text);
                 m_Success = false;
             }

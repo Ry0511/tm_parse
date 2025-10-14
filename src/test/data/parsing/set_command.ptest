@@ -1,0 +1,34 @@
+test_type = ParserTest
+
+test_content = {
+  set foo baz ( 5 * 10 )
+  set foo:bar baz(0) 1
+}
+
+expected_parse_content = {
+  SetCommand = (
+    ObjectRef
+      DotIdentifier["foo"]
+    PropertyAccess
+      DotIdentifier["baz"]
+    ParenExpr["( 5 * 10 )"]
+      ComposedExpr["5 * 10"]
+        BinaryOpExpr["5 * 10"]
+  )
+
+  SetCommand = (
+    ObjectRef["foo:bar"]
+      DotIdentifier["foo"]
+      DotIdentifier["bar"]
+    PropertyAccess["baz(0)"]
+      DotIdentifier["baz"]
+      ArrayAccess["(0)"]
+    ComposedExpr["1"]
+      LiteralExpr["1"]
+  )
+}
+
+expected_text = {
+  "set foo baz ( 5 * 10 )"
+  "set foo:bar baz(0) 1"
+}
