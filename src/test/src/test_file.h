@@ -8,6 +8,7 @@
 
 #include "tm_parse/pch.h"
 #include "tm_parse/lexer/token.h"
+#include "tm_parse/parser/parser.h"
 
 namespace tm_parse {
 class Lexer;
@@ -27,6 +28,7 @@ class TestFile {
    private:
     fs::path m_TestFile;
     str m_TestContent;
+    Parser m_Parser; // TODO: The parser really shouldn't own the string
     std::map<str, std::any> m_TestData;
 
    public:

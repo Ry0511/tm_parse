@@ -16,17 +16,20 @@
 
 namespace tm_parse::tests {
 
-TestFile::TestFile(const fs::path& test_file) : m_TestFile(test_file) {
+namespace {
+str read_file(const fs::path& path) {
+    using It = std::istreambuf_iterator<str_char>;
+    str_ifstream ss{path};
+    return str{It{ss}, It{}};
+}
+}
+
+TestFile::TestFile(const fs::path& test_file) : m_TestFile(test_file), m_Parser(read_file(test_file)) {
     if (!fs::is_regular_file(test_file)) {
         throw std::runtime_error(std::format("file not found {}", test_file.string()).c_str());
     }
-
-    using It = std::istreambuf_iterator<str_char>;
-    str_ifstream ss{test_file};
-    m_TestContent = str{It{ss}, It{}};
-
-    Parser parser{m_TestContent};
-    read_values(parser);
+    m_TestContent = str{m_Parser.text()};
+    read_values(m_Parser);
 }
 
 const std::any& TestFile::get_impl(const str& key) const {
@@ -49,7 +52,7 @@ std::unique_ptr<TestRunner> TestFile::create_test_runner() const {
     }
 
     throw std::runtime_error{
-        std::format("no runner for test type {}", test_file().filename().c_str()).c_str()
+        std::format("no runner for test type {}", test_file().filename().string())
     };
 }
 
