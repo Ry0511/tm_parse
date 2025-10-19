@@ -166,6 +166,12 @@ template <class T> struct RuleRegister { RuleRegister() { RuleTestApi::add_rule<
         return KIND;                                                                   \
     }
 
+// TODO: All throughout the codebase it is assumed that Rule::matches(matcher) doesn't invalidate
+//  the matcher however this isn't actually the case. Calls directly to the matcher function will/can
+//  invalidate the matcher creating a need for a matcher function that does not invalidate the matcher.
+//  It would be best to implement some way of matching a rule without directly invalidating the
+//  matcher because otherwise you need to manually restore the position after each failed match.
+
 #define RULE_STATIC_API(rule)                       \
     RULE_STATIC_CONSTANTS(rule);                    \
     static bool matches(Matcher& matcher) noexcept; \

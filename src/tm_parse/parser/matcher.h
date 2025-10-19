@@ -38,6 +38,16 @@ class Matcher {
    public:
     bool is_eof() const noexcept { return m_Position >= m_Tokens.size(); }
 
+    template <class T>
+    bool matches() noexcept {
+        size_t pos = m_Position;
+        if (T::matches(*this)) {
+            return true;
+        }
+        m_Position = pos;
+        return false;
+    }
+
    public:
     bool try_match(std::span<const tk::TokenKind> kinds) noexcept;
     bool try_match_real(std::span<const tk::TokenKind> kinds) noexcept;
