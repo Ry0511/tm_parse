@@ -4,12 +4,15 @@ test_content = {
   set foo baz ( 5 * 10 )
   set foo:bar baz(+1.5) 1
   set foo:bar baz[-1.5] True
+  set foo'baz' bar 1
+  set $(foo) baz bar
 }
 
 expected_parse_content = {
   SetCommand = (
     ObjectRef
-      DotIdentifier["foo"]
+      FullObjectRef["foo"]
+        DotIdentifier["foo"]
     PropertyAccess
       DotIdentifier["baz"]
     ParenExpr["( 5 * 10 )"]
@@ -19,8 +22,9 @@ expected_parse_content = {
 
   SetCommand = (
     ObjectRef["foo:bar"]
-      DotIdentifier["foo"]
-      DotIdentifier["bar"]
+      FullObjectRef["foo:bar"]
+        DotIdentifier["foo"]
+        DotIdentifier["bar"]
     PropertyAccess["baz(+1.5)"]
       DotIdentifier["baz"]
       ArrayAccess["(+1.5)"]
@@ -29,20 +33,42 @@ expected_parse_content = {
   )
 
   SetCommand = (
-      ObjectRef["foo:bar"]
+    ObjectRef["foo:bar"]
+      FullObjectRef["foo:bar"]
         DotIdentifier["foo"]
         DotIdentifier["bar"]
-      PropertyAccess["baz[-1.5]"]
+    PropertyAccess["baz[-1.5]"]
+      DotIdentifier["baz"]
+      ArrayAccess["[-1.5]"]
+    ComposedExpr["True"]
+      LiteralExpr["True"]
+  )
+
+  SetCommand = (
+    ObjectRef["foo'baz'"]
+      ClassObjectRef["foo'baz'"]
         DotIdentifier["baz"]
-        ArrayAccess["[-1.5]"]
-      ComposedExpr["True"]
-        LiteralExpr["True"]
-    )
+    PropertyAccess["bar"]
+      DotIdentifier["bar"]
+    ComposedExpr["1"]
+      LiteralExpr["1"]
+  )
+
+  SetCommand = (
+    ObjectRef["$(foo)"]
+      MetaVarExpr["$(foo)"]
+        DotIdentifier["foo"]
+    PropertyAccess["baz"]
+      DotIdentifier["baz"]
+    ComposedExpr["bar"]
+      IdentifierRefExpr["bar"]
+  )
 }
 
 expected_text = {
   "set foo baz ( 5 * 10 )"
   "set foo:bar baz(+1.5) 1"
   "set foo:bar baz[-1.5] True"
-  "set $(foo) $(baz) ( 5.0 * $(bar) )"
+  "set foo'baz' bar 1"
+  "set $(foo) baz bar"
 }

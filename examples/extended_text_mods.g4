@@ -1,20 +1,10 @@
-//
-// You might be wondering why there is a grammar file for antlr if both the lexer and parser are
-// implemented manually. It was introduced early into development and is used to model complex rules
-// such as nested recursive rules.
-//
-// This file doesn't or might not match the actual parse result nor how it is actually parsed but
-// it is a good approximation of the parsing. Though the emitted tree would differ a fair bit as
-// the manual parser will clean as it is parsing i.e., ComposedExpr is broken into Binary and Unary
-// rules and some aspects of the parsing are ommited from the final results i.e., +(A * B) would
-// just become A * B
-//
-
 grammar extended_text_mods;
 
 options { caseInsensitive = true; }
 
-program: composed_expr;
+program
+  : ( set_command )*
+  ;
 
 identifier
   : IDENTIFIER
@@ -29,22 +19,67 @@ identifier
   | KW_CLASS
   | KW_NAME
   | KW_END
-  | KW_ON
+  | KW_BEFORE
+  | KW_AFTER
   | KW_LOG_INFO
   | KW_CREATE_MOD
-  | KW_PRE
-  | KW_POST
-  | KW_POST_UNCONDITIONAL
   ;
 
 literal_expr
-  : identifier
+  : meta_var
+  | identifier
   | NUMBER
   | STRING_LITERAL
   | KW_TRUE
   | KW_FALSE
   | KW_NONE
   ;
+
+// -------------------------------------------------------------------------------------------------
+// -- COMMON RULES --
+// -------------------------------------------------------------------------------------------------
+
+meta_var
+  : DOLLAR_SIGN LEFT_PAREN property_access RIGHT_PAREN
+  ;
+
+dot_identifier
+  : identifier ( DOT IDENTIFIER )*
+  ;
+
+array_access
+  : ( LEFT_PAREN NUMBER RIGHT_PAREN )
+  | ( LEFT_BRACKET NUMBER RIGHT_BRACKET )
+  ;
+
+property_access
+  : identifier array_access? ( DOT identifier array_access? )*
+  ;
+
+class_ref
+  : identifier SQUOTE dot_identifier SQUOTE
+  ;
+
+full_object_ref
+  : dot_identifier ( COLON dot_identifier )?
+  ;
+
+object_reference
+  : class_ref
+  | full_object_ref
+  | meta_var
+  ;
+
+expression
+  : composed_expr
+  ;
+
+// -------------------------------------------------------------------------------------------------
+// -- SET COMMANDS --
+// -------------------------------------------------------------------------------------------------
+
+set_command
+  : KW_SET object_reference property_access expression;
 
 // -------------------------------------------------------------------------------------------------
 // -- MATHS EXPRESSIONS --
@@ -91,12 +126,10 @@ KW_OBJECT            : 'OBJECT'             ;
 KW_CLASS             : 'CLASS'              ;
 KW_NAME              : 'NAME'               ;
 KW_END               : 'END'                ;
-KW_ON                : 'ON'                 ;
 KW_LOG_INFO          : 'LOG_INFO'           ;
 KW_CREATE_MOD        : 'CREATE_MOD'         ;
-KW_PRE               : 'PRE'                ;
-KW_POST              : 'POST'               ;
-KW_POST_UNCONDITIONAL: 'POST_UNCONDITIONAL' ;
+KW_BEFORE            : 'BEFORE'             ;
+KW_AFTER             : 'AFTER'              ;
 
 DOT  : '.' ;
 PLUS : '+' ;
@@ -107,14 +140,17 @@ SLASH: '/' ;
 SQUOTE: '\'' ;
 DQUOTE: '"'  ;
 
+DOLLAR_SIGN  : '$' ;
 LEFT_PAREN   : '(' ;
 RIGHT_PAREN  : ')' ;
 LEFT_BRACKET : '[' ;
 RIGHT_BRACKET: ']' ;
 LEFT_CURLY   : '{' ;
 RIGHT_CURLY  : '}' ;
+COLON        : ':' ;
 
 IDENTIFIER: [A-Z_][_A-Z0-9]* ;
+
 STRING_LITERAL: DQUOTE * DQUOTE ;
 
 WS : [\r\n ]+ -> skip;

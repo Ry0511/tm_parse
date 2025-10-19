@@ -52,6 +52,7 @@ bool ParserTestRunner::run(TestFile& file) {
             err("* {}::create check failed", expected.Class);
         }
 
+        // TODO: we never verify the index for pos
         str left = txt::escape_string(rule->full_text());
         str right = txt::escape_string(expected_text[pos].inner_text());
         ++pos;

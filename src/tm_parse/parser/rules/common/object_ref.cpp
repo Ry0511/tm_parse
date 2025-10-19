@@ -6,9 +6,11 @@
 
 #include "tm_parse/pch.h"
 
-#include "dot_identifier.h"
 #include "tm_parse/parser/parser.h"
+#include "tm_parse/parser/rules/common/class_obj_ref.h"
+#include "tm_parse/parser/rules/common/full_object_ref.h"
 #include "tm_parse/parser/rules/common/object_ref.h"
+#include "tm_parse/parser/rules/expr/meta_var_expr.h"
 
 namespace tm_parse::rules {
 
@@ -17,49 +19,47 @@ ObjectRef::ObjectRef(ObjectRef&&) noexcept = default;
 ObjectRef& ObjectRef::operator=(ObjectRef&&) noexcept = default;
 
 bool ObjectRef::matches(Matcher& matcher) noexcept {
-    if (!DotIdentifier::matches(matcher)) {
-        return false;
+
+    if (matcher.matches<MetaVarExpr>()) {
+        return true;
     }
 
-    if (matcher.maybe(tk::Colon)) {
-        return DotIdentifier::matches(matcher);
+    if (matcher.matches<ClassObjectRef>()) {
+        return true;
     }
 
-    return true;
+    return matcher.matches<FullObjectRef>();
 }
 
 std::unique_ptr<ObjectRef> ObjectRef::create(Parser& parser) {
     auto ref = std::make_unique<ObjectRef>();
+    Matcher m = parser.create_matcher();
 
-    ref->m_MainObject = DotIdentifier::create(parser);
-    ref->m_MainObject->set_parent(*ref);
-
-    if (parser.maybe(tk::Colon)) {
-        ref->m_SubObject = DotIdentifier::create(parser);
-        ref->m_SubObject->set_parent(*ref);
-        ref->post_init(ref->m_MainObject->first_token(), ref->m_SubObject->last_token());
-    } else {
-        ref->copy_state(*ref->m_MainObject);
+    // $(Globals) - builtin meta variable
+    if (m.matches<MetaVarExpr>()) {
+        ref->m_Ref = MetaVarExpr::create(parser);
+    }
+    // Class'foo.baz.bar'
+    else if (m.matches<ClassObjectRef>()) {
+        ref->m_Ref = ClassObjectRef::create(parser);
+    }
+    // foo.baz:bar
+    else {
+        ref->m_Ref = FullObjectRef::create(parser);
     }
 
+    ref->copy_state(*ref->m_Ref);
     return ref;
 }
 
 void ObjectRef::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
-    func(*this);
-    this->m_MainObject->visit(func);
-
-    if (this->m_SubObject != nullptr) {
-        this->m_SubObject->visit(func);
-    }
+    ParserRule::visit(func);
+    m_Ref->visit(func);
 }
 
 void ObjectRef::cascade_assign_parents(ParserRule* parent) noexcept {
     ParserRule::cascade_assign_parents(parent);
-    m_MainObject->cascade_assign_parents(this);
-    if (m_SubObject != nullptr) {
-        m_SubObject->cascade_assign_parents(this);
-    }
+    m_Ref->cascade_assign_parents(this);
 }
 
 }  // namespace tm_parse::rules

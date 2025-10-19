@@ -12,11 +12,14 @@ namespace tm_parse::rkind {
 
 using parser_rule_kind_int = uint8_t;
 
+// TODO: this can be replaced with a static variable on the class
 enum ParserRuleKind : parser_rule_kind_int {
     ArrayAccess,
     DotIdentifier,
     ObjectRef,
     PropertyAccess,
+    ClassObjectRef,
+    FullObjectRef,
 
     ObjectDefinition,
     SetCommand,

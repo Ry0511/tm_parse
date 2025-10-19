@@ -5,15 +5,17 @@ test_content = {
   foo.baz
   foo:baz
   foo.baz:bar
+  $(foo.baz.bar)
+  foo'baz.bar'
 }
 
-# TODO: will want to test the text held by the rule as well so something like:
-# ObjectRef = ( DotIdentifier["foo.baz"] DotIdentifier["bar"] )
 expected_parse_content = {
-  ObjectRef = ( DotIdentifier["foo"] )
-  ObjectRef = ( DotIdentifier["foo.baz"] )
-  ObjectRef = ( DotIdentifier["foo"] DotIdentifier["baz"] )
-  ObjectRef = ( DotIdentifier["foo.baz"] DotIdentifier["bar"] )
+  ObjectRef = ( FullObjectRef["foo"]           DotIdentifier["foo"]                          )
+  ObjectRef = ( FullObjectRef["foo.baz"]       DotIdentifier["foo.baz"]                      )
+  ObjectRef = ( FullObjectRef["foo:baz"]       DotIdentifier["foo"]     DotIdentifier["baz"] )
+  ObjectRef = ( FullObjectRef["foo.baz:bar"]   DotIdentifier["foo.baz"] DotIdentifier["bar"] )
+  ObjectRef = ( MetaVarExpr["$(foo.baz.bar)"]  DotIdentifier["foo.baz.bar"]                  )
+  ObjectRef = ( ClassObjectRef["foo'baz.bar'"] DotIdentifier["baz.bar"]                      )
 }
 
 expected_text = {
@@ -21,4 +23,6 @@ expected_text = {
   "foo.baz"
   "foo:baz"
   "foo.baz:bar"
+  "$(foo.baz.bar)"
+  "foo'baz.bar'"
 }

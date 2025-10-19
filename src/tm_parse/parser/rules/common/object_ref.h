@@ -15,8 +15,7 @@ class DotIdentifier;
 
 class ObjectRef : public ParserRule {
    private:
-    std::unique_ptr<DotIdentifier> m_MainObject;  // Required
-    std::unique_ptr<DotIdentifier> m_SubObject;   // Optional
+    std::unique_ptr<ParserRule> m_Ref;
 
    public:
     ObjectRef() = default;
