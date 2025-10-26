@@ -8,7 +8,7 @@
 
 #include "tm_parse/parser/parser.h"
 #include "tm_parse/parser/rules/common/class_obj_ref.h"
-#include "tm_parse/parser/rules/common/dot_identifier.h"
+#include "tm_parse/parser/rules/common/obj_dot_identifier.h"
 
 namespace tm_parse::rules {
 
@@ -19,7 +19,7 @@ ClassObjectRef& ClassObjectRef::operator=(ClassObjectRef&&) noexcept = default;
 
 bool ClassObjectRef::matches(Matcher& matcher) noexcept {
     return matcher.maybe_real(tk::AnyIdentifier) && matcher.maybe_real(tk::SingleQuote)
-           && DotIdentifier::matches(matcher) && matcher.maybe_real(tk::SingleQuote);
+           && ObjectDotIdentifier::matches(matcher) && matcher.maybe_real(tk::SingleQuote);
 }
 
 std::unique_ptr<ClassObjectRef> ClassObjectRef::create(Parser& parser) {
@@ -28,7 +28,7 @@ std::unique_ptr<ClassObjectRef> ClassObjectRef::create(Parser& parser) {
 
     auto rule = std::make_unique<ClassObjectRef>();
     rule->m_Class = str{first.text()};
-    rule->m_Object = DotIdentifier::create(parser);
+    rule->m_Object = ObjectDotIdentifier::create(parser);
     Token last = parser.require_real(tk::SingleQuote);
 
     rule->post_init(first, last);

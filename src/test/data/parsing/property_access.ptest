@@ -8,10 +8,10 @@ test_content = {
 }
 
 expected_parse_content = {
-  PropertyAccess = (DotIdentifier)
-  PropertyAccess = (DotIdentifier["foo(+1.0)")
-  PropertyAccess = (DotIdentifier["foo[-1.0]")
-  PropertyAccess = (DotIdentifier["foo.baz(0.5)")
+  PropertyAccess = (PropertyDotIdentifier)
+  PropertyAccess = (PropertyDotIdentifier["foo(+1.0)")
+  PropertyAccess = (PropertyDotIdentifier["foo[-1.0]")
+  PropertyAccess = (PropertyDotIdentifier["foo.baz(0.5)")
 }
 
 expected_text = {

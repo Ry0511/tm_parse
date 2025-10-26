@@ -13,9 +13,9 @@ expected_parse_content = {
   SetCommand = (
     ObjectRef
       FullObjectRef["foo"]
-        DotIdentifier["foo"]
+        ObjectDotIdentifier["foo"]
     PropertyAccess
-      DotIdentifier["baz"]
+      PropertyDotIdentifier["baz"]
     ParenExpr["( 5 * 10 )"]
       ComposedExpr["5 * 10"]
         BinaryOpExpr["5 * 10"]
@@ -24,10 +24,10 @@ expected_parse_content = {
   SetCommand = (
     ObjectRef["foo:bar"]
       FullObjectRef["foo:bar"]
-        DotIdentifier["foo"]
-        DotIdentifier["bar"]
+        ObjectDotIdentifier["foo"]
+        ObjectDotIdentifier["bar"]
     PropertyAccess["baz(+1.5)"]
-      DotIdentifier["baz(+1.5)"]
+      PropertyDotIdentifier["baz(+1.5)"]
     ComposedExpr["1"]
       LiteralExpr["1"]
   )
@@ -35,10 +35,10 @@ expected_parse_content = {
   SetCommand = (
     ObjectRef["foo:bar"]
       FullObjectRef["foo:bar"]
-        DotIdentifier["foo"]
-        DotIdentifier["bar"]
+        ObjectDotIdentifier["foo"]
+        ObjectDotIdentifier["bar"]
     PropertyAccess["baz[-1.5]"]
-      DotIdentifier["baz[-1.5]"]
+      PropertyDotIdentifier["baz[-1.5]"]
     ComposedExpr["True"]
       LiteralExpr["True"]
   )
@@ -46,9 +46,9 @@ expected_parse_content = {
   SetCommand = (
     ObjectRef["foo'baz'"]
       ClassObjectRef["foo'baz'"]
-        DotIdentifier["baz"]
+        ObjectDotIdentifier["baz"]
     PropertyAccess["bar"]
-      DotIdentifier["bar"]
+      PropertyDotIdentifier["bar"]
     ComposedExpr["1"]
       LiteralExpr["1"]
   )
@@ -56,9 +56,9 @@ expected_parse_content = {
   SetCommand = (
     ObjectRef["$(foo)"]
       MetaVarExpr["$(foo)"]
-        DotIdentifier["foo"]
+        PropertyDotIdentifier["foo"]
     PropertyAccess["baz"]
-      DotIdentifier["baz"]
+      PropertyDotIdentifier["baz"]
     ComposedExpr["bar"]
       IdentifierRefExpr["bar"]
   )
@@ -66,9 +66,9 @@ expected_parse_content = {
   SetCommand = (
     ObjectRef["$(foo[0].baz(10))"]
       MetaVarExpr["$(foo[0].baz(10))"]
-        DotIdentifier["foo[0].baz(10)"]
+        PropertyDotIdentifier["foo[0].baz(10)"]
     PropertyAccess["baz(0).bar[1]"]
-      DotIdentifier["baz(0).bar[1]"]
+      PropertyDotIdentifier["baz(0).bar[1]"]
     ComposedExpr["10"]
       LiteralExpr["10"]
   )

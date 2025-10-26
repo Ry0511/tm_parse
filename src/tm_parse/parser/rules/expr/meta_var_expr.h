@@ -11,11 +11,11 @@
 
 namespace tm_parse::rules {
 
-class DotIdentifier;
+class PropertyDotIdentifier;
 
 class MetaVarExpr : public Expr {
    private:
-    std::unique_ptr<DotIdentifier> m_Identifier;
+    std::unique_ptr<PropertyDotIdentifier> m_Identifier;
 
    public:
     MetaVarExpr() noexcept;

@@ -7,8 +7,8 @@
 #include "tm_parse/pch.h"
 
 #include "tm_parse/parser/parser.h"
-#include "tm_parse/parser/rules/common/dot_identifier.h"
 #include "tm_parse/parser/rules/common/full_object_ref.h"
+#include "tm_parse/parser/rules/common/obj_dot_identifier.h"
 
 namespace tm_parse::rules {
 
@@ -18,12 +18,12 @@ FullObjectRef::FullObjectRef(FullObjectRef&&) noexcept = default;
 FullObjectRef& FullObjectRef::operator=(FullObjectRef&&) noexcept = default;
 
 bool FullObjectRef::matches(Matcher& matcher) noexcept {
-    if (!DotIdentifier::matches(matcher)) {
+    if (!ObjectDotIdentifier::matches(matcher)) {
         return false;
     }
 
     if (matcher.maybe_real(tk::Colon)) {
-        return DotIdentifier::matches(matcher);
+        return ObjectDotIdentifier::matches(matcher);
     }
 
     return true;
@@ -32,11 +32,11 @@ bool FullObjectRef::matches(Matcher& matcher) noexcept {
 std::unique_ptr<FullObjectRef> FullObjectRef::create(Parser& parser) {
     auto ref = std::make_unique<FullObjectRef>();
 
-    ref->m_MainObject = DotIdentifier::create(parser);
+    ref->m_MainObject = ObjectDotIdentifier::create(parser);
     ref->m_MainObject->set_parent(*ref);
 
     if (parser.maybe_real(tk::Colon)) {
-        ref->m_SubObject = DotIdentifier::create(parser);
+        ref->m_SubObject = ObjectDotIdentifier::create(parser);
         ref->m_SubObject->set_parent(*ref);
         ref->post_init(ref->m_MainObject->first_token(), ref->m_SubObject->last_token());
     }

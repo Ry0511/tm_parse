@@ -9,7 +9,7 @@
 #include "parser_test_runner.h"
 #include "test_file.h"
 #include "tm_parse/parser/parser.h"
-#include "tm_parse/parser/rules/common/dot_identifier.h"
+#include "tm_parse/parser/rules/common/prop_dot_identifier.h"
 #include "tm_parse/util/text_helpers.h"
 
 namespace tm_parse::tests {

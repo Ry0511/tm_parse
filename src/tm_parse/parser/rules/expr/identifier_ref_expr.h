@@ -9,11 +9,11 @@
 
 namespace tm_parse::rules {
 
-class DotIdentifier;
+class PropertyDotIdentifier;
 
 class IdentifierRefExpr : public Expr {
    private:
-    std::unique_ptr<DotIdentifier> m_Identifier;
+    std::unique_ptr<PropertyDotIdentifier> m_Identifier;
 
    public:
     IdentifierRefExpr();
@@ -26,7 +26,7 @@ class IdentifierRefExpr : public Expr {
     IdentifierRefExpr& operator=(IdentifierRefExpr&&) noexcept;
 
    public:
-    const DotIdentifier& identifier() const noexcept { return *m_Identifier; }
+    const PropertyDotIdentifier& identifier() const noexcept { return *m_Identifier; }
 
    public:
     RULE_STATIC_API(IdentifierRefExpr);

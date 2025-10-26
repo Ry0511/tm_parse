@@ -12,12 +12,12 @@
 
 namespace tm_parse::rules {
 
-class DotIdentifier;
+class ObjectDotIdentifier;
 
 class FullObjectRef : public ParserRule {
    private:
-    std::unique_ptr<DotIdentifier> m_MainObject;  // Required
-    std::unique_ptr<DotIdentifier> m_SubObject;   // Optional
+    std::unique_ptr<ObjectDotIdentifier> m_MainObject;  // Required
+    std::unique_ptr<ObjectDotIdentifier> m_SubObject;   // Optional
 
    public:
     FullObjectRef() noexcept;
@@ -32,6 +32,8 @@ class FullObjectRef : public ParserRule {
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
     void cascade_assign_parents(ParserRule* parent) noexcept override;
+
+   public:
     RULE_STATIC_API(FullObjectRef);
 };
 

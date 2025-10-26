@@ -12,12 +12,12 @@
 
 namespace tm_parse::rules {
 
-class DotIdentifier;
+class ObjectDotIdentifier;
 
 class ClassObjectRef : public ParserRule {
    private:
     str m_Class;
-    std::unique_ptr<DotIdentifier> m_Object;
+    std::unique_ptr<ObjectDotIdentifier> m_Object;
 
    public:
     ClassObjectRef();

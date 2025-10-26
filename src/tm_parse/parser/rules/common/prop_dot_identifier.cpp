@@ -8,21 +8,21 @@
 
 #include "tm_parse/lexer/token_error.h"
 #include "tm_parse/parser/parser.h"
-#include "tm_parse/parser/rules/common/dot_identifier.h"
 #include "tm_parse/parser/rules/common/array_access.h"
+#include "tm_parse/parser/rules/common/prop_dot_identifier.h"
 
 namespace tm_parse::rules {
 
-DotIdentifier::DotIdentifier() = default;
-DotIdentifier::DotIdentifier(DotIdentifier&&) noexcept = default;
-DotIdentifier& DotIdentifier::operator=(DotIdentifier&&) noexcept = default;
-DotIdentifier::~DotIdentifier() noexcept = default;
+PropertyDotIdentifier::PropertyDotIdentifier() = default;
+PropertyDotIdentifier::PropertyDotIdentifier(PropertyDotIdentifier&&) noexcept = default;
+PropertyDotIdentifier& PropertyDotIdentifier::operator=(PropertyDotIdentifier&&) noexcept = default;
+PropertyDotIdentifier::~PropertyDotIdentifier() noexcept = default;
 
-const Token& DotIdentifierData::last_token() const noexcept {
+const Token& PropertyDotIdentifierData::last_token() const noexcept {
     return ArrayPart ? ArrayPart->last_token() : IdentifierPart;
 }
 
-bool DotIdentifier::matches(Matcher& matcher) noexcept {
+bool PropertyDotIdentifier::matches(Matcher& matcher) noexcept {
     if (!matcher.maybe_real(tk::AnyIdentifier)) {
         return false;
     }
@@ -39,11 +39,11 @@ bool DotIdentifier::matches(Matcher& matcher) noexcept {
     return true;
 }
 
-std::unique_ptr<DotIdentifier> DotIdentifier::create(Parser& parser) {
-    auto rule = std::make_unique<DotIdentifier>();
+std::unique_ptr<PropertyDotIdentifier> PropertyDotIdentifier::create(Parser& parser) {
+    auto rule = std::make_unique<PropertyDotIdentifier>();
 
     do {
-        DotIdentifierData& data = rule->m_Parts.emplace_back();
+        PropertyDotIdentifierData& data = rule->m_Parts.emplace_back();
         data.IdentifierPart = parser.require_real(tk::AnyIdentifier);
 
         Matcher m = parser.create_matcher();

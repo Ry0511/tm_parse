@@ -8,8 +8,8 @@
 #include "tm_parse/parser/rules/primary/set_command.h"
 
 #include "tm_parse/parser/parser.h"
-#include "tm_parse/parser/rules/common/dot_identifier.h"
 #include "tm_parse/parser/rules/common/object_ref.h"
+#include "tm_parse/parser/rules/common/prop_dot_identifier.h"
 #include "tm_parse/parser/rules/common/property_access.h"
 #include "tm_parse/parser/rules/expr/expr.h"
 

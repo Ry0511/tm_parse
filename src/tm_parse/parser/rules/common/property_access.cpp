@@ -10,7 +10,7 @@
 #include "tm_parse/parser/rules/common/array_access.h"
 
 #include "tm_parse/parser/parser.h"
-#include "tm_parse/parser/rules/common/dot_identifier.h"
+#include "tm_parse/parser/rules/common/prop_dot_identifier.h"
 
 namespace tm_parse::rules {
 
@@ -19,14 +19,14 @@ PropertyAccess::PropertyAccess(PropertyAccess&&) noexcept = default;
 PropertyAccess& PropertyAccess::operator=(PropertyAccess&&) noexcept = default;
 
 bool PropertyAccess::matches(Matcher& matcher) noexcept {
-    bool res = DotIdentifier::matches(matcher);
+    bool res = PropertyDotIdentifier::matches(matcher);
     ArrayAccess::matches(matcher);
     return res;
 }
 
 std::unique_ptr<PropertyAccess> PropertyAccess::create(Parser& parser) {
     auto rule = std::make_unique<PropertyAccess>();
-    rule->m_Property = DotIdentifier::create(parser);
+    rule->m_Property = PropertyDotIdentifier::create(parser);
     rule->copy_state(*rule->m_Property);
     return rule;
 }

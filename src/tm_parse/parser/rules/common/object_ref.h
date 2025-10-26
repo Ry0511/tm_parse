@@ -11,7 +11,7 @@
 
 namespace tm_parse::rules {
 
-class DotIdentifier;
+class PropertyDotIdentifier;
 
 class ObjectRef : public ParserRule {
    private:

@@ -10,12 +10,12 @@ test_content = {
 }
 
 expected_parse_content = {
-  ObjectRef = ( FullObjectRef["foo"]           DotIdentifier["foo"]                          )
-  ObjectRef = ( FullObjectRef["foo.baz"]       DotIdentifier["foo.baz"]                      )
-  ObjectRef = ( FullObjectRef["foo:baz"]       DotIdentifier["foo"]     DotIdentifier["baz"] )
-  ObjectRef = ( FullObjectRef["foo.baz:bar"]   DotIdentifier["foo.baz"] DotIdentifier["bar"] )
-  ObjectRef = ( MetaVarExpr["$(foo.baz.bar)"]  DotIdentifier["foo.baz.bar"]                  )
-  ObjectRef = ( ClassObjectRef["foo'baz.bar'"] DotIdentifier["baz.bar"]                      )
+  ObjectRef = ( FullObjectRef["foo"]           ObjectDotIdentifier["foo"]                                )
+  ObjectRef = ( FullObjectRef["foo.baz"]       ObjectDotIdentifier["foo.baz"]                            )
+  ObjectRef = ( FullObjectRef["foo:baz"]       ObjectDotIdentifier["foo"]     ObjectDotIdentifier["baz"] )
+  ObjectRef = ( FullObjectRef["foo.baz:bar"]   ObjectDotIdentifier["foo.baz"] ObjectDotIdentifier["bar"] )
+  ObjectRef = ( MetaVarExpr["$(foo.baz.bar)"]  PropertyDotIdentifier["foo.baz.bar"]                      )
+  ObjectRef = ( ClassObjectRef["foo'baz.bar'"] ObjectDotIdentifier["baz.bar"]                            )
 }
 
 expected_text = {

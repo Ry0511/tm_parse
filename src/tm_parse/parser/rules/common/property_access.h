@@ -7,7 +7,7 @@
 #pragma once
 
 #include "tm_parse/pch.h"
-#include "tm_parse/parser/rules/common/dot_identifier.h"
+#include "tm_parse/parser/rules/common/prop_dot_identifier.h"
 #include "tm_parse/parser/rules/parser_rule.h"
 
 namespace tm_parse::rules {
@@ -32,7 +32,7 @@ class PropertyAccess : public ParserRule {
 
    public:
     const ParserRule& property() const noexcept { return *m_Property; }
-    const DotIdentifier& dot_identifier() const { return m_Property->as_ref<DotIdentifier>(); }
+    const PropertyDotIdentifier& property_dot_identifier() const { return m_Property->as_ref<PropertyDotIdentifier>(); }
 
    public:
     RULE_STATIC_API(PropertyAccess);
