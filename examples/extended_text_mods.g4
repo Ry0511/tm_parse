@@ -3,7 +3,9 @@ grammar extended_text_mods;
 options { caseInsensitive = true; }
 
 program
-  : ( set_command )*
+  : ( set_command
+    | object_definition
+    )*
     EOF
   ;
 
@@ -40,7 +42,7 @@ literal_expr
 // -------------------------------------------------------------------------------------------------
 
 meta_var
-  : DOLLAR_SIGN LEFT_PAREN dot_identifier RIGHT_PAREN
+  : DOLLAR_SIGN LEFT_PAREN prop_dot_identifier RIGHT_PAREN
   ;
 
 static_array_access
@@ -55,20 +57,24 @@ array_access
   : ( static_array_access | dynamic_array_access )+
   ;
 
-dot_identifier
+obj_dot_identifier
+  : identifier ( DOT identifier )*
+  ;
+
+prop_dot_identifier
   : identifier array_access? ( DOT identifier array_access? )*
   ;
 
 property_access
-  : dot_identifier
+  : prop_dot_identifier
   ;
 
 class_ref
-  : identifier SQUOTE dot_identifier SQUOTE
+  : identifier SQUOTE obj_dot_identifier SQUOTE
   ;
 
 full_object_ref
-  : dot_identifier ( COLON dot_identifier )?
+  : obj_dot_identifier ( COLON obj_dot_identifier )?
   ;
 
 object_reference
@@ -95,6 +101,16 @@ expression
 //  access is guaranteed to be greedy
 set_command
   : KW_SET object_reference property_access expression
+  ;
+
+object_definition
+  : KW_BEGIN KW_OBJECT
+    KW_CLASS EQUAL obj_dot_identifier
+    KW_NAME EQUAL obj_dot_identifier
+    ( object_definition
+    | assignment_expr
+    )*
+    KW_END KW_OBJECT
   ;
 
 // -------------------------------------------------------------------------------------------------
