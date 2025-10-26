@@ -1,4 +1,3 @@
-
 create_mod = (
   name = "My Mod Name",
   version = "1.0",
@@ -8,38 +7,9 @@ create_mod = (
   )
 )
 
-# Executed on function call
-on WillowGame.WillowPlayerController:SpawningProcessComplete PRE {
-  log_info "applying xp multipliers to globals definition"
+set $(Globals) ExpScaleByLevelDifference(0).HigherLevelEnemyExpScale 100.0
 
-  set $(Globals) ExpScaleByLevelDifference(0) (
-    HigherLevelEnemyExpScale=1.00 * higher_level_mult,
-    LowerLevelEnemyExpScale=0.9 * lower_level_mult
-  )
+set $(Globals) ExpScaleByLevelDifference(0).HigherLevelEnemyExpScale 1.00 * lower_level_mult
 
-  set $(Globals) ExpScaleByLevelDifference(1) (
-    HigherLevelEnemyExpScale=1.03 * higher_level_mult,
-    LowerLevelEnemyExpScale=0.7 * lower_level_mult
-  )
-
-  set $(Globals) ExpScaleByLevelDifference(2) (
-    HigherLevelEnemyExpScale=1.06 * higher_level_mult,
-    LowerLevelEnemyExpScale=0.4 * lower_level_mult
-  )
-
-  set $(Globals) ExpScaleByLevelDifference(3) (
-    HigherLevelEnemyExpScale=1.09 * higher_level_mult,
-    LowerLevelEnemyExpScale=0.15 * lower_level_mult
-  )
-
-  set $(Globals) ExpScaleByLevelDifference(4) (
-    HigherLevelEnemyExpScale=1.12 * higher_level_mult,
-    LowerLevelEnemyExpScale=0.05 * lower_level_mult
-  )
-
-  set $(Globals) ExpScaleByLevelDifference(5) (
-    HigherLevelEnemyExpScale=1.15 * higher_level_mult,
-    LowerLevelEnemyExpScale=0.01 * lower_level_mult
-  )
-
-}
+Begin Object Class=Foo Name=Baz
+End Object

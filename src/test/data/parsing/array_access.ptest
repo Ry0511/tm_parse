@@ -1,9 +1,25 @@
 test_type = ParserTest
+skip_blank_lines = true
 
 # array access does not skip tokens so Identifier BlankLine LeftParen Number RightParen would fail
-test_content = {(-1)(1)(+1)[-1][1][+1]}
+test_content = {
+  (-1)
+  (1)
+  (+1)
+  [-1]
+  [1]
+  [+1]
+  [+1](+1)[-1](+1)
+  (-1)[-1](+1)[+1]
+  (-999999999999999999999999999999999999999999999999999)
+  [-999999999999999999999999999999999999999999999999999]
+}
 
 expected_parse_content = {
+  ArrayAccess
+  ArrayAccess
+  ArrayAccess
+  ArrayAccess
   ArrayAccess
   ArrayAccess
   ArrayAccess
@@ -19,4 +35,8 @@ expected_text = {
   "[-1]"
   "[1]"
   "[+1]"
+  "[+1](+1)[-1](+1)"
+  "(-1)[-1](+1)[+1]"
+  "(-999999999999999999999999999999999999999999999999999)"
+  "[-999999999999999999999999999999999999999999999999999]"
 }

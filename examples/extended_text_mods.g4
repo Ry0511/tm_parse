@@ -4,6 +4,7 @@ options { caseInsensitive = true; }
 
 program
   : ( set_command )*
+    EOF
   ;
 
 identifier
@@ -43,17 +44,18 @@ meta_var
   : DOLLAR_SIGN LEFT_PAREN property_access RIGHT_PAREN
   ;
 
-dot_identifier
-  : identifier ( DOT IDENTIFIER )*
+array_access
+  : (   ( LEFT_PAREN NUMBER RIGHT_PAREN )
+      | ( LEFT_BRACKET NUMBER RIGHT_BRACKET )
+    )+
   ;
 
-array_access
-  : ( LEFT_PAREN NUMBER RIGHT_PAREN )
-  | ( LEFT_BRACKET NUMBER RIGHT_BRACKET )
+dot_identifier
+  : identifier array_access? ( DOT identifier array_access? )*
   ;
 
 property_access
-  : identifier array_access? ( DOT identifier array_access? )*
+  : dot_identifier
   ;
 
 class_ref

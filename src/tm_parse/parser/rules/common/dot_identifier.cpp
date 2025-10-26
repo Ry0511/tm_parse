@@ -5,22 +5,35 @@
 //
 
 #include "tm_parse/pch.h"
-#include "dot_identifier.h"
 
 #include "tm_parse/lexer/token_error.h"
 #include "tm_parse/parser/parser.h"
+#include "tm_parse/parser/rules/common/dot_identifier.h"
+#include "tm_parse/parser/rules/common/array_access.h"
 
 namespace tm_parse::rules {
+
+DotIdentifier::DotIdentifier() = default;
+DotIdentifier::DotIdentifier(DotIdentifier&&) noexcept = default;
+DotIdentifier& DotIdentifier::operator=(DotIdentifier&&) noexcept = default;
+DotIdentifier::~DotIdentifier() noexcept = default;
+
+const Token& DotIdentifierData::last_token() const noexcept {
+    return ArrayPart ? ArrayPart->last_token() : IdentifierPart;
+}
 
 bool DotIdentifier::matches(Matcher& matcher) noexcept {
     if (!matcher.maybe_real(tk::AnyIdentifier)) {
         return false;
     }
 
+    matcher.matches<ArrayAccess>();
+
     while (matcher.maybe(tk::Dot)) {
         if (!matcher.maybe(tk::AnyIdentifier)) {
             return false;
         }
+        matcher.matches<ArrayAccess>();
     }
 
     return true;
@@ -28,22 +41,20 @@ bool DotIdentifier::matches(Matcher& matcher) noexcept {
 
 std::unique_ptr<DotIdentifier> DotIdentifier::create(Parser& parser) {
     auto rule = std::make_unique<DotIdentifier>();
-    Token first = parser.require_real(tk::AnyIdentifier);
-    Token last = first;
 
-    rule->m_NameParts.push_back(first.Region);
+    do {
+        DotIdentifierData& data = rule->m_Parts.emplace_back();
+        data.IdentifierPart = parser.require_real(tk::AnyIdentifier);
 
-    while (parser.maybe(tk::Dot)) {
-        last = parser.require(tk::AnyIdentifier);
-        rule->m_NameParts.push_back(last.Region);
-    }
+        Matcher m = parser.create_matcher();
+        if (m.matches<ArrayAccess>()) {
+            data.ArrayPart = ArrayAccess::create(parser);
+        }
 
-    rule->m_NameParts.shrink_to_fit();
-    rule->post_init(first, last);
+    } while (parser.maybe_real(tk::Dot));
 
+    rule->post_init(rule->first().IdentifierPart, rule->last().last_token());
     return rule;
 }
-
-DotIdentifier::~DotIdentifier() = default;
 
 }  // namespace tm_parse::rules

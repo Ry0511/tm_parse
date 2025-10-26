@@ -7,17 +7,14 @@
 #pragma once
 
 #include "tm_parse/pch.h"
+#include "tm_parse/parser/rules/common/dot_identifier.h"
 #include "tm_parse/parser/rules/parser_rule.h"
 
 namespace tm_parse::rules {
 
-class DotIdentifier;
-class ArrayAccess;
-
 class PropertyAccess : public ParserRule {
    private:
-    std::unique_ptr<DotIdentifier> m_Property;   // mandatory
-    std::unique_ptr<ArrayAccess> m_ArrayAccess;  // nullable
+    std::unique_ptr<ParserRule> m_Property;
 
    public:
     PropertyAccess() = default;
@@ -30,12 +27,14 @@ class PropertyAccess : public ParserRule {
     PropertyAccess& operator=(PropertyAccess&&) noexcept;
 
    public:
-    const DotIdentifier& property() const noexcept { return *m_Property; }
-    const ArrayAccess* array_access() const noexcept { return m_ArrayAccess.get(); }
-
-   public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
     void cascade_assign_parents(ParserRule* parent) noexcept override;
+
+   public:
+    const ParserRule& property() const noexcept { return *m_Property; }
+    const DotIdentifier& dot_identifier() const { return m_Property->as_ref<DotIdentifier>(); }
+
+   public:
     RULE_STATIC_API(PropertyAccess);
 };
 

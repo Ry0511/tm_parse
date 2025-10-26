@@ -25,6 +25,7 @@ bool ParserTestRunner::run(TestFile& file) {
     auto text = file.get<str_view>("test_content_str");
     auto expected_rules = file.get<std::vector<ParserTestEntry>>("expected_parse_content");
     auto expected_text = file.get<TokenVec>("expected_text");
+    auto skip_blank_lines = file.get<bool>("skip_blank_lines", false);
 
     Parser parser{str{text}};
     size_t pos = 0;
@@ -40,6 +41,12 @@ bool ParserTestRunner::run(TestFile& file) {
         const RuleFactory& factory = RuleTestApi::get_factory(expected.Class);
 
         Matcher m = parser.create_matcher();
+
+        if (skip_blank_lines) {
+            while (m.maybe(tk::BlankLine)) {}
+            while (parser.maybe(tk::BlankLine)) {}
+        }
+
         if (!factory.matches(m)) {
             err("* {}::matches check failed", expected.Class);
             m_Success = false;

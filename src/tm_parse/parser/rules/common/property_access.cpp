@@ -5,9 +5,10 @@
 //
 
 #include "tm_parse/pch.h"
-#include "property_access.h"
 
-#include "array_access.h"
+#include "tm_parse/parser/rules/common/property_access.h"
+#include "tm_parse/parser/rules/common/array_access.h"
+
 #include "tm_parse/parser/parser.h"
 #include "tm_parse/parser/rules/common/dot_identifier.h"
 
@@ -25,39 +26,19 @@ bool PropertyAccess::matches(Matcher& matcher) noexcept {
 
 std::unique_ptr<PropertyAccess> PropertyAccess::create(Parser& parser) {
     auto rule = std::make_unique<PropertyAccess>();
-
     rule->m_Property = DotIdentifier::create(parser);
-    rule->m_Property->set_parent(*rule);
-
-    Matcher matcher = parser.create_matcher();
-    if (ArrayAccess::matches(matcher)) {
-        rule->m_ArrayAccess = ArrayAccess::create(parser);
-        rule->m_ArrayAccess->set_parent(*rule);
-
-        rule->post_init(*rule->m_Property, *rule->m_ArrayAccess);
-    } else {
-        rule->copy_state(*rule->m_Property);
-    }
-
+    rule->copy_state(*rule->m_Property);
     return rule;
 }
 
 void PropertyAccess::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
     ParserRule::visit(func);
     m_Property->visit(func);
-
-    if (m_ArrayAccess != nullptr) {
-        m_ArrayAccess->visit(func);
-    }
 }
 
 void PropertyAccess::cascade_assign_parents(ParserRule* parent) noexcept {
     ParserRule::cascade_assign_parents(parent);
     m_Property->cascade_assign_parents(this);
-
-    if (m_ArrayAccess != nullptr) {
-        m_ArrayAccess->cascade_assign_parents(this);
-    }
 }
 
 }  // namespace tm_parse::rules

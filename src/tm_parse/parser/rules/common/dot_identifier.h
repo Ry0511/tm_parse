@@ -20,23 +20,39 @@ namespace tm_parse::rules {
 //  which I don't need to explain what it does.
 //
 
+class ArrayAccess;
+
+// TODO: There always was and is a plan to introduce a NameContext or something similar to resolve
+//  duplicated identifiers but currently that does not exist so just going to use Token as a
+//  placeholder until that is ready.
+struct DotIdentifierData {
+    Token IdentifierPart;
+    std::unique_ptr<ArrayAccess> ArrayPart;
+
+    const Token& last_token() const noexcept;
+};
+
 class DotIdentifier : public ParserRule {
    private:
-    std::vector<TextRegion> m_NameParts;
+    std::vector<DotIdentifierData> m_Parts;
 
    public:
-    DotIdentifier() = default;
-    ~DotIdentifier() override;
+    DotIdentifier();
+    ~DotIdentifier() noexcept override;
 
    public:
-    DotIdentifier(const DotIdentifier&) = default;
-    DotIdentifier& operator=(const DotIdentifier&) = default;
-    DotIdentifier(DotIdentifier&&) = default;
-    DotIdentifier& operator=(DotIdentifier&&) = default;
+    DotIdentifier(const DotIdentifier&) = delete;
+    DotIdentifier& operator=(const DotIdentifier&) = delete;
+    DotIdentifier(DotIdentifier&&) noexcept;
+    DotIdentifier& operator=(DotIdentifier&&) noexcept;
 
    public:
-    const std::vector<TextRegion>& name_parts() const noexcept { return m_NameParts; }
+    const std::vector<DotIdentifierData>& identifier_parts() const noexcept { return m_Parts; }
+    const DotIdentifierData& first() const noexcept { return m_Parts.front(); }
+    const DotIdentifierData& last() const noexcept { return m_Parts.back(); }
+    size_t size() const noexcept { return m_Parts.size(); }
 
+   public:
     RULE_STATIC_API(DotIdentifier);
 };
 

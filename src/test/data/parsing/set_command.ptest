@@ -6,6 +6,7 @@ test_content = {
   set foo:bar baz[-1.5] True
   set foo'baz' bar 1
   set $(foo) baz bar
+  set $(foo[0].baz(10)) baz(0).bar[1] 10
 }
 
 expected_parse_content = {
@@ -26,8 +27,7 @@ expected_parse_content = {
         DotIdentifier["foo"]
         DotIdentifier["bar"]
     PropertyAccess["baz(+1.5)"]
-      DotIdentifier["baz"]
-      ArrayAccess["(+1.5)"]
+      DotIdentifier["baz(+1.5)"]
     ComposedExpr["1"]
       LiteralExpr["1"]
   )
@@ -38,8 +38,7 @@ expected_parse_content = {
         DotIdentifier["foo"]
         DotIdentifier["bar"]
     PropertyAccess["baz[-1.5]"]
-      DotIdentifier["baz"]
-      ArrayAccess["[-1.5]"]
+      DotIdentifier["baz[-1.5]"]
     ComposedExpr["True"]
       LiteralExpr["True"]
   )
@@ -63,6 +62,16 @@ expected_parse_content = {
     ComposedExpr["bar"]
       IdentifierRefExpr["bar"]
   )
+
+  SetCommand = (
+    ObjectRef["$(foo[0].baz(10))"]
+      MetaVarExpr["$(foo[0].baz(10))"]
+        DotIdentifier["foo[0].baz(10)"]
+    PropertyAccess["baz(0).bar[1]"]
+      DotIdentifier["baz(0).bar[1]"]
+    ComposedExpr["10"]
+      LiteralExpr["10"]
+  )
 }
 
 expected_text = {
@@ -71,4 +80,5 @@ expected_text = {
   "set foo:bar baz[-1.5] True"
   "set foo'baz' bar 1"
   "set $(foo) baz bar"
+  "set $(foo[0].baz(10)) baz(0).bar[1] 10"
 }
