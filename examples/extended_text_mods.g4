@@ -27,8 +27,7 @@ identifier
   ;
 
 literal_expr
-  : meta_var
-  | identifier
+  : identifier
   | NUMBER
   | STRING_LITERAL
   | KW_TRUE
@@ -41,13 +40,19 @@ literal_expr
 // -------------------------------------------------------------------------------------------------
 
 meta_var
-  : DOLLAR_SIGN LEFT_PAREN property_access RIGHT_PAREN
+  : DOLLAR_SIGN LEFT_PAREN dot_identifier RIGHT_PAREN
+  ;
+
+static_array_access
+  : LEFT_BRACKET NUMBER RIGHT_BRACKET
+  ;
+
+dynamic_array_access
+  : LEFT_PAREN NUMBER RIGHT_PAREN
   ;
 
 array_access
-  : (   ( LEFT_PAREN NUMBER RIGHT_PAREN )
-      | ( LEFT_BRACKET NUMBER RIGHT_BRACKET )
-    )+
+  : ( static_array_access | dynamic_array_access )+
   ;
 
 dot_identifier
@@ -73,15 +78,40 @@ object_reference
   ;
 
 expression
-  : composed_expr
+  : meta_var
+  | paren_expr
+  | assignment_expr_list
+  | assignment_expr
+  | composed_expr
+  | literal_expr
+  | identifier
   ;
 
 // -------------------------------------------------------------------------------------------------
 // -- SET COMMANDS --
 // -------------------------------------------------------------------------------------------------
 
+// NOTE: set foo baz(0)(1) succeeds here but will fail in the actual implementation since array
+//  access is guaranteed to be greedy
 set_command
-  : KW_SET object_reference property_access expression;
+  : KW_SET object_reference property_access expression
+  ;
+
+// -------------------------------------------------------------------------------------------------
+// -- EXPRESSIONS --
+// -------------------------------------------------------------------------------------------------
+
+paren_expr
+  : LEFT_PAREN expression RIGHT_PAREN
+  ;
+
+assignment_expr
+  : property_access EQUAL expression
+  ;
+
+assignment_expr_list
+  : LEFT_PAREN assignment_expr ( COMMA assignment_expr )* RIGHT_PAREN
+  ;
 
 // -------------------------------------------------------------------------------------------------
 // -- MATHS EXPRESSIONS --
@@ -142,6 +172,8 @@ SLASH: '/' ;
 SQUOTE: '\'' ;
 DQUOTE: '"'  ;
 
+COMMA        : ',' ;
+EQUAL        : '=' ;
 DOLLAR_SIGN  : '$' ;
 LEFT_PAREN   : '(' ;
 RIGHT_PAREN  : ')' ;
@@ -155,4 +187,4 @@ IDENTIFIER: [A-Z_][_A-Z0-9]* ;
 
 STRING_LITERAL: DQUOTE * DQUOTE ;
 
-WS : [\r\n ]+ -> skip;
+WS : [\t\r\n ]+ -> skip;
