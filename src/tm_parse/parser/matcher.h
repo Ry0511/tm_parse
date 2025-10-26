@@ -16,9 +16,10 @@ class Parser;
 class Matcher {
    private:
     std::span<const Token> m_Tokens;
-    size_t m_Position;
+    size_t m_Position{0};
 
    public:
+    explicit Matcher() noexcept;
     explicit Matcher(Parser& parser) noexcept;
     explicit Matcher(const Parser& parser) noexcept;
     explicit Matcher(std::span<const Token> parser, size_t pos = 0) noexcept;
@@ -26,6 +27,8 @@ class Matcher {
 
    public:
     const std::span<const Token>& tokens() const noexcept { return m_Tokens; }
+    void set_tokens(std::span<const Token> tokens) noexcept { m_Tokens = tokens; }
+
     size_t position() const noexcept { return m_Position; }
     void set_position(size_t position) noexcept { m_Position = position; }
 

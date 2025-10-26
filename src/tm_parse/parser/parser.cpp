@@ -31,10 +31,9 @@ std::vector<Token> read_all_tokens(str_view text) {
 
 }  // namespace
 
-Parser::Parser(str text)
-    : m_Text(std::move(text)),
-      m_Tokens(read_all_tokens(m_Text)),
-      m_Matcher(m_Tokens) {}
+Parser::Parser(str text) : m_Text(std::move(text)), m_Tokens(read_all_tokens(m_Text)) {
+    Matcher::set_tokens(m_Tokens);
+}
 
 std::unique_ptr<ParserRule> Parser::parse() {
     Matcher m = create_matcher();

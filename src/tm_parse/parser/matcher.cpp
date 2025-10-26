@@ -12,6 +12,8 @@
 
 namespace tm_parse {
 
+Matcher::Matcher() noexcept = default;
+
 Matcher::Matcher(const Parser& parser) noexcept
     : m_Tokens(parser.m_Tokens),
       m_Position(parser.position()) {}
