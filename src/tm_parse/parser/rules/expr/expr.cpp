@@ -22,84 +22,37 @@
 
 namespace tm_parse::rules {
 
-namespace {
-
-template <class T>
-std::unique_ptr<T> match_create(Parser& parser) {
-    Matcher matcher = parser.create_matcher();
-    if (T::matches(matcher)) {
-        return T::create(parser);
-    }
-    return nullptr;
-}
-
-}  // namespace
-
 bool Expr::matches(Matcher& matcher) noexcept {
-#define TRY_MATCH_RULE(rule)      \
-    pos = matcher.position();     \
-    if (rule::matches(matcher)) { \
-        return true;              \
-    }                             \
-    matcher.set_position(pos);
-
-    size_t pos = matcher.position();
-
-    TRY_MATCH_RULE(LogInfoExpr);
-    TRY_MATCH_RULE(MetaVarExpr);
-    TRY_MATCH_RULE(ParenExpr);
-    TRY_MATCH_RULE(AssignmentExprList);
-    TRY_MATCH_RULE(AssignmentExpr);
-    TRY_MATCH_RULE(ComposedExpr);
-    TRY_MATCH_RULE(LiteralExpr);
-    TRY_MATCH_RULE(IdentifierRefExpr);
-
-    return false;
+    // clang-format off
+    return matcher.matches<MetaVarExpr>()
+           || matcher.matches<ParenExpr>()
+           || matcher.matches<AssignmentExprList>()
+           || matcher.matches<AssignmentExpr>()
+           || matcher.matches<ComposedExpr>()
+           || matcher.matches<LiteralExpr>()
+           || matcher.matches<IdentifierRefExpr>();
+    // clang-format on
 }
 
 std::unique_ptr<Expr> Expr::create(Parser& parser) {
     Matcher m = parser.create_matcher();
 
-#define TRY_CREATE_RULE(rule)                    \
-    if (auto ptr = match_create<rule>(parser)) { \
-        return ptr;                              \
+#define TRY_CREATE_RULE(rule)        \
+    if (m.matches<rule>()) {         \
+        return rule::create(parser); \
     }
 
-    if (auto ptr = match_create<LogInfoExpr>(parser)) {
-        return ptr;
-    }
+    TRY_CREATE_RULE(MetaVarExpr);
+    TRY_CREATE_RULE(AssignmentExprList);
+    TRY_CREATE_RULE(ParenExpr);
+    TRY_CREATE_RULE(AssignmentExpr);
+    TRY_CREATE_RULE(ComposedExpr);
+    TRY_CREATE_RULE(LiteralExpr);
+    TRY_CREATE_RULE(IdentifierRefExpr);
 
-    if (auto ptr = match_create<MetaVarExpr>(parser)) {
-        return ptr;
-    }
-
-    if (auto ptr = match_create<ParenExpr>(parser)) {
-        return ptr;
-    }
-
-    if (auto ptr = match_create<AssignmentExprList>(parser)) {
-        return ptr;
-    }
-
-    if (auto ptr = match_create<AssignmentExpr>(parser)) {
-        return ptr;
-    }
-
-    if (auto ptr = match_create<ComposedExpr>(parser)) {
-        return ptr;
-    }
-
-    if (auto ptr = match_create<LiteralExpr>(parser)) {
-        return ptr;
-    }
-
-    if (auto ptr = match_create<IdentifierRefExpr>(parser)) {
-        return ptr;
-    }
+#undef TRY_CREATE_RULE
 
     throw TokenError("could not create any expression", m.next_real());
 }
-
-Expr::~Expr() = default;
 
 }  // namespace tm_parse::rules

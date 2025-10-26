@@ -31,9 +31,8 @@ class AssignmentExprList : public Expr {
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
     void cascade_assign_parents(ParserRule* parent) noexcept override;
 
+   public:
     RULE_STATIC_API(AssignmentExprList);
-
-
 };
 
 }  // namespace tm_parse::rules

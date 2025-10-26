@@ -11,16 +11,10 @@
 
 namespace tm_parse::rules {
 
-enum class ExprType : int {
-    Assignment,      // A = Expr
-    AssignmentList,  // A = Expr, B = Expr, C = Expr
-    Literal,         // True | False | Number | StringLiteral
-};
-
 class Expr : public ParserRule {
    public:
     Expr() = default;
-    ~Expr() override;
+    ~Expr() override = default;
 
    public:
     Expr(const Expr&) = default;
