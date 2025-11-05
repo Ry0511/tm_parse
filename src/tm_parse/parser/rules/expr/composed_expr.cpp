@@ -86,8 +86,7 @@ void ComposedExpr::cascade_assign_parents(ParserRule* parent) noexcept {
 //     int c = -a;  // 10
 //
 // see: extended_text_mods.g4 as a simpler outline of how the rules should be processed. But do
-// note that this implementation will produce a slightly different tree as it also cleans the
-// emitted results.
+// note that this implementation will produce a different tree as it also cleans the emitted results.
 //
 
 namespace {
@@ -202,20 +201,18 @@ std::unique_ptr<Expr> ComposedExpr::parse_term(Parser& parser) {
 std::unique_ptr<Expr> ComposedExpr::parse_factor(Parser& parser) {
     // simple literal
     Matcher matcher = parser.create_matcher();
-    size_t pos = matcher.position();
-    if (LiteralExpr::matches(matcher)) {
+
+    if (matcher.matches<LiteralExpr>()) {
         return LiteralExpr::create(parser);
     }
 
     // simple variable
-    matcher.set_position(pos);
-    if (IdentifierRefExpr::matches(matcher)) {
+    if (matcher.matches<IdentifierRefExpr>()) {
         return IdentifierRefExpr::create(parser);
     }
 
     // meta var via $(foo.baz.bar)
-    matcher.set_position(pos);
-    if (MetaVarExpr::matches(matcher)) {
+    if (matcher.matches<MetaVarExpr>()) {
         return MetaVarExpr::create(parser);
     }
 
@@ -235,7 +232,8 @@ std::unique_ptr<Expr> ComposedExpr::parse_factor(Parser& parser) {
         return node;
     }
 
-    // negation is just sugar that allows -(A * B) to be equal to (A * B) * -1
+    // negation is just sugar that allows for writing -A instead of (A * -1); Can also apply to
+    //  groups i.e., -(A * B)
     if (Token first = parser.maybe_real(tk::Minus)) {
         auto unary = std::make_unique<UnaryOpExpr>();
         unary->m_Operator = Operator::Negate;
