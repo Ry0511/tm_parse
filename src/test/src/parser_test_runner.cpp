@@ -27,6 +27,13 @@ bool ParserTestRunner::run(TestFile& file) {
     auto expected_text = file.get<TokenVec>("expected_text");
     auto skip_blank_lines = file.get<bool>("skip_blank_lines", false);
 
+    auto delimiter_token = tk::EndOfInput;
+    str delimiter_text = file.get<str>("delimited_by", "");
+    if (!delimiter_text.empty()) {
+        delimiter_token = str_to_token_kind(delimiter_text);
+    }
+
+
     Parser parser{str{text}};
     size_t pos = 0;
 
@@ -57,6 +64,10 @@ bool ParserTestRunner::run(TestFile& file) {
 
         if (!rule) {
             err("* {}::create check failed", expected.Class);
+        }
+
+        if (delimiter_token != tk::EndOfInput) {
+            parser.maybe_real(delimiter_token);
         }
 
         // TODO: we never verify the index for pos
@@ -96,15 +107,14 @@ bool ParserTestRunner::run(TestFile& file) {
             const auto& [name, text] = expected.VisitorTree.at(state.Index);
             ++state.Index;
 
+            info("Rule is {} parsed from {}", rule.rule_name(), rule.full_text());
             if (rule_name != name) {
-                info("* {} <> {}", rule.rule_name(), rule.full_text());
-                err("* {} != {}", rule_name, name);
+                err("Expecting Rule {} but got {}", rule_name, name);
                 m_Success = false;
             }
 
             if (!text.empty() && rule_text != text) {
-                info("* {} <> {}", rule.rule_name(), rule.full_text());
-                err("* {} != {}", rule_text, text);
+                err("Expecting text '{}' but got '{}'", text, rule_text);
                 m_Success = false;
             }
         });

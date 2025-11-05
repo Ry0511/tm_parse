@@ -11,7 +11,18 @@
 
 namespace tm_parse::rules {
 
-enum class Operator : uint8_t { Add, Subtract, Divide, Multiply, Negate, Positive, Unknown };
+// TODO: Probably a good idea to scrap the Expr base class as it just makes things harder to work with.
+
+enum class Operator : uint8_t {
+    Add,           // +
+    Subtract,      // -
+    Divide,        // /
+    Multiply,      // *
+    Negate,        // -A
+    Positive,      // +A
+    LogicalNegate, // !A
+    Unknown        //
+};
 
 class ComposedExpr;
 

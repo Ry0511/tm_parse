@@ -86,12 +86,13 @@ void ComposedExpr::cascade_assign_parents(ParserRule* parent) noexcept {
 //     int c = -a;  // 10
 //
 // see: extended_text_mods.g4 as a simpler outline of how the rules should be processed. But do
-// note that this implementation will produce a different tree as it also cleans the emitted results.
+// note that this implementation will produce a different tree as it also cleans the emitted
+// results.
 //
 
 namespace {
 
-constinit tk::TokenKind op_unary_operators[]{tk::Plus, tk::Minus};
+constinit tk::TokenKind op_unary_operators[]{tk::Plus, tk::Minus, tk::ExclamationMark};
 constinit tk::TokenKind op_low_precedence[]{tk::Plus, tk::Minus};
 constinit tk::TokenKind op_high_precedence[]{tk::Star, tk::Slash};
 
@@ -157,12 +158,9 @@ std::unique_ptr<ComposedExpr> ComposedExpr::create(Parser& parser) {
 
 std::unique_ptr<Expr> ComposedExpr::parse_expr(Parser& parser) {
     std::unique_ptr<Expr> node = parse_term(parser);
-    Matcher m = parser.create_matcher();
 
-    // TODO: Need to introduce the same api for parser as we do for matcher
-    while (Token cur = m.any_real(op_low_precedence)) {
+    while (Token cur = parser.any_real(op_low_precedence)) {
         Operator op = (cur == tk::Plus) ? Operator::Add : Operator::Subtract;
-        parser.set_position(m.position());
 
         auto binary_op = std::make_unique<BinaryOpExpr>();
         binary_op->m_Operator = op;
@@ -171,7 +169,6 @@ std::unique_ptr<Expr> ComposedExpr::parse_expr(Parser& parser) {
         binary_op->post_init(*binary_op->m_Left, *binary_op->m_Right);
 
         node = std::move(binary_op);
-        m.set_position(parser.position());
     }
 
     return node;
@@ -234,9 +231,18 @@ std::unique_ptr<Expr> ComposedExpr::parse_factor(Parser& parser) {
 
     // negation is just sugar that allows for writing -A instead of (A * -1); Can also apply to
     //  groups i.e., -(A * B)
-    if (Token first = parser.maybe_real(tk::Minus)) {
+    constexpr tk::TokenKind unary_operator_tokens[]{tk::Minus, tk::ExclamationMark};
+    if (Token first = parser.any_real(unary_operator_tokens)) {
         auto unary = std::make_unique<UnaryOpExpr>();
-        unary->m_Operator = Operator::Negate;
+
+        if (first == tk::Minus) {
+            unary->m_Operator = Operator::Negate;
+        } else if (first == tk::ExclamationMark) {
+            unary->m_Operator = Operator::LogicalNegate;
+        } else {
+            throw std::logic_error{"unhandled token"};
+        }
+
         unary->m_Operand = parse_factor(parser);
         unary->post_init(first, unary->m_Operand->last_token());
         return unary;

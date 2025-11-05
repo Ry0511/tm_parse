@@ -1,0 +1,67 @@
+test_type = ParserTest
+delimited_by = Ampersand
+
+test_content = {
+  5 + 10 - 15
+  &
+  -(25 * 50)
+  &
+  -A
+  &
+  --(10 * 50)
+  &
+  (5 + 10) * (15 + 20) / (25 - 30)
+}
+
+expected_parse_content = {
+
+  ComposedExpr = (
+    BinaryOpExpr["5 + 10 - 15"]
+      BinaryOpExpr["5 + 10"]
+        LiteralExpr["5"]
+        LiteralExpr["10"]
+      LiteralExpr["15"]
+  )
+
+  ComposedExpr = (
+    UnaryOpExpr["-(25 * 50)"]
+      BinaryOpExpr["(25 * 50)"]
+        LiteralExpr["25"]
+        LiteralExpr["50"]
+  )
+
+  ComposedExpr = (
+    UnaryOpExpr["-A"]
+      IdentifierRefExpr["A"]
+  )
+
+  ComposedExpr = (
+    UnaryOpExpr["--(10 * 50)"]
+      UnaryOpExpr["-(10 * 50)"]
+        BinaryOpExpr["(10 * 50)"]
+          LiteralExpr["10"]
+          LiteralExpr["50"]
+  )
+
+  ComposedExpr = (
+    BinaryOpExpr["(5 + 10) * (15 + 20) / (25 - 30)"]
+      BinaryOpExpr["(5 + 10) * (15 + 20)"]
+        BinaryOpExpr["(5 + 10)"]
+          LiteralExpr["5"]
+          LiteralExpr["10"]
+        BinaryOpExpr["(15 + 20)"]
+          LiteralExpr["15"]
+          LiteralExpr["20"]
+      BinaryOpExpr["(25 - 30)"]
+        LiteralExpr["25"]
+        LiteralExpr["30"]
+  )
+}
+
+expected_text = {
+  "5 + 10 - 15"
+  "-(25 * 50)"
+  "-A"
+  "--(10 * 50)"
+  "(5 + 10) * (15 + 20) / (25 - 30)"
+}

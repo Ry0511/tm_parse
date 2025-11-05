@@ -46,6 +46,7 @@ enum TokenKind : token_kind_int {
     RightBracket,           // ]
     Equal,                  // =
     SingleQuote,            // '
+    ExclamationMark,        // !
     QuestionMark,           // ?
     DollarSign,             // $
     LeftBrace,              // {
@@ -115,6 +116,7 @@ constexpr std::array<std::string_view, token_type_count + 1> token_type_names{
     "RightBracket",
     "Equal",
     "SingleQuote",
+    "ExclamationMark",
     "QuestionMark",
     "DollarSign",
     "LeftBrace",
