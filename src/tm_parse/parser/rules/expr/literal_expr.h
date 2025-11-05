@@ -43,10 +43,10 @@ class LiteralExpr : public Expr {
         }
     }
 
-    bool has_value() const noexcept { return std::holds_alternative<std::monostate>(m_Value); }
+    bool has_value() const noexcept { return !std::holds_alternative<std::monostate>(m_Value); }
 
     template <class T>
-    const T& get() const noexcept {
+    const T& get() const {
         if constexpr (std::is_floating_point_v<T>) {
             return static_cast<T>(std::get<double>(m_Value));
         }
