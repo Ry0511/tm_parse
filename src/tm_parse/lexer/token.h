@@ -90,7 +90,7 @@ struct Token {
 
    public:
     bool has_radix() const noexcept {
-        if (Text == nullptr || !Region) {
+        if (Text == nullptr || !Region || Kind != tk::Number) {
             return false;
         }
         return this->text().find_first_of(TXT('.')) != str_view::npos;
