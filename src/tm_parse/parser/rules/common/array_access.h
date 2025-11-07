@@ -12,7 +12,7 @@
 namespace tm_parse::rules {
 
 struct ArrayAccessData {
-    int64_t Index{0};
+    size_t Index{0};
     bool IsDynamicAccess{false};
     bool IsValidNumber{false};
 };

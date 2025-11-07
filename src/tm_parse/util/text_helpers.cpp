@@ -4,8 +4,57 @@
 // Author     : -Ry
 //
 
+#include "tm_parse/pch.h"
 #include "tm_parse/util/text_helpers.h"
+
 namespace tm_parse::txt {
+
+namespace {
+
+// TODO: This still assumes str_char == char
+template <class T>
+    requires( // clang-format off  - somtimes the formatter is genuinely retarded
+        std::is_same_v<T, int32_t>
+        || std::is_same_v<T, int64_t>
+        || std::is_same_v<T, size_t>
+        || std::is_same_v<T, double>
+    ) // clang-format on
+struct NumberParser {
+    using Limits = std::numeric_limits<T>;
+
+    std::optional<T> parse(const str& text) noexcept {
+        try {
+            // simple i32
+            if constexpr (std::is_same_v<T, int32_t>) {
+                return static_cast<T>(std::stoi(text));
+            }
+            // simple i64
+            else if constexpr (std::is_same_v<T, int64_t>) {
+                return static_cast<T>(std::stoll(text));
+            }
+            // need to check bounds
+            else if constexpr (std::is_same_v<T, size_t>) {
+                if (text.empty() || text[0] == TXT('-')) {
+                    return std::nullopt;
+                }
+
+                auto val = std::stoull(text);
+                if (std::cmp_less(val, Limits::min()) || std::cmp_greater(val, Limits::max())) {
+                    return std::nullopt;
+                }
+                return val;
+            }
+            // simple float
+            else if constexpr (std::is_same_v<T, double>) {
+                return std::stod(text);
+            }
+        } catch (const std::logic_error&) {
+            return std::nullopt;
+        }
+    }
+};
+
+}  // namespace
 
 bool is_whitespace(str_char c) noexcept {
     switch (c) {
@@ -85,8 +134,24 @@ str escape_string(str_view in, bool flatten_whitespace) noexcept {
     return out;
 }
 
-double parse_number(str_view str) noexcept {
-    return std::stod(std::string{str});
+std::optional<double> parse_double(str_view str) noexcept {
+    try {
+        return std::strtod(str.begin(), nullptr);
+    } catch (const std::logic_error&) {
+        return std::nullopt;
+    }
+}
+
+std::optional<int32_t> parse_int32(str_view text) noexcept {
+    return NumberParser<int32_t>{}.parse(str{text});
+}
+
+std::optional<int64_t> parse_int64(str_view text) noexcept {
+    return NumberParser<int64_t>{}.parse(str{text});
+}
+
+std::optional<size_t> parse_size_t(str_view text) noexcept {
+    return NumberParser<size_t>{}.parse(str{text});
 }
 
 }  // namespace tm_parse::txt

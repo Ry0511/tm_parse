@@ -9,6 +9,7 @@
 #include "tm_parse/lexer/token_error.h"
 #include "tm_parse/parser/parser.h"
 #include "tm_parse/parser/rules/expr/literal_expr.h"
+#include "tm_parse/util/text_helpers.h"
 
 namespace tm_parse::rules {
 
@@ -32,14 +33,10 @@ std::unique_ptr<LiteralExpr> LiteralExpr::create(Parser& parser) {
             break;
 
         case tk::Number: {
-            // TODO: Replace calls of strto with our own wrappers. Also handle the potential errors.
-            str_view number_text = next.text();
             if (next.has_radix()) {
-                // NOLINTNEXTLINE
-                rule->m_Value = static_cast<double>(std::strtod(number_text.data(), nullptr));
+                rule->m_Value = txt::parse_double(next.text());
             } else {
-                // NOLINTNEXTLINE
-                rule->m_Value = static_cast<int64_t>(std::strtoll(number_text.data(), nullptr, 10));
+                rule->m_Value = txt::parse_int64(next.text());
             }
             break;
         }

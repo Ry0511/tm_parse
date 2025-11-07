@@ -9,6 +9,7 @@
 #include "tm_parse/lexer/token_error.h"
 #include "tm_parse/parser/parser.h"
 #include "tm_parse/parser/rules/common/array_access.h"
+#include "tm_parse/util/text_helpers.h"
 
 namespace tm_parse::rules {
 
@@ -24,19 +25,9 @@ bool has_array_access(Matcher& m) noexcept {
 }
 
 void parse_number(ArrayAccessData& data, const Token& token) noexcept {
-    const auto number_text = token.text();
-
-    try {
-        // Number is anything matching: -?[0-9]+(\.[0-9]+)*
-        // obviously we won't know if its a valid number until we try to parse it
-        // TODO: Replace strtoll with our own utility that takes in str_view or similar
-        data.Index = static_cast<int64_t>(std::strtoll(number_text.data(), nullptr, 10));
-        data.IsValidNumber = true;
-    } catch (const std::out_of_range& err) {
-        LOG_TRACE("invalid number in text '{}' with message {}", number_text, err.what());
-        data.Index = std::numeric_limits<int64_t>::max();
-        data.IsValidNumber = false;
-    }
+    auto index = txt::parse_size_t(token.text());
+    data.Index = index.has_value() ? index.value() : std::numeric_limits<size_t>::max();
+    data.IsValidNumber = index.has_value();
 }
 
 }  // namespace

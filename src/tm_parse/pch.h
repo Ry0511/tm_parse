@@ -73,14 +73,17 @@ using std::uint8_t;
 
 namespace tm_parse {
 
+// NOLINTNEXTLINE
 namespace fs = std::filesystem;
 
 constexpr size_t invalid_index_v = std::numeric_limits<size_t>::max();
 
+// text
 using str_char = char;
 using str = std::string;
 using str_view = std::string_view;
 
+// streams
 using str_istream = std::basic_istream<str_char>;
 using str_fstream = std::basic_fstream<str_char>;
 using str_ifstream = std::basic_ifstream<str_char>;
@@ -88,10 +91,18 @@ using str_stream = std::basic_stringstream<str_char>;
 
 #define TXT(S) S
 
+// Common type aliases
+using Float = std::optional<double>;
+using Int = std::optional<int64_t>;
+using Bool = bool;
+using Str = str;
+
 #if defined(TM_PARSE_ARCH_X64)
 static_assert(sizeof(void*) == 8);
+
 #elif defined(TM_PARSE_ARCH_X86)
 static_assert(sizeof(void*) == 4);
+
 #else
 #error "unsupported architecture defined"
 #endif
