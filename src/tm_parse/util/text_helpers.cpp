@@ -42,11 +42,11 @@ struct NumberParser {
                 if (std::cmp_less(val, Limits::min()) || std::cmp_greater(val, Limits::max())) {
                     return std::nullopt;
                 }
-                return val;
+                return static_cast<T>(val);
             }
             // simple float
             else if constexpr (std::is_same_v<T, double>) {
-                return std::stod(text);
+                return static_cast<T>(std::stod(text));
             }
         } catch (const std::logic_error&) {
             return std::nullopt;
@@ -134,12 +134,8 @@ str escape_string(str_view in, bool flatten_whitespace) noexcept {
     return out;
 }
 
-std::optional<double> parse_double(str_view str) noexcept {
-    try {
-        return std::strtod(str.begin(), nullptr);
-    } catch (const std::logic_error&) {
-        return std::nullopt;
-    }
+std::optional<double> parse_double(str_view text) noexcept {
+    return NumberParser<double>{}.parse(str{text});
 }
 
 std::optional<int32_t> parse_int32(str_view text) noexcept {
