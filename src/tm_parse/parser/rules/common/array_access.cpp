@@ -13,8 +13,6 @@
 
 namespace tm_parse::rules {
 
-ArrayAccess::~ArrayAccess() = default;
-
 namespace {
 
 constexpr tk::TokenKind dynamic_access_seq[]{tk::LeftParen, tk::Number, tk::RightParen};
@@ -28,6 +26,7 @@ void parse_number(ArrayAccessData& data, const Token& token) noexcept {
     auto index = txt::parse_size_t(token.text());
     data.Index = index.has_value() ? index.value() : std::numeric_limits<size_t>::max();
     data.IsValidNumber = index.has_value();
+    data.IsInitialised = true;
 }
 
 }  // namespace
@@ -52,25 +51,26 @@ std::unique_ptr<ArrayAccess> ArrayAccess::create(Parser& parser) {
         throw TokenError{"expecting LeftParen or LeftBracket", first};
     }
 
+    size_t i = 0;
     do {
-        ArrayAccessData data{};
 
         // dynamic array access
         if (Token open = parser.maybe(tk::LeftParen)) {
             Token index = parser.require(tk::Number);
             last = parser.require(tk::RightParen);
-            parse_number(data, index);
+            parse_number(rule->m_Data.at(i), index);
         }
         // static array access
         else if (Token open = parser.require(tk::LeftBracket)) {
             Token index = parser.require(tk::Number);
             last = parser.require(tk::RightBracket);
-            parse_number(data, index);
+            parse_number(rule->m_Data.at(i), index);
         }
 
         m = parser.create_matcher();
+        ++i;
 
-    } while (has_array_access(m));
+    } while (i < max_array_indexes && has_array_access(m));
 
     rule->post_init(first, last);
 

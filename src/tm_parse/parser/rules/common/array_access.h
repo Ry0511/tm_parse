@@ -12,18 +12,26 @@
 namespace tm_parse::rules {
 
 struct ArrayAccessData {
-    size_t Index{0};
-    bool IsDynamicAccess{false};
-    bool IsValidNumber{false};
+    size_t Index{invalid_index_v};  // Index Value
+    bool IsDynamicAccess{false};    // Initialised with (\d) or [\d]
+    bool IsValidNumber{false};      // Was the value of \d valid?
+    bool IsInitialised{false};      // Have we been initialised?
 };
 
 class ArrayAccess : public ParserRule {
+   public:
+    /**
+     * Going on an assumption that we will never need multi-dimensional array access and if we do
+     * it will not exceed this value.
+     */
+    static constexpr size_t max_array_indexes = 4;
+
    private:
-    std::vector<ArrayAccessData> m_Data;
+    std::array<ArrayAccessData, max_array_indexes> m_Data{};
 
    public:
     ArrayAccess() = default;
-    ~ArrayAccess() override;
+    ~ArrayAccess() override = default;
 
    public:
     ArrayAccess(const ArrayAccess&) = default;
@@ -32,13 +40,12 @@ class ArrayAccess : public ParserRule {
     ArrayAccess& operator=(ArrayAccess&&) = default;
 
    public:
-    const std::vector<ArrayAccessData>& array_access_data() const noexcept { return m_Data; }
-    const ArrayAccessData& first() const noexcept { return m_Data.front(); }
-    const ArrayAccessData& last() const noexcept { return m_Data.back(); }
-    size_t size() const noexcept { return m_Data.size(); }
-
-    auto begin() const noexcept { return m_Data.begin(); }
-    auto end() const noexcept { return m_Data.end(); }
+    const auto& array_parts() const noexcept { return m_Data; }
+    auto size() const noexcept {
+        return std::count_if(m_Data.begin(), m_Data.end(), [](const ArrayAccessData& data) {
+            return data.IsInitialised;
+        });
+    }
 
    public:
     RULE_STATIC_API(ArrayAccess);
