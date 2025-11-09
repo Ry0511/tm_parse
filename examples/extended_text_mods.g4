@@ -4,6 +4,7 @@ options { caseInsensitive = true; }
 
 program
   : ( set_command
+    | set_matching_command
     | object_definition
     )*
     EOF
@@ -103,13 +104,36 @@ set_command
   : KW_SET object_reference property_access expression
   ;
 
-object_definition
-  : KW_BEGIN KW_OBJECT
-    KW_CLASS EQUAL obj_dot_identifier
-    KW_NAME EQUAL obj_dot_identifier
-    ( object_definition
+// Set command that only applies when the current value is the one specified i.e.,
+//  > set Foo Baz 2.0 when 1.0
+//  when Foo.Baz has a value of 1.0 then we will assign 2.0 otherwise do nothing
+set_matching_command
+  : KW_SET object_reference property_access expression
+    ( KW_MATCHING | KW_WHEN ) expression
+  ;
+
+// -------------------------------------------------------------------------------------------------
+// -- OBJECT DEFINITION --
+// -------------------------------------------------------------------------------------------------
+
+object_def_class: KW_CLASS EQUAL obj_dot_identifier;
+object_def_name : KW_NAME  EQUAL obj_dot_identifier;
+
+object_def_header
+  : ( object_def_class object_def_name )
+  | ( object_def_name object_def_class )
+  ;
+
+object_def_body
+  : ( object_definition
     | assignment_expr
     )*
+  ;
+
+object_definition
+  : KW_BEGIN KW_OBJECT
+    object_def_header
+    object_def_body
     KW_END KW_OBJECT
   ;
 
@@ -135,12 +159,12 @@ assignment_expr_list
 
 composed_expr
   : composed_expr_term
-    ( ( PLUS | MINUS ) composed_expr_term )*
+    ( ( PLUS | MINUS | KW_OR ) composed_expr_term )*
   ;
 
 composed_expr_term
   : composed_expr_factor
-    ( ( STAR | SLASH ) composed_expr_factor )*
+    ( ( STAR | SLASH | KW_AND ) composed_expr_factor )*
   ;
 
 composed_expr_factor
@@ -150,7 +174,7 @@ composed_expr_factor
   ;
 
 composed_expr_unary
-  : ( PLUS | MINUS ) composed_expr_factor
+  : ( PLUS | MINUS | KW_NOT ) composed_expr_factor
   ;
 
 composed_expr_paren
@@ -161,7 +185,7 @@ composed_expr_paren
 // -- LEXER STUFF --
 // -------------------------------------------------------------------------------------------------
 
-NUMBER: (MINUS | PLUS)? [0-9]+ ( DOT [0-9]+ )?;
+NUMBER: (MINUS | PLUS)? [0-9]+ (DOT [0-9]+)?;
 
 KW_TRUE              : 'TRUE'               ;
 KW_FALSE             : 'FALSE'              ;
@@ -178,6 +202,11 @@ KW_LOG_INFO          : 'LOG_INFO'           ;
 KW_CREATE_MOD        : 'CREATE_MOD'         ;
 KW_BEFORE            : 'BEFORE'             ;
 KW_AFTER             : 'AFTER'              ;
+KW_MATCHING          : 'MATCHING'           ;
+KW_WHEN              : 'WHEN'               ;
+KW_NOT               : 'NOT'                ;
+KW_AND               : 'AND'                ;
+KW_OR                : 'OR'                 ;
 
 DOT  : '.' ;
 PLUS : '+' ;
