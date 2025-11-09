@@ -81,6 +81,8 @@ void ComposedExpr::cascade_assign_parents(ParserRule* parent) noexcept {
 // extended to support unary operations i.e., -( A + B ) and -( -A + +B ) albeit +B is just for
 // symmetry, it does nothing ( omitted from the parsed result as well ).
 //
+// We also include logical operators here which are: [and, or, not, !] with ! being the same as not
+//
 //   i.e, for C++ ( and presumably every other language )
 //     int a = -10;
 //     int b = +a;  // -10
@@ -93,19 +95,17 @@ void ComposedExpr::cascade_assign_parents(ParserRule* parent) noexcept {
 
 namespace {
 
-// TODO: Change logical negation ! to the keyword not to keep things the same with the other
-//  logical operators i.e., and, or
-
-constinit tk::TokenKind op_unary_operators[]{tk::Plus, tk::Minus, tk::ExclamationMark};
-constinit tk::TokenKind op_high_precedence[]{tk::Star, tk::Slash, tk::And};
-constinit tk::TokenKind op_low_precedence[]{tk::Plus, tk::Minus, tk::Or};
+constexpr tk::TokenKind op_unary_operators[]{tk::Plus, tk::Minus, tk::Not, tk::ExclamationMark};
+constexpr tk::TokenKind op_high_precedence[]{tk::Star, tk::Slash, tk::And};
+constexpr tk::TokenKind op_low_precedence[]{tk::Plus, tk::Minus, tk::Or};
 
 Operator get_unary_op_kind(const Token& tok) noexcept {
     // clang-format off
     switch (tok.Kind) {
         case tk::Plus:            return Operator::Positive;
         case tk::Minus:           return Operator::Negate;
-        case tk::ExclamationMark: return Operator::LogicalNegate; // TODO: Might as well make this an identifier
+        case tk::Not:             return Operator::LogicalNegate;
+        case tk::ExclamationMark: return Operator::LogicalNegate;
     }
     // clang-format on
     return Operator::Unknown;
@@ -228,8 +228,34 @@ std::unique_ptr<ParserRule> ComposedExpr::parse_factor(Parser& parser) {
     // simple literal
     Matcher matcher = parser.create_matcher();
 
+    // sub expression
+    if (Token first = parser.maybe_real(tk::LeftParen)) {
+        auto node = parse_expr(parser);
+        Token last = parser.require_real(tk::RightParen);
+        node->post_init(first, last);
+        return node;
+    }
+
+    // unary operator + is generally ignored/no op and only done for symmetry, its only usage/change
+    // is that the rules full text region will include it.
+    if (Token first = parser.maybe_real(tk::Plus)) {
+        auto node = parse_factor(parser);
+        node->post_init(first, node->last_token());
+        return node;
+    }
+
     if (matcher.matches<LiteralExpr>()) {
         return LiteralExpr::create(parser);
+    }
+
+    // unary operators: -A, !A, not A
+    constexpr tk::TokenKind unary_operator_tokens[]{tk::Minus, tk::ExclamationMark, tk::Not};
+    if (Token first = parser.any_real(unary_operator_tokens)) {
+        auto unary = std::make_unique<UnaryOpExpr>();
+        unary->m_Operator = get_unary_op_kind(first);
+        unary->m_Operand = parse_factor(parser);
+        unary->post_init(first, unary->m_Operand->last_token());
+        return unary;
     }
 
     // simple variable
@@ -240,33 +266,6 @@ std::unique_ptr<ParserRule> ComposedExpr::parse_factor(Parser& parser) {
     // meta var via $(foo.baz.bar)
     if (matcher.matches<MetaVarExpr>()) {
         return MetaVarExpr::create(parser);
-    }
-
-    // sub expression
-    if (Token first = parser.maybe_real(tk::LeftParen)) {
-        auto node = parse_expr(parser);
-        Token last = parser.require_real(tk::RightParen);
-        node->post_init(first, last);
-        return node;
-    }
-
-    // unary operator + is generally ignored/no op and only done for symmetry, its only usage/change
-    // is that the rules full text region will include it
-    if (Token first = parser.maybe_real(tk::Plus)) {
-        auto node = parse_factor(parser);
-        node->post_init(first, node->last_token());
-        return node;
-    }
-
-    // negation is just sugar that allows for writing -A instead of (A * -1); Can also apply to
-    //  groups i.e., -(A * B)
-    constexpr tk::TokenKind unary_operator_tokens[]{tk::Minus, tk::ExclamationMark};
-    if (Token first = parser.any_real(unary_operator_tokens)) {
-        auto unary = std::make_unique<UnaryOpExpr>();
-        unary->m_Operator = get_unary_op_kind(first);
-        unary->m_Operand = parse_factor(parser);
-        unary->post_init(first, unary->m_Operand->last_token());
-        return unary;
     }
 
     // Don't know what this is

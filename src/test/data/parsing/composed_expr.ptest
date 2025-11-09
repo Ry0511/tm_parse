@@ -19,6 +19,8 @@ test_content = {
   A and B or !C
   &
   A + B and C or D
+  &
+  A and B or not C
 }
 
 expected_parse_content = {
@@ -95,6 +97,15 @@ expected_parse_content = {
           PropertyDotIdentifier["C"]
       PropertyDotIdentifier["D"]
   )
+
+  ComposedExpr = (
+    BinaryOpExpr["A and B or not C"]
+      BinaryOpExpr["A and B"]
+        PropertyDotIdentifier["A"]
+        PropertyDotIdentifier["B"]
+      UnaryOpExpr["not C"]
+        PropertyDotIdentifier["C"]
+  )
 }
 
 expected_text = {
@@ -107,4 +118,5 @@ expected_text = {
   "A or B"
   "A and B or !C"
   "A + B and C or D"
+  "A and B or not C"
 }

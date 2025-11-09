@@ -32,6 +32,7 @@ enum TokenKind : token_kind_int {
     PreCall,                // PRE
     PostCall,               // POST
     PostUnconditionalCall,  // POST_UNCONDITIONAL
+    Not,                    // Not
     And,                    // And
     Or,                     // Or
     Keyword_Count,          // Count of keywords
@@ -103,6 +104,7 @@ constexpr std::array<std::string_view, token_type_count + 1> token_type_names{
     "PRE",
     "POST",
     "POST_UNCONDITIONAL",
+    "Not",
     "And",
     "Or",
     "Keyword_Count",
