@@ -263,7 +263,7 @@ std::unique_ptr<ParserRule> ComposedExpr::parse_factor(Parser& parser) {
         return PropertyDotIdentifier::create(parser);
     }
 
-    // meta var via $(foo.baz.bar)
+    // meta var via $foo.baz.bar
     if (matcher.matches<MetaVarExpr>()) {
         return MetaVarExpr::create(parser);
     }

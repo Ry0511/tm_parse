@@ -12,7 +12,7 @@
 namespace tm_parse::rules {
 
 bool ObjectDotIdentifier::matches(Matcher& matcher) noexcept {
-    if (!matcher.require_real(tk::AnyIdentifier)) {
+    if (!matcher.maybe_real(tk::AnyIdentifier)) {
         return false;
     }
 

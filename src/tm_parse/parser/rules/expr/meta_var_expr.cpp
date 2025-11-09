@@ -20,20 +20,15 @@ MetaVarExpr::MetaVarExpr(MetaVarExpr&&) noexcept = default;
 MetaVarExpr& MetaVarExpr::operator=(MetaVarExpr&&) noexcept = default;
 
 bool MetaVarExpr::matches(Matcher& matcher) noexcept {
-    return matcher.maybe_real(tk::DollarSign) && matcher.maybe_real(tk::LeftParen)
-           && PropertyDotIdentifier::matches(matcher) && matcher.maybe_real(tk::RightParen);
+    return matcher.maybe_real(tk::DollarSign) && PropertyDotIdentifier::matches(matcher);
 }
 
 std::unique_ptr<MetaVarExpr> MetaVarExpr::create(Parser& parser) {
     Token first = parser.require_real(tk::DollarSign);
-    parser.require_real(tk::LeftParen);
 
     auto rule = std::make_unique<MetaVarExpr>();
     rule->m_Identifier = PropertyDotIdentifier::create(parser);
-
-    Token last = parser.require_real(tk::RightParen);
-
-    rule->post_init(first, last);
+    rule->post_init(first, rule->m_Identifier->last_token());
 
     return rule;
 }

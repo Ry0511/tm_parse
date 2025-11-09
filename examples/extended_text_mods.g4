@@ -43,7 +43,7 @@ literal_expr
 // -------------------------------------------------------------------------------------------------
 
 meta_var
-  : DOLLAR_SIGN LEFT_PAREN prop_dot_identifier RIGHT_PAREN
+  : DOLLAR_SIGN prop_dot_identifier
   ;
 
 static_array_access
@@ -174,7 +174,7 @@ composed_expr_factor
   ;
 
 composed_expr_unary
-  : ( PLUS | MINUS | KW_NOT ) composed_expr_factor
+  : ( PLUS | MINUS | KW_NOT | EXCLAMATION_MARK ) composed_expr_factor
   ;
 
 composed_expr_paren
@@ -187,6 +187,7 @@ composed_expr_paren
 
 NUMBER: (MINUS | PLUS)? [0-9]+ (DOT [0-9]+)?;
 
+// -- KEYWORDS -------------------------------------------------------------------------------------
 KW_TRUE              : 'TRUE'               ;
 KW_FALSE             : 'FALSE'              ;
 KW_NONE              : 'NONE'               ;
@@ -207,26 +208,25 @@ KW_WHEN              : 'WHEN'               ;
 KW_NOT               : 'NOT'                ;
 KW_AND               : 'AND'                ;
 KW_OR                : 'OR'                 ;
-
-DOT  : '.' ;
-PLUS : '+' ;
-MINUS: '-' ;
-STAR : '*' ;
-SLASH: '/' ;
-
-SQUOTE: '\'' ;
-DQUOTE: '"'  ;
-
-COMMA        : ',' ;
-EQUAL        : '=' ;
-DOLLAR_SIGN  : '$' ;
-LEFT_PAREN   : '(' ;
-RIGHT_PAREN  : ')' ;
-LEFT_BRACKET : '[' ;
-RIGHT_BRACKET: ']' ;
-LEFT_CURLY   : '{' ;
-RIGHT_CURLY  : '}' ;
-COLON        : ':' ;
+// -- SYMBOLS --------------------------------------------------------------------------------------
+DOT                  : '.'                  ;
+PLUS                 : '+'                  ;
+MINUS                : '-'                  ;
+STAR                 : '*'                  ;
+SLASH                : '/'                  ;
+EXCLAMATION_MARK     : '!'                  ;
+SQUOTE               : '\''                 ;
+DQUOTE               : '"'                  ;
+COMMA                : ','                  ;
+EQUAL                : '='                  ;
+DOLLAR_SIGN          : '$'                  ;
+LEFT_PAREN           : '('                  ;
+RIGHT_PAREN          : ')'                  ;
+LEFT_BRACKET         : '['                  ;
+RIGHT_BRACKET        : ']'                  ;
+LEFT_CURLY           : '{'                  ;
+RIGHT_CURLY          : '}'                  ;
+COLON                : ':'                  ;
 
 IDENTIFIER: [A-Z_][_A-Z0-9]* ;
 
