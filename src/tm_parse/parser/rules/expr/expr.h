@@ -23,7 +23,11 @@ class Expr : public ParserRule {
     Expr& operator=(Expr&&) noexcept = default;
 
    public:
-    RULE_STATIC_API(Expr);
+    RULE_STATIC_CONSTANTS(Expr);
+
+   public:
+    static bool matches(Matcher& matcher) noexcept;
+    static std::unique_ptr<ParserRule> create(Parser& parser);
 };
 
 }  // namespace tm_parse::rules

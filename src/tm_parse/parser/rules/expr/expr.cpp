@@ -34,7 +34,7 @@ bool Expr::matches(Matcher& matcher) noexcept {
     // clang-format on
 }
 
-std::unique_ptr<Expr> Expr::create(Parser& parser) {
+std::unique_ptr<ParserRule> Expr::create(Parser& parser) {
     Matcher m = parser.create_matcher();
 
 #define TRY_CREATE_RULE(rule)        \

@@ -161,7 +161,6 @@ template <class T> struct RuleRegister { RuleRegister() { RuleTestApi::add_rule<
 #endif
 
 #define RULE_STATIC_CONSTANTS(rule)                                                    \
-    TM_PARSE_TEST_API(rule);                                                           \
     constexpr static ::tm_parse::rkind::ParserRuleKind KIND = ::tm_parse::rkind::rule; \
     constexpr static str_view NAME = TXT(#rule);                                       \
     str_view rule_name() const noexcept override {                                     \
@@ -171,17 +170,21 @@ template <class T> struct RuleRegister { RuleRegister() { RuleTestApi::add_rule<
         return KIND;                                                                   \
     }
 
+#define RULE_STATIC_METHODS(rule)                   \
+    static bool matches(Matcher& matcher) noexcept; \
+    static std::unique_ptr<rule> create(Parser& parser)
+
 // TODO: All throughout the codebase it is assumed that Rule::matches(matcher) doesn't invalidate
 //  the matcher *on failure* however this isn't actually the case. Calls directly to the matcher
 //  function will/can invalidate the matcher creating a need for a matcher function that does not
-//  invalidate the matcher. It would be best to implement some way of matching a rule without directly
-//  invalidating the matcher because otherwise you need to manually restore the position after each
-//  failed match.
+//  invalidate the matcher. It would be best to implement some way of matching a rule without
+//  directly invalidating the matcher because otherwise you need to manually restore the position
+//  after each failed match.
 //   > 05/11/2025 Partly implemented this, needs some more checking
 
-#define RULE_STATIC_API(rule)                       \
-    RULE_STATIC_CONSTANTS(rule);                    \
-    static bool matches(Matcher& matcher) noexcept; \
-    static std::unique_ptr<rule> create(Parser& parser)
+#define RULE_STATIC_API(rule)    \
+    TM_PARSE_TEST_API(rule);     \
+    RULE_STATIC_CONSTANTS(rule); \
+    RULE_STATIC_METHODS(rule)
 
 }  // namespace tm_parse

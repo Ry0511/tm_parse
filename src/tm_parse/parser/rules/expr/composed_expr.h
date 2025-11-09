@@ -7,7 +7,7 @@
 #pragma once
 
 #include "tm_parse/pch.h"
-#include "tm_parse/parser/rules/expr/expr.h"
+#include "tm_parse/parser/rules/parser_rule.h"
 
 namespace tm_parse::rules {
 
@@ -29,11 +29,11 @@ enum class Operator : uint8_t {
 
 class ComposedExpr;
 
-class UnaryOpExpr : public Expr {
+class UnaryOpExpr : public ParserRule {
    private:
     friend ComposedExpr;
     Operator m_Operator{Operator::Unknown};
-    std::unique_ptr<Expr> m_Operand;
+    std::unique_ptr<ParserRule> m_Operand;
 
    public:
     UnaryOpExpr() noexcept;
@@ -47,7 +47,7 @@ class UnaryOpExpr : public Expr {
 
    public:
     Operator op() const noexcept { return m_Operator; };
-    const Expr& operand() const noexcept { return *m_Operand; };
+    const ParserRule& operand() const noexcept { return *m_Operand; };
 
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
@@ -57,12 +57,12 @@ class UnaryOpExpr : public Expr {
     RULE_STATIC_CONSTANTS(UnaryOpExpr);
 };
 
-class BinaryOpExpr : public Expr {
+class BinaryOpExpr : public ParserRule {
    private:
     friend ComposedExpr;
     Operator m_Operator{};
-    std::unique_ptr<Expr> m_Left;
-    std::unique_ptr<Expr> m_Right;
+    std::unique_ptr<ParserRule> m_Left;
+    std::unique_ptr<ParserRule> m_Right;
 
    public:
     BinaryOpExpr();
@@ -76,8 +76,8 @@ class BinaryOpExpr : public Expr {
 
    public:
     Operator op() const noexcept { return m_Operator; }
-    const Expr& left() const noexcept { return *m_Left; }
-    const Expr& right() const noexcept { return *m_Right; }
+    const ParserRule& left() const noexcept { return *m_Left; }
+    const ParserRule& right() const noexcept { return *m_Right; }
 
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
@@ -87,9 +87,9 @@ class BinaryOpExpr : public Expr {
     RULE_STATIC_CONSTANTS(BinaryOpExpr);
 };
 
-class ComposedExpr : public Expr {
+class ComposedExpr : public ParserRule {
    private:
-    std::unique_ptr<Expr> m_Expr;
+    std::unique_ptr<ParserRule> m_Expr;
 
    public:
     ComposedExpr() noexcept;
@@ -102,7 +102,7 @@ class ComposedExpr : public Expr {
     ComposedExpr& operator=(ComposedExpr&&) noexcept;
 
    public:
-    const Expr& expr() const noexcept { return *m_Expr; }
+    const ParserRule& expr() const noexcept { return *m_Expr; }
 
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
@@ -112,9 +112,9 @@ class ComposedExpr : public Expr {
     RULE_STATIC_API(ComposedExpr);
 
    private:
-    static std::unique_ptr<Expr> parse_expr(Parser& parser);
-    static std::unique_ptr<Expr> parse_term(Parser& parser);
-    static std::unique_ptr<Expr> parse_factor(Parser& parser);
+    static std::unique_ptr<ParserRule> parse_expr(Parser& parser);
+    static std::unique_ptr<ParserRule> parse_term(Parser& parser);
+    static std::unique_ptr<ParserRule> parse_factor(Parser& parser);
 };
 
 }  // namespace tm_parse::rules

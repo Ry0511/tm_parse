@@ -40,34 +40,34 @@ ComposedExpr& ComposedExpr::operator=(ComposedExpr&&) noexcept = default;
 ////////////////////////////////////////////////////////////////////////////////
 
 void UnaryOpExpr::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
-    Expr::visit(func);
+    ParserRule::visit(func);
     m_Operand->visit(func);
 }
 
 void BinaryOpExpr::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
-    Expr::visit(func);
+    ParserRule::visit(func);
     m_Left->visit(func);
     m_Right->visit(func);
 }
 
 void ComposedExpr::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
-    Expr::visit(func);
+    ParserRule::visit(func);
     m_Expr->visit(func);
 }
 
 void UnaryOpExpr::cascade_assign_parents(ParserRule* parent) noexcept {
-    Expr::cascade_assign_parents(parent);
+    ParserRule::cascade_assign_parents(parent);
     m_Operand->cascade_assign_parents(this);
 }
 
 void BinaryOpExpr::cascade_assign_parents(ParserRule* parent) noexcept {
-    Expr::cascade_assign_parents(parent);
+    ParserRule::cascade_assign_parents(parent);
     m_Left->cascade_assign_parents(this);
     m_Right->cascade_assign_parents(this);
 }
 
 void ComposedExpr::cascade_assign_parents(ParserRule* parent) noexcept {
-    Expr::cascade_assign_parents(parent);
+    ParserRule::cascade_assign_parents(parent);
     m_Expr->cascade_assign_parents(this);
 }
 
@@ -184,8 +184,8 @@ std::unique_ptr<ComposedExpr> ComposedExpr::create(Parser& parser) {
     return rule;
 }
 
-std::unique_ptr<Expr> ComposedExpr::parse_expr(Parser& parser) {
-    std::unique_ptr<Expr> node = parse_term(parser);
+std::unique_ptr<ParserRule> ComposedExpr::parse_expr(Parser& parser) {
+    std::unique_ptr<ParserRule> node = parse_term(parser);
 
     while (Token cur = parser.any_real(op_low_precedence)) {
         Operator op = get_binary_op_kind(cur);
@@ -202,7 +202,7 @@ std::unique_ptr<Expr> ComposedExpr::parse_expr(Parser& parser) {
     return node;
 }
 
-std::unique_ptr<Expr> ComposedExpr::parse_term(Parser& parser) {
+std::unique_ptr<ParserRule> ComposedExpr::parse_term(Parser& parser) {
     auto node = parse_factor(parser);
     Matcher m = parser.create_matcher();
 
@@ -223,7 +223,7 @@ std::unique_ptr<Expr> ComposedExpr::parse_term(Parser& parser) {
     return node;
 }
 
-std::unique_ptr<Expr> ComposedExpr::parse_factor(Parser& parser) {
+std::unique_ptr<ParserRule> ComposedExpr::parse_factor(Parser& parser) {
     // simple literal
     Matcher matcher = parser.create_matcher();
 

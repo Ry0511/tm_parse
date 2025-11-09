@@ -13,7 +13,7 @@ namespace tm_parse::rules {
 
 class ParenExpr : public Expr {
    private:
-    std::unique_ptr<Expr> m_Inner;
+    std::unique_ptr<ParserRule> m_Inner;
 
    public:
     ParenExpr() = default;
