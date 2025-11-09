@@ -17,6 +17,8 @@ test_content = {
   A or B
   &
   A and B or !C
+  &
+  A + B and C or D
 }
 
 expected_parse_content = {
@@ -38,7 +40,7 @@ expected_parse_content = {
 
   ComposedExpr = (
     UnaryOpExpr["-A"]
-      IdentifierRefExpr["A"]
+      PropertyDotIdentifier["A"]
   )
 
   ComposedExpr = (
@@ -65,30 +67,33 @@ expected_parse_content = {
 
   ComposedExpr = (
     BinaryOpExpr["A and B"]
-      IdentifierRefExpr["A"]
-        PropertyDotIdentifier["A"]
-      IdentifierRefExpr["B"]
-        PropertyDotIdentifier["B"]
+      PropertyDotIdentifier["A"]
+      PropertyDotIdentifier["B"]
   )
 
   ComposedExpr = (
     BinaryOpExpr["A or B"]
-      IdentifierRefExpr["A"]
-        PropertyDotIdentifier["A"]
-      IdentifierRefExpr["B"]
-        PropertyDotIdentifier["B"]
+      PropertyDotIdentifier["A"]
+      PropertyDotIdentifier["B"]
   )
 
   ComposedExpr = (
     BinaryOpExpr["A and B or !C"]
       BinaryOpExpr["A and B"]
-        IdentifierRefExpr["A"]
-          PropertyDotIdentifier["A"]
-        IdentifierRefExpr["B"]
-          PropertyDotIdentifier["B"]
+        PropertyDotIdentifier["A"]
+        PropertyDotIdentifier["B"]
       UnaryOpExpr["!C"]
-        IdentifierRefExpr["C"]
+        PropertyDotIdentifier["C"]
+  )
+
+  ComposedExpr = (
+    BinaryOpExpr["A + B and C or D"]
+      BinaryOpExpr["A + B and C"]
+        PropertyDotIdentifier["A"]
+        BinaryOpExpr["B and C"]
+          PropertyDotIdentifier["B"]
           PropertyDotIdentifier["C"]
+      PropertyDotIdentifier["D"]
   )
 }
 
@@ -101,4 +106,5 @@ expected_text = {
   "A and B"
   "A or B"
   "A and B or !C"
+  "A + B and C or D"
 }

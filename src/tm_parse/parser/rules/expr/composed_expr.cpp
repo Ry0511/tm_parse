@@ -10,6 +10,7 @@
 #include "tm_parse/parser/rules/expr/composed_expr.h"
 
 #include "tm_parse/lexer/token_error.h"
+#include "tm_parse/parser/rules/common/prop_dot_identifier.h"
 #include "tm_parse/parser/rules/expr/identifier_ref_expr.h"
 #include "tm_parse/parser/rules/expr/literal_expr.h"
 #include "tm_parse/parser/rules/expr/meta_var_expr.h"
@@ -232,8 +233,8 @@ std::unique_ptr<ParserRule> ComposedExpr::parse_factor(Parser& parser) {
     }
 
     // simple variable
-    if (matcher.matches<IdentifierRefExpr>()) {
-        return IdentifierRefExpr::create(parser);
+    if (matcher.matches<PropertyDotIdentifier>()) {
+        return PropertyDotIdentifier::create(parser);
     }
 
     // meta var via $(foo.baz.bar)

@@ -39,7 +39,9 @@ class PropertyDotIdentifier : public ParserRule {
     PropertyDotIdentifier& operator=(PropertyDotIdentifier&&) noexcept;
 
    public:
-    const std::vector<PropertyDotIdentifierData>& identifier_parts() const noexcept { return m_Parts; }
+    const std::vector<PropertyDotIdentifierData>& identifier_parts() const noexcept {
+        return m_Parts;
+    }
     const PropertyDotIdentifierData& first() const noexcept { return m_Parts.front(); }
     const PropertyDotIdentifierData& last() const noexcept { return m_Parts.back(); }
     size_t size() const noexcept { return m_Parts.size(); }

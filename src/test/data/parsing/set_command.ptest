@@ -60,7 +60,7 @@ expected_parse_content = {
     PropertyAccess["baz"]
       PropertyDotIdentifier["baz"]
     ComposedExpr["bar"]
-      IdentifierRefExpr["bar"]
+      PropertyDotIdentifier["bar"]
   )
 
   SetCommand = (
