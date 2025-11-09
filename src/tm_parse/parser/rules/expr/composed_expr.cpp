@@ -11,7 +11,6 @@
 
 #include "tm_parse/lexer/token_error.h"
 #include "tm_parse/parser/rules/common/prop_dot_identifier.h"
-#include "tm_parse/parser/rules/expr/identifier_ref_expr.h"
 #include "tm_parse/parser/rules/expr/literal_expr.h"
 #include "tm_parse/parser/rules/expr/meta_var_expr.h"
 
@@ -156,7 +155,7 @@ bool match_term(Matcher& matcher) {
 }
 
 bool match_factor(Matcher& matcher) {
-    if (LiteralExpr::matches(matcher) || IdentifierRefExpr::matches(matcher)
+    if (LiteralExpr::matches(matcher) || PropertyDotIdentifier::matches(matcher)
         || MetaVarExpr::matches(matcher)) {
         return true;
     }

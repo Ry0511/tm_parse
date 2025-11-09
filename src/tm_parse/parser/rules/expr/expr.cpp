@@ -14,7 +14,6 @@
 #include "tm_parse/parser/rules/expr/assignment_expr.h"
 #include "tm_parse/parser/rules/expr/assignment_expr_list.h"
 #include "tm_parse/parser/rules/expr/composed_expr.h"
-#include "tm_parse/parser/rules/expr/identifier_ref_expr.h"
 #include "tm_parse/parser/rules/expr/literal_expr.h"
 #include "tm_parse/parser/rules/expr/log_info_expr.h"
 #include "tm_parse/parser/rules/expr/meta_var_expr.h"
@@ -29,8 +28,7 @@ bool Expr::matches(Matcher& matcher) noexcept {
            || matcher.matches<AssignmentExprList>()
            || matcher.matches<AssignmentExpr>()
            || matcher.matches<ComposedExpr>()
-           || matcher.matches<LiteralExpr>()
-           || matcher.matches<IdentifierRefExpr>();
+           || matcher.matches<LiteralExpr>();
     // clang-format on
 }
 
@@ -48,7 +46,6 @@ std::unique_ptr<ParserRule> Expr::create(Parser& parser) {
     TRY_CREATE_RULE(AssignmentExpr);
     TRY_CREATE_RULE(ComposedExpr);
     TRY_CREATE_RULE(LiteralExpr);
-    TRY_CREATE_RULE(IdentifierRefExpr);
 
 #undef TRY_CREATE_RULE
 
