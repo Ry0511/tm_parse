@@ -146,13 +146,13 @@ struct RuleTestApi {
 };
 
 // clang-format off
-template <class T> struct RuleRegister { RuleRegister() { RuleTestApi::add_rule<T>(); } };
+template <class T> struct RuleAutoRegister { RuleAutoRegister() { RuleTestApi::add_rule<T>(); } };
 // clang-format on
 
 }  // namespace tests
 
 #define TM_PARSE_TEST_API(rule) \
-    inline static const ::tm_parse::tests::RuleRegister<rule> RULE_REGISTER {}
+    inline static const ::tm_parse::tests::RuleAutoRegister<rule> RULE_REGISTER {}
 
 #else
 
