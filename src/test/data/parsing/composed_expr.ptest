@@ -11,6 +11,12 @@ test_content = {
   --(10 * 50)
   &
   (5 + 10) * (15 + 20) / (25 - 30)
+  &
+  A and B
+  &
+  A or B
+  &
+  A and B or !C
 }
 
 expected_parse_content = {
@@ -56,6 +62,34 @@ expected_parse_content = {
         LiteralExpr["25"]
         LiteralExpr["30"]
   )
+
+  ComposedExpr = (
+    BinaryOpExpr["A and B"]
+      IdentifierRefExpr["A"]
+        PropertyDotIdentifier["A"]
+      IdentifierRefExpr["B"]
+        PropertyDotIdentifier["B"]
+  )
+
+  ComposedExpr = (
+    BinaryOpExpr["A or B"]
+      IdentifierRefExpr["A"]
+        PropertyDotIdentifier["A"]
+      IdentifierRefExpr["B"]
+        PropertyDotIdentifier["B"]
+  )
+
+  ComposedExpr = (
+    BinaryOpExpr["A and B or !C"]
+      BinaryOpExpr["A and B"]
+        IdentifierRefExpr["A"]
+          PropertyDotIdentifier["A"]
+        IdentifierRefExpr["B"]
+          PropertyDotIdentifier["B"]
+      UnaryOpExpr["!C"]
+        IdentifierRefExpr["C"]
+          PropertyDotIdentifier["C"]
+  )
 }
 
 expected_text = {
@@ -64,4 +98,7 @@ expected_text = {
   "-A"
   "--(10 * 50)"
   "(5 + 10) * (15 + 20) / (25 - 30)"
+  "A and B"
+  "A or B"
+  "A and B or !C"
 }

@@ -11,17 +11,20 @@
 
 namespace tm_parse::rules {
 
-// TODO: Probably a good idea to scrap the Expr base class as it just makes things harder to work with.
+// TODO: Probably a good idea to scrap the Expr base class as it just makes things harder to work
+// with.
 
 enum class Operator : uint8_t {
-    Add,           // +
-    Subtract,      // -
-    Divide,        // /
-    Multiply,      // *
-    Negate,        // -A
-    Positive,      // +A
-    LogicalNegate, // !A
-    Unknown        //
+    Add,            // +    Binary
+    Subtract,       // -    Binary
+    Divide,         // /    Binary
+    Multiply,       // *    Binary
+    Negate,         // -A   Unary
+    Positive,       // +A   Unary
+    LogicalNegate,  // !A   Unary
+    LogicalOr,      // or   Binary
+    LogicalAnd,     // and  Binary
+    Unknown
 };
 
 class ComposedExpr;
@@ -29,7 +32,7 @@ class ComposedExpr;
 class UnaryOpExpr : public Expr {
    private:
     friend ComposedExpr;
-    Operator m_Operator{Operator::Unknown};  // TODO: this is always going to be Negate
+    Operator m_Operator{Operator::Unknown};
     std::unique_ptr<Expr> m_Operand;
 
    public:

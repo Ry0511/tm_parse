@@ -92,9 +92,37 @@ void ComposedExpr::cascade_assign_parents(ParserRule* parent) noexcept {
 
 namespace {
 
+// TODO: Change logical negation ! to the keyword not to keep things the same with the other
+//  logical operators i.e., and, or
+
 constinit tk::TokenKind op_unary_operators[]{tk::Plus, tk::Minus, tk::ExclamationMark};
-constinit tk::TokenKind op_low_precedence[]{tk::Plus, tk::Minus};
-constinit tk::TokenKind op_high_precedence[]{tk::Star, tk::Slash};
+constinit tk::TokenKind op_high_precedence[]{tk::Star, tk::Slash, tk::And};
+constinit tk::TokenKind op_low_precedence[]{tk::Plus, tk::Minus, tk::Or};
+
+Operator get_unary_op_kind(const Token& tok) noexcept {
+    // clang-format off
+    switch (tok.Kind) {
+        case tk::Plus:            return Operator::Positive;
+        case tk::Minus:           return Operator::Negate;
+        case tk::ExclamationMark: return Operator::LogicalNegate; // TODO: Might as well make this an identifier
+    }
+    // clang-format on
+    return Operator::Unknown;
+}
+
+Operator get_binary_op_kind(const Token& tok) noexcept {
+    // clang-format off
+    switch (tok.Kind) {
+        case tk::Plus:  return Operator::Add;
+        case tk::Minus: return Operator::Subtract;
+        case tk::Star:  return Operator::Multiply;
+        case tk::Slash: return Operator::Divide;
+        case tk::And:   return Operator::LogicalAnd;
+        case tk::Or:    return Operator::LogicalOr;
+    }
+    // clang-format on
+    return Operator::Unknown;
+}
 
 bool match_expr(Matcher& matcher);
 bool match_term(Matcher& matcher);
@@ -160,7 +188,7 @@ std::unique_ptr<Expr> ComposedExpr::parse_expr(Parser& parser) {
     std::unique_ptr<Expr> node = parse_term(parser);
 
     while (Token cur = parser.any_real(op_low_precedence)) {
-        Operator op = (cur == tk::Plus) ? Operator::Add : Operator::Subtract;
+        Operator op = get_binary_op_kind(cur);
 
         auto binary_op = std::make_unique<BinaryOpExpr>();
         binary_op->m_Operator = op;
@@ -179,7 +207,7 @@ std::unique_ptr<Expr> ComposedExpr::parse_term(Parser& parser) {
     Matcher m = parser.create_matcher();
 
     while (Token cur = m.any_real(op_high_precedence)) {
-        Operator op = (cur == tk::Star) ? Operator::Multiply : Operator::Divide;
+        Operator op = get_binary_op_kind(cur);
         parser.set_position(m.position());
 
         auto binary_op = std::make_unique<BinaryOpExpr>();
@@ -234,26 +262,15 @@ std::unique_ptr<Expr> ComposedExpr::parse_factor(Parser& parser) {
     constexpr tk::TokenKind unary_operator_tokens[]{tk::Minus, tk::ExclamationMark};
     if (Token first = parser.any_real(unary_operator_tokens)) {
         auto unary = std::make_unique<UnaryOpExpr>();
-
-        if (first == tk::Minus) {
-            unary->m_Operator = Operator::Negate;
-        } else if (first == tk::ExclamationMark) {
-            unary->m_Operator = Operator::LogicalNegate;
-        } else {
-            throw std::logic_error{"unhandled token"};
-        }
-
+        unary->m_Operator = get_unary_op_kind(first);
         unary->m_Operand = parse_factor(parser);
         unary->post_init(first, unary->m_Operand->last_token());
         return unary;
     }
 
     // Don't know what this is
-    Token cur = parser.next_real();
-    throw TokenError{
-        "expecting one of [LiteralExpr, IdentifierRefExpr, MetaVarExpr, or ComposedExpr]",
-        cur
-    };
+    Token cur = matcher.next_real();
+    throw TokenError{"unexpected input in composed expression", cur};
 }
 
 }  // namespace tm_parse::rules

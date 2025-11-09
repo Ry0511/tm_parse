@@ -302,6 +302,7 @@ Token Lexer::read_other() {
         case TXT(','):  return _create_token(tk::Comma);
         case TXT('='):  return _create_token(tk::Equal);
         case TXT('\''): return _create_token(tk::SingleQuote);
+        case TXT('!'):  return _create_token(tk::ExclamationMark);
         case TXT('?'):  return _create_token(tk::QuestionMark);
         case TXT('$'):  return _create_token(tk::DollarSign);
         case TXT('{'):  return _create_token(tk::LeftBrace);

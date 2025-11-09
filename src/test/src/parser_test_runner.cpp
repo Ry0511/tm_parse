@@ -107,9 +107,9 @@ bool ParserTestRunner::run(TestFile& file) {
             const auto& [name, text] = expected.VisitorTree.at(state.Index);
             ++state.Index;
 
-            info("Rule is {} parsed from {}", rule.rule_name(), rule.full_text());
+            info("Rule is '{}' parsed from '{}'", rule.rule_name(), rule.full_text());
             if (rule_name != name) {
-                err("Expecting Rule {} but got {}", rule_name, name);
+                err("Expecting Rule '{}' but got '{}'", name, rule_name);
                 m_Success = false;
             }
 
