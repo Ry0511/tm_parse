@@ -19,11 +19,11 @@ enum class LogLevel : uint8_t {
 };
 
 // clang-format off
-#define TM_PARSE_LOG(level, ...)                      \
-    ::tm_parse::logging::log(                         \
-        ::tm_parse::logging::LogLevel::level,         \
-        std::format(__VA_ARGS__) + std::string{"\n"}, \
-        std::source_location::current()               \
+#define TM_PARSE_LOG(level, ...)              \
+    ::tm_parse::logging::log(                 \
+        ::tm_parse::logging::LogLevel::level, \
+        std::format(__VA_ARGS__),             \
+        std::source_location::current()       \
     )
 // clang-format on
 

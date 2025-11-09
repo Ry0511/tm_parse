@@ -79,22 +79,28 @@ void log(LogLevel level, std::string_view msg, const std::source_location& src) 
     std::string function_name = get_function_name(src);
 
     std::string header = std::format(
-        "[{:>5}] {:>60}:{:<3}",
+        "[{:>5}] {:>60}:{:0>4} ",
         get_log_level_name(level),
         truncate_left(std::format("{} {}", function_name, file_name), 60),
         src.line()
     );
 
-    const char* end = msg.data();
-    const char* start = end;
-
-    while (*end != '\0') {
-        char c = *end;
-        if (c == '\n' || c == '\r') {
-            std::cout << header << " | " << std::string_view{start, end} << '\n';
-            start = end + 1;
+    size_t begin{0};
+    for (size_t i = 0; i <= msg.size(); ++i) {
+        if (i < msg.size()) {
+            char ch = msg[i];
+            if (msg[i] != '\n' && msg[i] != '\r') {
+                continue;
+            }
         }
-        ++end;
+
+        str_view line = msg.substr(begin, i - begin);
+        begin = i + 1;
+
+        if (line.empty()) {
+            continue;
+        }
+        std::cout << header << line << '\n';
     }
 }
 
