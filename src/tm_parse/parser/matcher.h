@@ -56,6 +56,8 @@ class Matcher {
     bool try_match_real(std::span<const tk::TokenKind> kinds) noexcept;
 
    public:
+    Token peek() const noexcept;
+    Token peek_real() const noexcept;
     Token next() noexcept;
     Token next_real() noexcept;
     Token maybe(tk::TokenKind kind) noexcept;

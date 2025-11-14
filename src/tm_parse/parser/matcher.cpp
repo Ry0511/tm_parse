@@ -56,6 +56,31 @@ bool Matcher::try_match_real(std::span<const tk::TokenKind> kinds) noexcept {
     return true;
 }
 
+Token Matcher::peek() const noexcept {
+    if (position() >= m_Tokens.size()) {
+        return Token{};
+    }
+    return m_Tokens[m_Position];
+}
+
+Token Matcher::peek_real() const noexcept {
+    size_t pos = m_Position;
+
+    while (pos < m_Tokens.size()) {
+        Token tok = m_Tokens[pos++];
+        switch (tok.Kind) {
+            case tk::LineComment:
+            case tk::MultiLineComment:
+            case tk::BlankLine:
+                continue;
+            default:
+                return tok;
+        }
+    }
+
+    return Token{};
+}
+
 Token Matcher::next() noexcept {
     if (position() >= m_Tokens.size()) {
         return Token{};
