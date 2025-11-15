@@ -28,6 +28,7 @@ std::unique_ptr<MetaVarExpr> MetaVarExpr::create(Parser& parser) {
 
     auto rule = std::make_unique<MetaVarExpr>();
     rule->m_Identifier = PropertyDotIdentifier::create(parser);
+    rule->m_Identifier->set_parent(*rule);
     rule->post_init(first, rule->m_Identifier->last_token());
 
     return rule;

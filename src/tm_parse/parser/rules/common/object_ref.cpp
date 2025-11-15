@@ -48,6 +48,7 @@ std::unique_ptr<ObjectRef> ObjectRef::create(Parser& parser) {
         ref->m_Ref = FullObjectRef::create(parser);
     }
 
+    ref->m_Ref->set_parent(*ref);
     ref->copy_state(*ref->m_Ref);
     return ref;
 }

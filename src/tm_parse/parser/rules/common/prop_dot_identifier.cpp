@@ -49,6 +49,7 @@ std::unique_ptr<PropertyDotIdentifier> PropertyDotIdentifier::create(Parser& par
         Matcher m = parser.create_matcher();
         if (m.matches<ArrayAccess>()) {
             data.ArrayPart = ArrayAccess::create(parser);
+            data.ArrayPart->set_parent(*rule);
         }
 
     } while (parser.maybe_real(tk::Dot));

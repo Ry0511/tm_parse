@@ -180,6 +180,7 @@ bool ComposedExpr::matches(Matcher& matcher) noexcept {
 std::unique_ptr<ComposedExpr> ComposedExpr::create(Parser& parser) {
     auto rule = std::make_unique<ComposedExpr>();
     rule->m_Expr = parse_expr(parser);
+    rule->m_Expr->set_parent(*rule);
     rule->copy_state(*rule->m_Expr);
     return rule;
 }
@@ -194,6 +195,8 @@ std::unique_ptr<ParserRule> ComposedExpr::parse_expr(Parser& parser) {
         binary_op->m_Operator = op;
         binary_op->m_Left = std::move(node);
         binary_op->m_Right = parse_term(parser);
+        binary_op->m_Left->set_parent(*binary_op);
+        binary_op->m_Right->set_parent(*binary_op);
         binary_op->post_init(*binary_op->m_Left, *binary_op->m_Right);
 
         node = std::move(binary_op);
@@ -214,6 +217,8 @@ std::unique_ptr<ParserRule> ComposedExpr::parse_term(Parser& parser) {
         binary_op->m_Operator = op;
         binary_op->m_Left = std::move(node);
         binary_op->m_Right = parse_factor(parser);
+        binary_op->m_Left->set_parent(*binary_op);
+        binary_op->m_Right->set_parent(*binary_op);
         binary_op->post_init(*binary_op->m_Left, *binary_op->m_Right);
 
         node = std::move(binary_op);
@@ -253,6 +258,7 @@ std::unique_ptr<ParserRule> ComposedExpr::parse_factor(Parser& parser) {
         auto unary = std::make_unique<UnaryOpExpr>();
         unary->m_Operator = get_unary_op_kind(first);
         unary->m_Operand = parse_factor(parser);
+        unary->m_Operand->set_parent(*unary);
         unary->post_init(first, unary->m_Operand->last_token());
         return unary;
     }

@@ -27,6 +27,7 @@ bool PropertyAccess::matches(Matcher& matcher) noexcept {
 std::unique_ptr<PropertyAccess> PropertyAccess::create(Parser& parser) {
     auto rule = std::make_unique<PropertyAccess>();
     rule->m_Property = PropertyDotIdentifier::create(parser);
+    rule->m_Property->set_parent(*rule);
     rule->copy_state(*rule->m_Property);
     return rule;
 }
