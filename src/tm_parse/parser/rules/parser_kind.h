@@ -22,6 +22,8 @@ enum ParserRuleKind : parser_rule_kind_int {
     ClassObjectRef,
     FullObjectRef,
 
+    ProgramRule,
+    ModDefinition,
     ObjectDefinition,
     SetCommand,
 

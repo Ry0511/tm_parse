@@ -113,8 +113,8 @@ class ParserRule {
 //  requires us to duplicate the create code just without the allocations...
 
 // TODO: Need to extract this out an put it into the tests section, only need two of the macros here
-#define TM_PARSE_TESTS
 
+#define TM_PARSE_TESTS
 #ifdef TM_PARSE_TESTS
 
 namespace tests {
@@ -152,7 +152,7 @@ template <class T> struct RuleAutoRegister { RuleAutoRegister() { RuleTestApi::a
 }  // namespace tests
 
 #define TM_PARSE_TEST_API(rule) \
-    inline static const ::tm_parse::tests::RuleAutoRegister<rule> RULE_REGISTER {}
+    inline static const ::tm_parse::tests::RuleAutoRegister<rule> RULE_REGISTER{}
 
 #else
 
@@ -176,7 +176,7 @@ template <class T> struct RuleAutoRegister { RuleAutoRegister() { RuleTestApi::a
 
 // TODO: All throughout the codebase it is assumed that Rule::matches(matcher) doesn't invalidate
 //  the matcher *on failure* however this isn't actually the case. Calls directly to the matcher
-//  function will/can invalidate the matcher creating a need for a matcher function that does not
+//  function will/can invalidate the matcher. This creates a need for a matcher function that does not
 //  invalidate the matcher. It would be best to implement some way of matching a rule without
 //  directly invalidating the matcher because otherwise you need to manually restore the position
 //  after each failed match.
