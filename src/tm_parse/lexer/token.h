@@ -119,4 +119,6 @@ struct Token {
     constexpr operator bool() const noexcept { return Kind != tk::InvalidToken; }
 };
 
+static constexpr Token invalid_token_v{tk::InvalidToken};
+
 }  // namespace tm_parse

@@ -39,7 +39,7 @@ class Matcher {
     Matcher& operator=(Matcher&&) = default;
 
    public:
-    bool is_eof() const noexcept { return m_Position >= m_Tokens.size(); }
+    bool is_eof() const noexcept;
 
     template <class T>
     bool matches() noexcept {
@@ -55,9 +55,10 @@ class Matcher {
     bool try_match(std::span<const tk::TokenKind> kinds) noexcept;
     bool try_match_real(std::span<const tk::TokenKind> kinds) noexcept;
 
+    // TODO: Should be possible to return Token as const ref
    public:
-    Token peek() const noexcept;
-    Token peek_real() const noexcept;
+    const Token& peek() const noexcept;
+    const Token& peek_real() const noexcept;
     Token next() noexcept;
     Token next_real() noexcept;
     Token maybe(tk::TokenKind kind) noexcept;
