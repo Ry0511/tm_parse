@@ -38,6 +38,7 @@ enum ParserRuleKind : parser_rule_kind_int {
     LogInfoExpr,
     MetaVarExpr,
     ParenExpr,
+    UnquotedStrLiteral,
 
     TokenRule, // potentially planned for removal
     Unknown,

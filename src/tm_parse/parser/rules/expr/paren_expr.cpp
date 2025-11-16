@@ -8,6 +8,7 @@
 
 #include "tm_parse/parser/parser.h"
 #include "tm_parse/parser/rules/expr/paren_expr.h"
+#include "tm_parse/parser/rules/util/common_expr.h"
 
 namespace tm_parse::rules {
 
@@ -27,7 +28,7 @@ void ParenExpr::cascade_assign_parents(ParserRule* parent) noexcept {
 
 bool ParenExpr::matches(Matcher& matcher) noexcept {
     if (matcher.maybe_real(tk::LeftParen)) {
-        return Expr::matches(matcher) && matcher.maybe_real(tk::RightParen);
+        return safe_expressions{}.matches(matcher) && matcher.maybe_real(tk::RightParen);
     }
     return false;
 }
@@ -36,7 +37,7 @@ std::unique_ptr<ParenExpr> ParenExpr::create(Parser& parser) {
     auto ptr = std::make_unique<ParenExpr>();
 
     Token first = parser.require_real(tk::LeftParen);
-    ptr->m_Inner = Expr::create(parser);
+    ptr->m_Inner = safe_expressions{}.create(parser);
     Token last = parser.require_real(tk::RightParen);
 
     ptr->post_init(first, last);

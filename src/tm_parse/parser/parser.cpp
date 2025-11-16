@@ -23,6 +23,11 @@ std::vector<Token> read_all_tokens(str_view text) {
         tokens.emplace_back(lexer.next_token());
     } while (!lexer.is_eof());
 
+    // ensure the last token is an EndOfInput token
+    Token last = tokens.back();
+    last.Kind = tk::EndOfInput;
+    tokens.emplace_back(last);
+
     tokens.shrink_to_fit();
 
     return tokens;

@@ -92,6 +92,10 @@ void ComposedExpr::cascade_assign_parents(ParserRule* parent) noexcept {
 // results.
 //
 
+// TODO: Need to adjust this so that things like A B C D do not pass as 4 composed expressions.
+//  Simply we require a minimum of 1 Unary or Binary expression for it to be a ComposedExpr. Could
+//  be simply replacing the while loops with a do-while loop.
+
 namespace {
 
 constexpr tk::TokenKind op_unary_operators[]{tk::Plus, tk::Minus, tk::Not, tk::ExclamationMark};

@@ -39,6 +39,22 @@ class Parser : public Matcher {
         return T::create(*this);
     }
 
+    template <class T, class... Tail>
+        requires std::is_base_of_v<ParserRule, T>
+    std::unique_ptr<ParserRule> create_one_of() {
+        size_t pos = position();
+        if (matches<T>()) {
+            set_position(pos);
+            return create<T>();
+        }
+
+        if constexpr (sizeof...(Tail) == 0) {
+            throw std::runtime_error{"no rule could be created as none matched"};
+        } else {
+            return create_one_of<Tail...>();
+        }
+    }
+
    private:
     friend class Matcher;
 };

@@ -51,6 +51,11 @@ class Matcher {
         return false;
     }
 
+    template <class... T>
+    bool matches_one_of() noexcept {
+        return (matches<T>() || ...);
+    }
+
    public:
     bool try_match(std::span<const tk::TokenKind> kinds) noexcept;
     bool try_match_real(std::span<const tk::TokenKind> kinds) noexcept;

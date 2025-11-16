@@ -8,7 +8,7 @@
 
 #include "tm_parse/parser/parser.h"
 #include "tm_parse/parser/rules/common/property_access.h"
-#include "tm_parse/parser/rules/expr/assignment_expr.h"
+#include "tm_parse/parser/rules/util/common_expr.h"
 
 namespace tm_parse::rules {
 
@@ -18,7 +18,7 @@ AssignmentExpr& AssignmentExpr::operator=(AssignmentExpr&&) noexcept = default;
 
 bool AssignmentExpr::matches(Matcher& matcher) noexcept {
     return PropertyAccess::matches(matcher) && matcher.maybe_real(tk::Equal)
-           && Expr::matches(matcher);
+           && assignment_expr_types{}.matches(matcher);
 }
 
 std::unique_ptr<AssignmentExpr> AssignmentExpr::create(Parser& parser) {
@@ -26,7 +26,7 @@ std::unique_ptr<AssignmentExpr> AssignmentExpr::create(Parser& parser) {
 
     rule->m_Property = PropertyAccess::create(parser);
     parser.require_real(tk::Equal);
-    rule->m_Expr = Expr::create(parser);
+    rule->m_Expr = assignment_expr_types{}.create(parser);
 
     rule->post_init(*rule->m_Property, *rule->m_Expr);
     rule->m_Property->set_parent(*rule);
