@@ -58,6 +58,12 @@ std::unique_ptr<ProgramRule> ProgramRule::create(Parser& parser) {
         }
     }
 
+    if (!rule->m_BodyRules.empty()) {
+        rule->post_init(*rule->m_ModDefinition, *rule->m_BodyRules.back());
+    } else {
+        rule->post_init(*rule->m_ModDefinition, *rule->m_ModDefinition);
+    }
+
     return rule;
 }
 
