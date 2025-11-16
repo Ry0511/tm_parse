@@ -14,8 +14,8 @@ namespace tm_parse::rules {
 
 ModDefinition::ModDefinition() noexcept = default;
 ModDefinition::~ModDefinition() noexcept = default;
-ModDefinition::ModDefinition(ModDefinition&&) = default;
-ModDefinition& ModDefinition::operator=(ModDefinition&&) = default;
+ModDefinition::ModDefinition(ModDefinition&&) noexcept = default;
+ModDefinition& ModDefinition::operator=(ModDefinition&&) noexcept = default;
 
 bool ModDefinition::matches(Matcher& matcher) noexcept {
     // create_mod = ( EXPR_LIST )
@@ -31,9 +31,6 @@ std::unique_ptr<ModDefinition> ModDefinition::create(Parser& parser) {
     rule->m_InitArgs = AssignmentExprList::create(parser);
     rule->m_InitArgs->set_parent(*rule);
     rule->post_init(first, rule->m_InitArgs->last_token());
-
-    // TODO: Might want to validate that the required arguments Name, Version, and Author have been
-    //  provided.
 
     return rule;
 }

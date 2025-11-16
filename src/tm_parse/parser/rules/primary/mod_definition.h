@@ -22,8 +22,8 @@ class ModDefinition : public ParserRule {
     ~ModDefinition() noexcept override;
     ModDefinition(const ModDefinition&) = delete;
     ModDefinition& operator=(const ModDefinition&) = delete;
-    ModDefinition(ModDefinition&&);
-    ModDefinition& operator=(ModDefinition&&);
+    ModDefinition(ModDefinition&&) noexcept;
+    ModDefinition& operator=(ModDefinition&&) noexcept;
 
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
