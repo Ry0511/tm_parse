@@ -133,7 +133,9 @@ bool match_term(Matcher& matcher);
 bool match_factor(Matcher& matcher);
 
 bool match_expr(Matcher& matcher) {
-    match_term(matcher);
+    if (!match_term(matcher)) {
+        return false;
+    }
 
     while (matcher.any_real(op_low_precedence)) {
         if (!match_term(matcher)) {
@@ -211,11 +213,9 @@ std::unique_ptr<ParserRule> ComposedExpr::parse_expr(Parser& parser) {
 
 std::unique_ptr<ParserRule> ComposedExpr::parse_term(Parser& parser) {
     auto node = parse_factor(parser);
-    Matcher m = parser.create_matcher();
 
-    while (Token cur = m.any_real(op_high_precedence)) {
+    while (Token cur = parser.any_real(op_high_precedence)) {
         Operator op = get_binary_op_kind(cur);
-        parser.set_position(m.position());
 
         auto binary_op = std::make_unique<BinaryOpExpr>();
         binary_op->m_Operator = op;
@@ -226,7 +226,6 @@ std::unique_ptr<ParserRule> ComposedExpr::parse_term(Parser& parser) {
         binary_op->post_init(*binary_op->m_Left, *binary_op->m_Right);
 
         node = std::move(binary_op);
-        m.set_position(parser.position());
     }
 
     return node;
