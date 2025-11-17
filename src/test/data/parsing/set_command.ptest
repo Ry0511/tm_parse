@@ -16,9 +16,8 @@ expected_parse_content = {
         ObjectDotIdentifier["foo"]
     PropertyAccess
       PropertyDotIdentifier["baz"]
-    ParenExpr["( 5 * 10 )"]
-      ComposedExpr["5 * 10"]
-        BinaryOpExpr["5 * 10"]
+    ComposedExpr["( 5 * 10 )"]
+      BinaryOpExpr["( 5 * 10 )"]
   )
 
   SetCommand = (
@@ -28,8 +27,7 @@ expected_parse_content = {
         ObjectDotIdentifier["bar"]
     PropertyAccess["baz(+1.5)"]
       PropertyDotIdentifier["baz(+1.5)"]
-    ComposedExpr["1"]
-      LiteralExpr["1"]
+    LiteralExpr["1"]
   )
 
   SetCommand = (
@@ -39,8 +37,7 @@ expected_parse_content = {
         ObjectDotIdentifier["bar"]
     PropertyAccess["baz[-1.5]"]
       PropertyDotIdentifier["baz[-1.5]"]
-    ComposedExpr["True"]
-      LiteralExpr["True"]
+    LiteralExpr["True"]
   )
 
   SetCommand = (
@@ -49,8 +46,7 @@ expected_parse_content = {
         ObjectDotIdentifier["baz"]
     PropertyAccess["bar"]
       PropertyDotIdentifier["bar"]
-    ComposedExpr["1"]
-      LiteralExpr["1"]
+    LiteralExpr["1"]
   )
 
   SetCommand = (
@@ -59,8 +55,7 @@ expected_parse_content = {
         PropertyDotIdentifier["foo"]
     PropertyAccess["baz"]
       PropertyDotIdentifier["baz"]
-    ComposedExpr["bar"]
-      PropertyDotIdentifier["bar"]
+    UnquotedStrLiteral["bar"]
   )
 
   SetCommand = (
@@ -69,8 +64,7 @@ expected_parse_content = {
         PropertyDotIdentifier["foo[0].baz(10)"]
     PropertyAccess["baz(0).bar[1]"]
       PropertyDotIdentifier["baz(0).bar[1]"]
-    ComposedExpr["10"]
-      LiteralExpr["10"]
+    LiteralExpr["10"]
   )
 }
 

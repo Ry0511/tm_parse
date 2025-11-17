@@ -68,6 +68,8 @@ bool ObjectDefinition::matches(Matcher& matcher) noexcept {
     bool exit_found = false;
 
     while (!exit_found) {
+        // only need this to perform a lookahead to see if we can start a nested object or an
+        //  assignment expression
         Matcher m{matcher};
 
         // check for child objects first

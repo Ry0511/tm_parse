@@ -1,0 +1,72 @@
+test_type = ParserTest
+
+test_content = {
+  A = my unquoted string literal
+  A = (Hello There)
+  A = (Hello There) // Comment but still apart of the unquoted literal
+  A = (Hello There) /*
+    Same applies with multi-line comments...
+  */
+  A = True
+  A = 50
+  A = (50 + 100) * 65
+}
+
+expected_parse_content = {
+  AssignmentExpr = (
+    PropertyAccess["A"]
+      PropertyDotIdentifier["A"]
+    UnquotedStrLiteral["my unquoted string literal"]
+  )
+
+  AssignmentExpr = (
+    PropertyAccess["A"]
+      PropertyDotIdentifier["A"]
+    UnquotedStrLiteral["(Hello There)"]
+  )
+
+  AssignmentExpr = (
+    PropertyAccess["A"]
+      PropertyDotIdentifier["A"]
+    UnquotedStrLiteral["(Hello There) // Comment but still apart of the unquoted literal"]
+  )
+
+  AssignmentExpr = (
+    PropertyAccess["A"]
+      PropertyDotIdentifier["A"]
+    UnquotedStrLiteral["(Hello There) /*\n    Same applies with multi-line comments...\n  */"]
+  )
+
+  AssignmentExpr = (
+    PropertyAccess["A"]
+      PropertyDotIdentifier["A"]
+    LiteralExpr["True"]
+  )
+
+  AssignmentExpr = (
+    PropertyAccess["A"]
+      PropertyDotIdentifier["A"]
+    LiteralExpr["50"]
+  )
+
+  AssignmentExpr = (
+    PropertyAccess["A"]
+      PropertyDotIdentifier["A"]
+    ComposedExpr["(50 + 100) * 65"]
+      BinaryOpExpr["(50 + 100) * 65"]
+        BinaryOpExpr["(50 + 100)"]
+          LiteralExpr["50"]
+          LiteralExpr["100"]
+        LiteralExpr["65"]
+  )
+}
+
+expected_text = {
+  "A = my unquoted string literal"
+  "A = (Hello There)"
+  "A = (Hello There) // Comment but still apart of the unquoted literal"
+  "A = (Hello There) /*\n    Same applies with multi-line comments...\n  */"
+  "A = True"
+  "A = 50"
+  "A = (50 + 100) * 65"
+}

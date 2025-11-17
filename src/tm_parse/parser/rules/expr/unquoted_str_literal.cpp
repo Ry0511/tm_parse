@@ -15,20 +15,11 @@ namespace tm_parse::rules {
 
 namespace {
 
-// TODO: This hasn't been tested nor validated yet
-
-// Not sure if tk::LineComment and tk::MultiLineComment should be delimiters...
 constexpr tk::TokenKind delimiter_tokens[]{
-    tk::BlankLine,   // new lines must be provided as \n
-    tk::EndOfInput,  // no brainer here
+    tk::BlankLine,
+    tk::EndOfInput,
     tk::InvalidToken
 };
-
-bool is_delimiter_token(const Token& tok) noexcept {
-    return std::ranges::any_of(delimiter_tokens, [&tok](const auto& kind) -> bool {
-        return tok.Kind == kind;
-    });
-}
 
 }  // namespace
 
@@ -38,21 +29,18 @@ UnquotedStrLiteral::UnquotedStrLiteral(UnquotedStrLiteral&&) noexcept = default;
 UnquotedStrLiteral& UnquotedStrLiteral::operator=(UnquotedStrLiteral&&) noexcept = default;
 
 bool UnquotedStrLiteral::matches(Matcher& matcher) noexcept {
-    // Consume everything that is not a delimiter token
-    while (!matcher.any(delimiter_tokens)) {}
+    while (matcher.not_any(delimiter_tokens)) {}
     return true;
 }
 
 std::unique_ptr<UnquotedStrLiteral> UnquotedStrLiteral::create(Parser& parser) {
     Token first = parser.next();
     Token last = first;
+    Token next = last;
 
-    bool terminated = is_delimiter_token(last);
-    while (Token tok = parser.next()) {
-        terminated = is_delimiter_token(tok);
-        if (!terminated) {
-            last = tok;
-        }
+    while (next.is_none_of(delimiter_tokens)) {
+        last = next;
+        next = parser.next();
     }
 
     auto rule = std::make_unique<UnquotedStrLiteral>();

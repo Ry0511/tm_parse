@@ -92,10 +92,6 @@ void ComposedExpr::cascade_assign_parents(ParserRule* parent) noexcept {
 // results.
 //
 
-// TODO: Need to adjust this so that things like A B C D do not pass as 4 composed expressions.
-//  Simply we require a minimum of 1 Unary or Binary expression for it to be a ComposedExpr. Could
-//  be simply replacing the while loops with a do-while loop.
-
 namespace {
 
 constexpr tk::TokenKind op_unary_operators[]{tk::Plus, tk::Minus, tk::Not, tk::ExclamationMark};
@@ -128,17 +124,18 @@ Operator get_binary_op_kind(const Token& tok) noexcept {
     return Operator::Unknown;
 }
 
-bool match_expr(Matcher& matcher);
-bool match_term(Matcher& matcher);
-bool match_factor(Matcher& matcher);
+bool match_expr(Matcher& matcher, bool& has_any_op);
+bool match_term(Matcher& matcher, bool& has_any_op);
+bool match_factor(Matcher& matcher, bool& has_any_op);
 
-bool match_expr(Matcher& matcher) {
-    if (!match_term(matcher)) {
+bool match_expr(Matcher& matcher, bool& has_any_op) {
+    if (!match_term(matcher, has_any_op)) {
         return false;
     }
 
     while (matcher.any_real(op_low_precedence)) {
-        if (!match_term(matcher)) {
+        has_any_op = true;
+        if (!match_term(matcher, has_any_op)) {
             return false;
         }
     }
@@ -146,13 +143,14 @@ bool match_expr(Matcher& matcher) {
     return true;
 }
 
-bool match_term(Matcher& matcher) {
-    if (!match_factor(matcher)) {
+bool match_term(Matcher& matcher, bool& has_any_op) {
+    if (!match_factor(matcher, has_any_op)) {
         return false;
     }
 
     while (matcher.any_real(op_high_precedence)) {
-        if (!match_factor(matcher)) {
+        has_any_op = true;
+        if (!match_factor(matcher, has_any_op)) {
             return false;
         }
     }
@@ -160,27 +158,35 @@ bool match_term(Matcher& matcher) {
     return true;
 }
 
-bool match_factor(Matcher& matcher) {
+bool match_factor(Matcher& matcher, bool& has_any_op) {
     if (LiteralExpr::matches(matcher) || PropertyDotIdentifier::matches(matcher)
         || MetaVarExpr::matches(matcher)) {
         return true;
     }
 
-    // sub expression
     if (matcher.maybe_real(tk::LeftParen)) {
-        if (!match_expr(matcher)) {
+        if (!match_expr(matcher, has_any_op)) {
             return false;
         }
         return matcher.maybe_real(tk::RightParen);
     }
 
-    return matcher.any_real(op_unary_operators);
+    if (matcher.any_real(op_unary_operators)) {
+        has_any_op = true;
+        return true;
+    }
+
+    return false;
 }
 
 }  // namespace
 
 bool ComposedExpr::matches(Matcher& matcher) noexcept {
-    return match_expr(matcher);
+    // Extra check here to prevent single identifier/number tokens from parsing as composed
+    // expressions i.e., "set foo baz 1" should have a LiteralExpr not a ComposedExpr(LiteralExpr)
+    // this also allows unquoted string literals to work since those literals have the lowest priority.
+    bool has_any_op = false;
+    return match_expr(matcher, has_any_op) && has_any_op;
 }
 
 std::unique_ptr<ComposedExpr> ComposedExpr::create(Parser& parser) {

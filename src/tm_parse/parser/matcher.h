@@ -70,6 +70,7 @@ class Matcher {
     Token maybe_real(tk::TokenKind kind) noexcept;
     Token any(std::span<const tk::TokenKind> kinds) noexcept;
     Token any_real(std::span<const tk::TokenKind> kinds) noexcept;
+    Token not_any(std::span<const tk::TokenKind> kinds) noexcept;
     Token require(tk::TokenKind kind);
     Token require_real(tk::TokenKind kind);
 };

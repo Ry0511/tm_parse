@@ -13,8 +13,7 @@ expected_parse_content = {
       AssignmentExpr["A = 1"]
         PropertyAccess["A"]
           PropertyDotIdentifier["A"]
-        ComposedExpr["1"]
-          LiteralExpr["1"]
+        LiteralExpr["1"]
   )
 
   ModDefinition = (
@@ -22,14 +21,12 @@ expected_parse_content = {
       AssignmentExpr["A = 1"]
         PropertyAccess["A"]
           PropertyDotIdentifier["A"]
-        ComposedExpr["1"]
-          LiteralExpr["1"]
+        LiteralExpr["1"]
 
       AssignmentExpr["B = 2"]
         PropertyAccess["B"]
           PropertyDotIdentifier["B"]
-        ComposedExpr["2"]
-          LiteralExpr["2"]
+        LiteralExpr["2"]
   )
 
   ModDefinition = (
@@ -37,8 +34,7 @@ expected_parse_content = {
       AssignmentExpr["A = 1"]
         PropertyAccess["A"]
           PropertyDotIdentifier["A"]
-        ComposedExpr["1"]
-          LiteralExpr["1"]
+        LiteralExpr["1"]
   )
 
 }

@@ -17,7 +17,7 @@ class ObjectDefinition : public ParserRule {
     str m_ClassName;
     str m_ObjectName;
     std::vector<std::unique_ptr<ObjectDefinition>> m_ChildObjects;
-    std::vector<std::unique_ptr<AssignmentExpr>> m_PropertyWrites;
+    std::vector<std::unique_ptr<AssignmentExpr>> m_PropertyWrites; // TODO: bad name
 
    public:
     ObjectDefinition() = default;

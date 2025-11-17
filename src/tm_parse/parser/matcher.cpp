@@ -164,6 +164,20 @@ Token Matcher::any_real(std::span<const tk::TokenKind> kinds) noexcept {
     return Token{tk::InvalidToken};
 }
 
+Token Matcher::not_any(std::span<const tk::TokenKind> kinds) noexcept {
+    size_t pos = m_Position;
+    Token tk = next();
+
+    for (const auto& kind : kinds) {
+        if (tk == kind) {
+            return tk;
+        }
+    }
+
+    m_Position = pos;
+    return Token{tk::InvalidToken};
+}
+
 Token Matcher::require(tk::TokenKind kind) {
     size_t pos = m_Position;
     Token tk = next();

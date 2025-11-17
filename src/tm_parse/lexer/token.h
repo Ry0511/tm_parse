@@ -20,8 +20,8 @@ struct Token {
    public:
     tk::TokenKind Kind;
     TextRegion Region;
-    int Line{-1};
-    int Column{-1};
+    uint16_t Column{std::numeric_limits<uint16_t>::max()};
+    uint16_t Line{std::numeric_limits<uint16_t>::max()};
     const str_char* Text{nullptr};
 
    public:
@@ -106,6 +106,19 @@ struct Token {
     }
     constexpr bool is_keyword() const noexcept { return tm_parse::is_keyword(Kind); }
     constexpr bool is_symbol() const noexcept { return tm_parse::is_symbol(Kind); }
+
+   public:
+    constexpr bool is_one_of(const std::span<const tk::TokenKind>& kinds) const noexcept {
+        return std::ranges::any_of(kinds, [this](const tk::TokenKind kind) {
+            return Kind == kind;
+        });
+    }
+
+    constexpr bool is_none_of(const std::span<const tk::TokenKind>& kinds) const noexcept {
+        return std::ranges::none_of(kinds, [this](const tk::TokenKind kind) {
+            return Kind == kind;
+        });
+    }
 
    public:
     constexpr bool operator==(tk::TokenKind kind) const noexcept {

@@ -12,6 +12,12 @@
 
 namespace tm_parse::rules {
 
+// TODO: Think this rule can be removed as it does not have any real usages. It also conflicts with
+//  ComposedExpr which creates this ambiguity when both are present:
+//    > set foo baz (A + B) * 100
+//  This could parse as a SetCommand(ParenExpr(ComposedExpr["A + B"])) instead of SetCommand(ComposedExpr["(A + B) * 100"])
+//
+
 ParenExpr::~ParenExpr() = default;
 ParenExpr::ParenExpr(ParenExpr&&) noexcept = default;
 ParenExpr& ParenExpr::operator=(ParenExpr&&) noexcept = default;
@@ -28,7 +34,7 @@ void ParenExpr::cascade_assign_parents(ParserRule* parent) noexcept {
 
 bool ParenExpr::matches(Matcher& matcher) noexcept {
     if (matcher.maybe_real(tk::LeftParen)) {
-        return safe_expressions{}.matches(matcher) && matcher.maybe_real(tk::RightParen);
+        return paren_expr_types{}.matches(matcher) && matcher.maybe_real(tk::RightParen);
     }
     return false;
 }
@@ -37,7 +43,7 @@ std::unique_ptr<ParenExpr> ParenExpr::create(Parser& parser) {
     auto ptr = std::make_unique<ParenExpr>();
 
     Token first = parser.require_real(tk::LeftParen);
-    ptr->m_Inner = safe_expressions{}.create(parser);
+    ptr->m_Inner = paren_expr_types{}.create(parser);
     Token last = parser.require_real(tk::RightParen);
 
     ptr->post_init(first, last);

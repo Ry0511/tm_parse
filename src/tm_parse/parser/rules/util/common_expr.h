@@ -22,47 +22,46 @@ namespace tm_parse::rules {
 
 // clang-format off
 
+// All expressions in order of precedence.
 using all_expressions = ExprTypeList<
     MetaVarExpr,
-    ParenExpr,
+    ComposedExpr,
     AssignmentExprList,
     AssignmentExpr,
-    ComposedExpr,
     LiteralExpr,
     UnquotedStrLiteral
 >;
 
-using safe_expressions = ExprTypeList<
+// All expressions in order of precedence.
+using paren_expr_types = ExprTypeList<
     MetaVarExpr,
-    ParenExpr,
     AssignmentExprList,
     AssignmentExpr,
-    ComposedExpr,
     LiteralExpr
 >;
 
+//
 // What is allowed on the right hand side of an assignment
 // i.e.,
 //   A = EXPR
 //
 using assignment_expr_types = ExprTypeList<
     MetaVarExpr,
-    ParenExpr,
-    AssignmentExprList,
     ComposedExpr,
+    AssignmentExprList,
     LiteralExpr,
     UnquotedStrLiteral
 >;
 
+//
 // What is allowed on the right hand side of an assignment inside of an expression list?
 // i.e.,
 //   ( A = EXPR, B = EXPR )
 //
 using assignment_expr_list_types = ExprTypeList<
     MetaVarExpr,
-    ParenExpr,
-    AssignmentExprList,
     ComposedExpr,
+    AssignmentExprList,
     LiteralExpr
 >;
 
