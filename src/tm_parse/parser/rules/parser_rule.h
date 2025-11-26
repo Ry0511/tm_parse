@@ -74,6 +74,7 @@ class ParserRule {
     }
 
    public:
+    // TODO: The nature of const and non-const here is something to consider
     template <class T>
         requires std::is_base_of_v<ParserRule, T>
     const T* is() const noexcept {
@@ -152,7 +153,7 @@ template <class T> struct RuleAutoRegister { RuleAutoRegister() { RuleTestApi::a
 }  // namespace tests
 
 #define TM_PARSE_TEST_API(rule) \
-    inline static const ::tm_parse::tests::RuleAutoRegister<rule> RULE_REGISTER{}
+    inline static const ::tm_parse::tests::RuleAutoRegister<rule> RULE_REGISTER {}
 
 #else
 
@@ -176,8 +177,8 @@ template <class T> struct RuleAutoRegister { RuleAutoRegister() { RuleTestApi::a
 
 // TODO: All throughout the codebase it is assumed that Rule::matches(matcher) doesn't invalidate
 //  the matcher *on failure* however this isn't actually the case. Calls directly to the matcher
-//  function will/can invalidate the matcher. This creates a need for a matcher function that does not
-//  invalidate the matcher. It would be best to implement some way of matching a rule without
+//  function will/can invalidate the matcher. This creates a need for a matcher function that does
+//  not invalidate the matcher. It would be best to implement some way of matching a rule without
 //  directly invalidating the matcher because otherwise you need to manually restore the position
 //  after each failed match.
 //   > 05/11/2025 Partly implemented this, needs some more checking

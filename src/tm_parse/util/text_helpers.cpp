@@ -134,6 +134,50 @@ str escape_string(str_view in, bool flatten_whitespace) noexcept {
     return out;
 }
 
+str sanitise_string(str_view text) {
+    str out{};
+    out.reserve(text.size() * 2);
+    bool escape_sequence = false;
+
+    for (str_char c : text) {
+        // enable escape sequence start
+        if (c == TXT('\\')) {
+            escape_sequence = true;
+        }
+        // not escaping anything just put the literal char
+        else if (!escape_sequence) {
+            out.push_back(c);
+        }
+        // escape sequence; next character is special
+        else {
+            // Not exhaustive but should cover the common cases
+            // clang-format off
+            switch (c) {
+                case TXT('\\'): out.push_back(TXT('\\')); break;
+                case TXT('n'):  out.push_back(TXT('\n')); break;
+                case TXT('r'):  out.push_back(TXT('\r')); break;
+                case TXT('t'):  out.push_back(TXT('\t')); break;
+                case TXT('v'):  out.push_back(TXT('\v')); break;
+                case TXT('\b'): out.push_back(TXT('\b')); break;
+                case TXT('\0'): out.push_back(TXT('\0')); break;
+                case TXT('"'):
+                case TXT('\''): out.push_back(c); break;
+                default:
+                    throw std::logic_error(std::format("invalid escape sequence \\{} in '{}'", c, text));
+            }
+            // clang-format on
+            escape_sequence = false;
+        }
+    }
+
+    if (escape_sequence) {
+        throw std::logic_error(std::format("string has trailing escape sequence; {}", text));
+    }
+
+    out.shrink_to_fit();
+    return out;
+}
+
 std::optional<double> parse_double(str_view text) noexcept {
     return NumberParser<double>{}.parse(str{text});
 }

@@ -35,6 +35,7 @@ enum ParserRuleKind : parser_rule_kind_int {
     Expr,
     IdentifierRefExpr,
     LiteralExpr,
+    TupleExpr,
     LogInfoExpr,
     MetaVarExpr,
     ParenExpr,

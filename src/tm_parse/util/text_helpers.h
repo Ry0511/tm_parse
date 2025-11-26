@@ -26,6 +26,8 @@ bool equal_icase(str_view a, str_view b) noexcept;
 
 str escape_string(str_view str, bool flatten_whitespace = false) noexcept;
 
+str sanitise_string(str_view text);
+
 std::optional<double> parse_double(str_view str) noexcept;
 
 std::optional<int32_t> parse_int32(str_view text) noexcept;

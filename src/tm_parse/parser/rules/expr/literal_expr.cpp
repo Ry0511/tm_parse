@@ -29,7 +29,8 @@ std::unique_ptr<LiteralExpr> LiteralExpr::create(Parser& parser) {
             break;
 
         case tk::StringLiteral:
-            rule->m_Value = str{next.inner_text()};
+            // TODO: Don't want this to kill the parsing if it is invalid
+            rule->m_Value = txt::sanitise_string(next.inner_text());
             break;
 
         case tk::Number: {

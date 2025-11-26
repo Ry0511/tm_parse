@@ -207,7 +207,7 @@ std::any TestFile::read_expected_parse_content(Parser& parser) {
             if (parser.maybe(tk::LeftBracket)) {
                 Token text = parser.require_real(tk::StringLiteral);
                 parser.maybe(tk::RightBracket);
-                entry.VisitorTree.emplace_back(str{id.text()}, str{text.inner_text()});
+                entry.VisitorTree.emplace_back(str{id.text()}, text.literal_text());
             } else {
                 entry.VisitorTree.emplace_back(str{id.text()}, str{});
             }

@@ -10,11 +10,14 @@
 
 #include "tm_parse/lexer/token_type.h"
 #include "tm_parse/util/text_region.h"
+#include "tm_parse/util/text_helpers.h"
 
 namespace tm_parse {
 
 // TODO: There is a plan to replace str_char* Text with a custom TextSource* or Ref<TextSource> at
 //  somepoint so that a few guarantees can be made about the text.
+
+// TODO: This has gotten quite large so there is a need/ask for this to be split into .h/.cpp
 
 struct Token {
    public:
@@ -86,6 +89,13 @@ struct Token {
         }
 
         return text.substr(1, text.size() - 2);
+    }
+
+    str literal_text() const {
+        if (Kind != tk::StringLiteral) {
+            return str{text()};
+        }
+        return txt::sanitise_string(inner_text());
     }
 
    public:

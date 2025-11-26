@@ -15,6 +15,7 @@
 #include "tm_parse/parser/rules/expr/log_info_expr.h"
 #include "tm_parse/parser/rules/expr/meta_var_expr.h"
 #include "tm_parse/parser/rules/expr/paren_expr.h"
+#include "tm_parse/parser/rules/expr/tuple_expr.h"
 #include "tm_parse/parser/rules/expr/unquoted_str_literal.h"
 #include "tm_parse/parser/rules/expr_type_list.h"
 
@@ -33,6 +34,7 @@ using all_expressions = ExprTypeList<
 >;
 
 // All expressions in order of precedence.
+// TODO: Remove this and remove ParenExpr
 using paren_expr_types = ExprTypeList<
     MetaVarExpr,
     AssignmentExprList,
@@ -50,6 +52,7 @@ using assignment_expr_types = ExprTypeList<
     ComposedExpr,
     AssignmentExprList,
     LiteralExpr,
+    TupleExpr,
     UnquotedStrLiteral
 >;
 
@@ -62,6 +65,7 @@ using assignment_expr_list_types = ExprTypeList<
     MetaVarExpr,
     ComposedExpr,
     AssignmentExprList,
+    TupleExpr,
     LiteralExpr
 >;
 

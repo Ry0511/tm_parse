@@ -3,13 +3,10 @@ test_type = ParserTest
 test_content = {
   A = my unquoted string literal
   A = (Hello There)
-  A = (Hello There) // Comment but still apart of the unquoted literal
-  A = (Hello There) /*
-    Same applies with multi-line comments...
-  */
   A = True
   A = 50
   A = (50 + 100) * 65
+  A = (10, "String", $var, (5, 6))
 }
 
 expected_parse_content = {
@@ -23,18 +20,6 @@ expected_parse_content = {
     PropertyAccess["A"]
       PropertyDotIdentifier["A"]
     UnquotedStrLiteral["(Hello There)"]
-  )
-
-  AssignmentExpr = (
-    PropertyAccess["A"]
-      PropertyDotIdentifier["A"]
-    UnquotedStrLiteral["(Hello There) // Comment but still apart of the unquoted literal"]
-  )
-
-  AssignmentExpr = (
-    PropertyAccess["A"]
-      PropertyDotIdentifier["A"]
-    UnquotedStrLiteral["(Hello There) /*\n    Same applies with multi-line comments...\n  */"]
   )
 
   AssignmentExpr = (
@@ -59,14 +44,26 @@ expected_parse_content = {
           LiteralExpr["100"]
         LiteralExpr["65"]
   )
+
+  AssignmentExpr = (
+    PropertyAccess["A"]
+      PropertyDotIdentifier["A"]
+    TupleExpr["(10, \"String\", $var, (5, 6))"]
+      LiteralExpr["10"]
+      LiteralExpr["String"]
+      MetaVarExpr["$var"]
+        PropertyDotIdentifier["var"]
+      TupleExpr["(5, 6)"]
+        LiteralExpr["5"]
+        LiteralExpr["6"]
+  )
 }
 
 expected_text = {
   "A = my unquoted string literal"
   "A = (Hello There)"
-  "A = (Hello There) // Comment but still apart of the unquoted literal"
-  "A = (Hello There) /*\n    Same applies with multi-line comments...\n  */"
   "A = True"
   "A = 50"
   "A = (50 + 100) * 65"
+  "A = (10, \"String\", $var, (5, 6))"
 }

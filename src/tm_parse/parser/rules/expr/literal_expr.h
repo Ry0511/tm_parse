@@ -30,6 +30,11 @@ class LiteralExpr : public Expr {
    public:
     bool has_value() const noexcept { return !std::holds_alternative<std::monostate>(m_Value); }
 
+    template <class T>
+    const T* get_if() const {
+        return std::get_if<T>(&m_Value);
+    }
+
    public:
     RULE_STATIC_API(LiteralExpr);
 };

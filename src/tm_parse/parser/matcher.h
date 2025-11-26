@@ -53,6 +53,7 @@ class Matcher {
 
     template <class... T>
     bool matches_one_of() noexcept {
+        static_assert(sizeof...(T) > 0, "atleast 1 type is required");
         return (matches<T>() || ...);
     }
 
