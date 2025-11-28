@@ -86,17 +86,16 @@ const Token& Matcher::peek_real() const noexcept {
     return invalid_token_v;
 }
 
-Token Matcher::next() noexcept {
+const Token& Matcher::next() noexcept {
     if (position() >= m_Tokens.size()) {
-        return Token{};
+        return invalid_token_v;
     }
     return m_Tokens[m_Position++];
 }
 
-Token Matcher::next_real() noexcept {
-    Token tk{};
+const Token& Matcher::next_real() noexcept {
     do {
-        tk = this->next();
+        const Token& tk = this->next();
 
         switch (tk.Kind) {
             case tk::LineComment:
@@ -109,36 +108,36 @@ Token Matcher::next_real() noexcept {
 
     } while (!is_eof());
 
-    return Token{};
+    return invalid_token_v;
 }
 
-Token Matcher::maybe(tk::TokenKind kind) noexcept {
+const Token& Matcher::maybe(tk::TokenKind kind) noexcept {
     size_t pos = m_Position;
-    Token tk = next();
+    const Token& tk = next();
 
     if (tk == kind) {
         return tk;
     }
 
     m_Position = pos;
-    return Token{tk::InvalidToken};
+    return invalid_token_v;
 }
 
-Token Matcher::maybe_real(tk::TokenKind kind) noexcept {
+const Token& Matcher::maybe_real(tk::TokenKind kind) noexcept {
     size_t pos = m_Position;
-    Token tk = next_real();
+    const Token& tk = next_real();
 
     if (tk == kind) {
         return tk;
     }
 
     m_Position = pos;
-    return Token{tk::InvalidToken};
+    return invalid_token_v;
 }
 
-Token Matcher::any(std::span<const tk::TokenKind> kinds) noexcept {
+const Token& Matcher::any(const std::span<const tk::TokenKind>& kinds) noexcept {
     size_t pos = m_Position;
-    Token tk = next();
+    const Token& tk = next();
 
     for (const auto& kind : kinds) {
         if (tk == kind) {
@@ -147,12 +146,12 @@ Token Matcher::any(std::span<const tk::TokenKind> kinds) noexcept {
     }
 
     m_Position = pos;
-    return Token{tk::InvalidToken};
+    return invalid_token_v;
 }
 
-Token Matcher::any_real(std::span<const tk::TokenKind> kinds) noexcept {
+const Token& Matcher::any_real(const std::span<const tk::TokenKind>& kinds) noexcept {
     size_t pos = m_Position;
-    Token tk = next_real();
+    const Token& tk = next_real();
 
     for (const auto& kind : kinds) {
         if (tk == kind) {
@@ -161,12 +160,12 @@ Token Matcher::any_real(std::span<const tk::TokenKind> kinds) noexcept {
     }
 
     m_Position = pos;
-    return Token{tk::InvalidToken};
+    return invalid_token_v;
 }
 
-Token Matcher::not_any(std::span<const tk::TokenKind> kinds) noexcept {
+const Token& Matcher::not_any(const std::span<const tk::TokenKind>& kinds) noexcept {
     size_t pos = m_Position;
-    Token tk = next();
+    const Token& tk = next();
 
     for (const auto& kind : kinds) {
         if (tk == kind) {
@@ -175,12 +174,12 @@ Token Matcher::not_any(std::span<const tk::TokenKind> kinds) noexcept {
     }
 
     m_Position = pos;
-    return Token{tk::InvalidToken};
+    return invalid_token_v;
 }
 
-Token Matcher::require(tk::TokenKind kind) {
+const Token& Matcher::require(tk::TokenKind kind) {
     size_t pos = m_Position;
-    Token tk = next();
+    const Token& tk = next();
     if (tk != kind) {
         m_Position = pos;
         throw TokenError{std::format("expecting token {}", token_type_name(kind)), tk};
@@ -188,9 +187,9 @@ Token Matcher::require(tk::TokenKind kind) {
     return tk;
 }
 
-Token Matcher::require_real(tk::TokenKind kind) {
+const Token& Matcher::require_real(tk::TokenKind kind) {
     size_t pos = m_Position;
-    Token tk = next_real();
+    const Token& tk = next_real();
 
     if (tk != kind) {
         m_Position = pos;

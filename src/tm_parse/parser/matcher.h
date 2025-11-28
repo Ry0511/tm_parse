@@ -65,15 +65,15 @@ class Matcher {
    public:
     const Token& peek() const noexcept;
     const Token& peek_real() const noexcept;
-    Token next() noexcept;
-    Token next_real() noexcept;
-    Token maybe(tk::TokenKind kind) noexcept;
-    Token maybe_real(tk::TokenKind kind) noexcept;
-    Token any(std::span<const tk::TokenKind> kinds) noexcept;
-    Token any_real(std::span<const tk::TokenKind> kinds) noexcept;
-    Token not_any(std::span<const tk::TokenKind> kinds) noexcept;
-    Token require(tk::TokenKind kind);
-    Token require_real(tk::TokenKind kind);
+    const Token& next() noexcept;
+    const Token& next_real() noexcept;
+    const Token& maybe(tk::TokenKind kind) noexcept;
+    const Token& maybe_real(tk::TokenKind kind) noexcept;
+    const Token& any(const std::span<const tk::TokenKind>& kinds) noexcept;
+    const Token& any_real(const std::span<const tk::TokenKind>& kinds) noexcept;
+    const Token& not_any(const std::span<const tk::TokenKind>& kinds) noexcept;
+    const Token& require(tk::TokenKind kind);
+    const Token& require_real(tk::TokenKind kind);
 };
 
 }  // namespace tm_parse
