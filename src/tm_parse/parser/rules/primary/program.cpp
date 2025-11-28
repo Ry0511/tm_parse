@@ -37,6 +37,7 @@ bool ProgramRule::matches(Matcher& matcher) noexcept {
 std::unique_ptr<ProgramRule> ProgramRule::create(Parser& parser) {
     auto rule = std::make_unique<ProgramRule>();
     rule->m_ModDefinition = parser.create<ModDefinition>();
+    rule->m_ModDefinition->set_parent(*rule);
 
     while (!parser.is_eof()) {
         const Token& tok = parser.peek_real();

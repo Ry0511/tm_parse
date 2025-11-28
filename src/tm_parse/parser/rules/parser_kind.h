@@ -41,8 +41,11 @@ enum ParserRuleKind : parser_rule_kind_int {
     ParenExpr,
     UnquotedStrLiteral,
 
-    TokenRule, // potentially planned for removal
+    TokenRule,  // potentially planned for removal
     Unknown,
+    ENUM_COUNT,
 };
+
+constexpr parser_rule_kind_int parser_rule_kind_count{ParserRuleKind::ENUM_COUNT};
 
 }  // namespace tm_parse::rkind

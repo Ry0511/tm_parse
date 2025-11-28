@@ -30,6 +30,7 @@ using all_expressions = ExprTypeList<
     AssignmentExprList,
     AssignmentExpr,
     LiteralExpr,
+    TupleExpr,
     UnquotedStrLiteral
 >;
 

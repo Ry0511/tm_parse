@@ -32,6 +32,11 @@ enum class LogLevel : uint8_t {
 #define LOG_WARN(...) TM_PARSE_LOG(Warn, __VA_ARGS__)
 #define LOG_ERR(...) TM_PARSE_LOG(Err, __VA_ARGS__)
 
+using LogCallback = std::function<void(LogLevel, std::string_view, const std::source_location&)>;
+
+std::string_view get_log_level_name(LogLevel level, bool no_colour = false);
+
 void log(LogLevel level, std::string_view msg, const std::source_location& src);
+void add_log_callback(const LogCallback& callback);
 
 }  // namespace tm_parse::logging

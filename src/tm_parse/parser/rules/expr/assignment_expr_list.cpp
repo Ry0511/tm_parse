@@ -67,7 +67,8 @@ std::unique_ptr<AssignmentExprList> AssignmentExprList::create(Parser& parser) {
             expr->m_Property = PropertyAccess::create(parser);
             parser.require_real(tk::Equal);
             expr->m_Expr = assignment_expr_list_types{}.create(parser);
-            expr->set_parent(*rule);
+            // TODO: as seen manually setting the parent is bug prone
+            expr->cascade_assign_parents(rule.get());
             expr->post_init(*expr->m_Property, *expr->m_Expr);
 
             rule->m_Assignments.emplace_back(std::move(expr));
