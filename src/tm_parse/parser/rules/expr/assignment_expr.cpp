@@ -17,16 +17,26 @@ AssignmentExpr::AssignmentExpr(AssignmentExpr&&) noexcept = default;
 AssignmentExpr& AssignmentExpr::operator=(AssignmentExpr&&) noexcept = default;
 
 bool AssignmentExpr::matches(Matcher& matcher) noexcept {
-    return PropertyAccess::matches(matcher) && matcher.maybe_real(tk::Equal)
-           && assignment_expr_types{}.matches(matcher);
+    return matches_with_expr_list<assignment_expr_types>(matcher);
 }
 
 std::unique_ptr<AssignmentExpr> AssignmentExpr::create(Parser& parser) {
+    return create_with_expr_list<assignment_expr_types>(parser);
+}
+
+template <class ExprList>
+bool AssignmentExpr::matches_with_expr_list(Matcher& matcher) {
+    return PropertyAccess::matches(matcher) && matcher.maybe_real(tk::Equal)
+           && ExprList{}.matches(matcher);
+}
+
+template <class ExprList>
+std::unique_ptr<AssignmentExpr> AssignmentExpr::create_with_expr_list(Parser& parser) {
     auto rule = std::make_unique<AssignmentExpr>();
 
     rule->m_Property = PropertyAccess::create(parser);
     parser.require_real(tk::Equal);
-    rule->m_Expr = assignment_expr_types{}.create(parser);
+    rule->m_Expr = ExprList{}.create(parser);
 
     rule->post_init(*rule->m_Property, *rule->m_Expr);
     rule->m_Property->set_parent(*rule);

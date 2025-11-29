@@ -13,6 +13,17 @@ namespace tm_parse {
 
 class Parser;
 
+struct MatcherErrorInfo {
+    size_t PosIndex{0};             // Position of m_Position in Tokens
+    std::span<const Token> Tokens;  // Context tokens relative from m_Position
+
+    const Token& last_valid() const noexcept { return Tokens[PosIndex]; }
+    auto front() const noexcept { return Tokens.front(); }
+    auto back() const noexcept { return Tokens.back(); }
+    auto size() const noexcept { return Tokens.size(); }
+    auto empty() const noexcept { return Tokens.empty(); }
+};
+
 class Matcher {
    private:
     std::span<const Token> m_Tokens;
@@ -61,7 +72,10 @@ class Matcher {
     bool try_match(std::span<const tk::TokenKind> kinds) noexcept;
     bool try_match_real(std::span<const tk::TokenKind> kinds) noexcept;
 
-    // TODO: Should be possible to return Token as const ref
+   public:
+    MatcherErrorInfo get_context_range(size_t max_line_tokens = 8) noexcept;
+    str get_error_string(str_view expected) noexcept;
+
    public:
     const Token& peek() const noexcept;
     const Token& peek_real() const noexcept;
@@ -72,8 +86,8 @@ class Matcher {
     const Token& any(const std::span<const tk::TokenKind>& kinds) noexcept;
     const Token& any_real(const std::span<const tk::TokenKind>& kinds) noexcept;
     const Token& not_any(const std::span<const tk::TokenKind>& kinds) noexcept;
-    const Token& require(tk::TokenKind kind);
-    const Token& require_real(tk::TokenKind kind);
+    const Token& require(tk::TokenKind kind, const SrcLoc& src = SrcLoc::current());
+    const Token& require_real(tk::TokenKind kind, const SrcLoc& src = SrcLoc::current());
 };
 
 }  // namespace tm_parse

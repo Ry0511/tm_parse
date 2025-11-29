@@ -54,7 +54,7 @@ std::unique_ptr<ProgramRule> ProgramRule::create(Parser& parser) {
                 break;
             }
             default: {
-                throw TokenError{"unknown token in ProgramRule", tok};
+                throw TokenError{parser.get_error_string("Begin or Set"), tok};
             }
         }
     }

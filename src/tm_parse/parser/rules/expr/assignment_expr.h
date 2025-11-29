@@ -35,6 +35,12 @@ class AssignmentExpr : public Expr {
 
    public:
     RULE_STATIC_API(AssignmentExpr);
+
+    template <class ExprList>
+    static bool matches_with_expr_list(Matcher&);
+
+    template <class ExprList>
+    static std::unique_ptr<AssignmentExpr> create_with_expr_list(Parser&);
 };
 
 }  // namespace tm_parse::rules

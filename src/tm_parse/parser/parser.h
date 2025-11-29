@@ -14,6 +14,10 @@
 
 namespace tm_parse {
 
+// TODO: Need to revisit this Parser/Matcher stuff - ideally we would want context on the parse tree
+//  when it fails. Currently we have no way of knowing where it got to. This context would be
+//  required for informing of errors and potential fixes.
+
 class Parser : public Matcher {
    private:
     str m_Text;
@@ -33,6 +37,7 @@ class Parser : public Matcher {
    public:
     Matcher create_matcher() const noexcept { return Matcher{*this}; }
 
+   public:
     template <class T>
         requires std::is_base_of_v<ParserRule, T>
     std::unique_ptr<T> create() {

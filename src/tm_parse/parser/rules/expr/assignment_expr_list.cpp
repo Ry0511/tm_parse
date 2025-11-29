@@ -21,7 +21,7 @@ bool AssignmentExprList::matches(Matcher& matcher) noexcept {
         return false;
     }
 
-    if (!AssignmentExpr::matches(matcher)) {
+    if (!AssignmentExpr::matches_with_expr_list<assignment_expr_list_types>(matcher)) {
         return false;
     }
 
@@ -33,15 +33,7 @@ bool AssignmentExprList::matches(Matcher& matcher) noexcept {
             return true;
         }
 
-        if (!matcher.matches<PropertyAccess>()) {
-            return false;
-        }
-
-        if (!matcher.maybe_real(tk::Equal)) {
-            return false;
-        }
-
-        if (!assignment_expr_list_types{}.matches(matcher)) {
+        if (!AssignmentExpr::matches_with_expr_list<assignment_expr_list_types>(matcher)) {
             return false;
         }
     }
@@ -53,25 +45,17 @@ std::unique_ptr<AssignmentExprList> AssignmentExprList::create(Parser& parser) {
     auto rule = std::make_unique<AssignmentExprList>();
 
     Token first = parser.require_real(tk::LeftParen);
-    rule->m_Assignments.emplace_back(AssignmentExpr::create(parser));
-    rule->m_Assignments.front()->set_parent(*rule);
+    rule->m_Assignments
+        .emplace_back(AssignmentExpr::create_with_expr_list<assignment_expr_list_types>(parser))
+        ->set_parent(*rule);
 
     while (parser.maybe_real(tk::Comma)) {
         if (parser.peek_real() != tk::RightParen) {
-            auto expr = std::make_unique<AssignmentExpr>();
-
-            // Would prefer to use AssignmentExpr::create but we do not allow UnquotedStrLiteral
-            // inside expression lists.
-            // TODO: This initialisation logic is far from ideal and could be turned into a constructor.
-            //  This doesn't just apply here we can apply this to pretty much all rules.
-            expr->m_Property = PropertyAccess::create(parser);
-            parser.require_real(tk::Equal);
-            expr->m_Expr = assignment_expr_list_types{}.create(parser);
-            // TODO: as seen manually setting the parent is bug prone
-            expr->cascade_assign_parents(rule.get());
+            auto& expr = rule->m_Assignments.emplace_back(
+                AssignmentExpr::create_with_expr_list<assignment_expr_list_types>(parser)
+            );
+            expr->set_parent(*rule);
             expr->post_init(*expr->m_Property, *expr->m_Expr);
-
-            rule->m_Assignments.emplace_back(std::move(expr));
         }
     }
 

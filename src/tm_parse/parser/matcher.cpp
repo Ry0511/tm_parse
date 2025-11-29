@@ -61,6 +61,82 @@ bool Matcher::try_match_real(std::span<const tk::TokenKind> kinds) noexcept {
     return true;
 }
 
+MatcherErrorInfo Matcher::get_context_range(size_t max_line_tokens) noexcept {
+    size_t begin = std::min(m_Position, m_Tokens.size() - 1);
+    size_t end = begin;
+    size_t count = max_line_tokens;
+
+    // Move 'begin' back N lines or to the start of the input
+    while (count > 0 && begin > 0) {
+        if (m_Tokens[begin] == tk::BlankLine) {
+            --count;
+            if (count <= 0) {
+                break;
+            }
+        }
+        --begin;
+    }
+
+    // m_Position inside the token range; effectively the last 'valid' token
+    size_t last_valid = (end == begin) ? 0 : ((end - begin) - 1);
+
+    // Move 'end' to the end of the line or end of input
+    while (end < m_Tokens.size() && m_Tokens[end] != tk::BlankLine) {
+        ++end;
+    }
+
+    return MatcherErrorInfo{last_valid, m_Tokens.subspan(begin, end - begin)};
+}
+
+str Matcher::get_error_string(str_view expected) noexcept {
+    const auto info = get_context_range();
+    str_stream ss{};
+
+    if (info.empty()) {
+        ss << TXT("Expected ") << expected;
+        if (m_Tokens.empty()) {
+            ss << TXT(" but the stream was empty");
+        } else {
+            const Token& next = peek_real();
+            ss << TXT(" but got ") << next.token_name();
+        }
+        return ss.str();
+    }
+
+    const Token& last_valid = info.last_valid();
+    const Token& first = info.front();
+    const Token& last = info.back();
+    TextRegion region = first.Region.extend(last.Region);
+
+    if (last_valid.is_eof()) {
+        ss << TXT("Expected ") << expected << TXT(" but got EndOfInput");
+        return ss.str();
+    }
+
+    ss << TXT('\n');
+
+    // Build the content string
+    constexpr str_view indent = TXT(" * ");
+    str_stream content{region.create_str(first.Text)};
+    str line{};
+    while (std::getline(content, line)) {
+        if (line.empty() || line.find_first_not_of(TXT(' ')) > line.length()) {
+            continue;
+        }
+        ss << indent << line << TXT('\n');
+    }
+
+    // Position indicator
+    auto len = last_valid.Region.length();
+    if (len > 0) {
+        auto column = static_cast<size_t>(last_valid.Column) - 1;
+        ss << str(column + indent.size(), TXT(' ')) << str(len, TXT('^')) << TXT('\n');
+    }
+
+    ss << std::format("Expected {} after {}", expected, last_valid.text());
+    return ss.str();
+}
+
 const Token& Matcher::peek() const noexcept {
     if (position() >= m_Tokens.size()) {
         return invalid_token_v;
@@ -177,23 +253,23 @@ const Token& Matcher::not_any(const std::span<const tk::TokenKind>& kinds) noexc
     return invalid_token_v;
 }
 
-const Token& Matcher::require(tk::TokenKind kind) {
+const Token& Matcher::require(tk::TokenKind kind, const SrcLoc& src) {
     size_t pos = m_Position;
     const Token& tk = next();
     if (tk != kind) {
         m_Position = pos;
-        throw TokenError{std::format("expecting token {}", token_type_name(kind)), tk};
+        throw TokenError{get_error_string(token_type_name(kind)), tk, src};
     }
     return tk;
 }
 
-const Token& Matcher::require_real(tk::TokenKind kind) {
+const Token& Matcher::require_real(tk::TokenKind kind, const SrcLoc& src) {
     size_t pos = m_Position;
     const Token& tk = next_real();
 
     if (tk != kind) {
         m_Position = pos;
-        throw TokenError{std::format("expecting token {}", token_type_name(kind)), tk};
+        throw TokenError{get_error_string(token_type_name(kind)), tk, src};
     }
 
     return tk;

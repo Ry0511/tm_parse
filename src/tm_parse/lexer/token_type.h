@@ -140,6 +140,7 @@ constexpr std::array<std::string_view, token_type_count + 1> token_type_names{
     "BlankLine",
     "EndOfInput",
     "InvalidToken",
+    "AnyIdentifier",
     "TokenKind_Count",
 };
 

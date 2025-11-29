@@ -56,6 +56,8 @@ set $pc baz (
   )
 )
 
+set $foo $baz
+
 )";
 
 float parse_timeout = 0.0F;
@@ -81,7 +83,7 @@ ImVec4 get_colour_log_level(LogLevel level);
 }  // namespace
 
 int main() {
-    add_log_callback([](LogLevel level, std::string_view msg, const std::source_location&) -> void {
+    add_log_callback([](LogLevel level, std::string_view msg, const SrcLoc&) -> void {
         bool has_space = (log_messages.size() + 1) < max_log_messages;
 
         if (!has_space && auto_clear) {
@@ -367,11 +369,7 @@ void draw_log_view(void) {
         }
     }
 
-    if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) {
-        ImGui::SetScrollHereY(1.0F);
-    }
     ImGui::EndChild();
-
     ImGui::End();
 }
 

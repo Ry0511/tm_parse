@@ -10,7 +10,7 @@
 
 namespace tm_parse {
 
-TokenError::TokenError(const Token& token, const std::source_location& loc)
+TokenError::TokenError(const Token& token, const SrcLoc& loc)
     : std::runtime_error(""),
       m_Token(token),
       m_SourceLocation(loc) {}
@@ -18,7 +18,7 @@ TokenError::TokenError(const Token& token, const std::source_location& loc)
 TokenError::TokenError(
     const std::string& msg,
     const Token& token,
-    const std::source_location& loc
+    const SrcLoc& loc
 )
     : std::runtime_error(msg),
       m_Token(token),
