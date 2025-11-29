@@ -48,7 +48,7 @@ std::unique_ptr<ArrayAccess> ArrayAccess::create(Parser& parser) {
     Token last = first;
 
     if (first != tk::LeftParen && first != tk::LeftBracket) {
-        throw TokenError{"expecting LeftParen or LeftBracket", first};
+        throw TokenError{"expecting ( or [", first};
     }
 
     size_t i = 0;
