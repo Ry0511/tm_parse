@@ -14,12 +14,9 @@ namespace tm_parse {
 
 Matcher::Matcher() noexcept = default;
 
-Matcher::Matcher(const Parser& parser) noexcept
-    : m_Tokens(parser.m_Tokens),
-      m_Position(parser.position()) {}
-
 Matcher::Matcher(Parser& parser) noexcept
-    : m_Tokens(parser.m_Tokens),
+    : m_Parser(&parser),
+      m_Tokens(parser.m_Tokens),
       m_Position(parser.position()) {}
 
 Matcher::Matcher(std::span<const Token> tokens, size_t pos) noexcept
@@ -129,7 +126,7 @@ str Matcher::get_error_string(str_view expected) noexcept {
     // Position indicator
     auto len = last_valid.Region.length();
     if (len > 0) {
-        auto column = static_cast<size_t>(last_valid.Column) - 1;
+        auto column = static_cast<size_t>(last_valid.Column);
         ss << str(column + indent.size(), TXT(' ')) << str(len, TXT('^')) << TXT('\n');
     }
 
@@ -245,12 +242,12 @@ const Token& Matcher::not_any(const std::span<const tk::TokenKind>& kinds) noexc
 
     for (const auto& kind : kinds) {
         if (tk == kind) {
-            return tk;
+            m_Position = pos;
+            return invalid_token_v;
         }
     }
 
-    m_Position = pos;
-    return invalid_token_v;
+    return tk;
 }
 
 const Token& Matcher::require(tk::TokenKind kind, const SrcLoc& src) {
@@ -273,6 +270,20 @@ const Token& Matcher::require_real(tk::TokenKind kind, const SrcLoc& src) {
     }
 
     return tk;
+}
+
+const Token& Matcher::require_any(const std::span<const tk::TokenKind>& kinds, const SrcLoc& src) {
+    size_t pos = m_Position;
+    const Token& tk = next();
+
+    for (const auto& kind : kinds) {
+        if (tk == kind) {
+            return tk;
+        }
+    }
+
+    m_Position = pos;
+    throw TokenError{get_error_string(create_str_from_kinds(kinds)), tk, src};
 }
 
 }  // namespace tm_parse

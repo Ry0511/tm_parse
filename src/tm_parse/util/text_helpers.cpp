@@ -48,7 +48,8 @@ struct NumberParser {
             else if constexpr (std::is_same_v<T, double>) {
                 return static_cast<T>(std::stod(text));
             }
-        } catch (const std::logic_error&) {
+        } catch (const std::logic_error& error) {
+            LOG_WARN("Error parsing number from '{}' ~ {}", text, error.what());
             return std::nullopt;
         }
     }

@@ -18,10 +18,15 @@ namespace tm_parse {
 //  when it fails. Currently we have no way of knowing where it got to. This context would be
 //  required for informing of errors and potential fixes.
 
+struct ParseStateInfo {
+    bool AllowUnquotedStrings{true};
+};
+
 class Parser : public Matcher {
    private:
     str m_Text;
     std::vector<Token> m_Tokens;
+    ParseStateInfo m_ParseStateInfo;
 
    public:
     explicit Parser(str text);
@@ -33,9 +38,10 @@ class Parser : public Matcher {
 
    public:
     str_view text() const noexcept { return m_Text; }
+    ParseStateInfo& parse_state() noexcept { return m_ParseStateInfo; }
 
    public:
-    Matcher create_matcher() const noexcept { return Matcher{*this}; }
+    Matcher create_matcher() noexcept { return Matcher{*this}; }
 
    public:
     template <class T>
@@ -54,7 +60,7 @@ class Parser : public Matcher {
         }
 
         if constexpr (sizeof...(Tail) == 0) {
-            throw std::runtime_error{"no rule could be created as none matched"};
+            throw std::runtime_error{std::format("{}", get_error_string("something"))};
         } else {
             return create_one_of<Tail...>();
         }

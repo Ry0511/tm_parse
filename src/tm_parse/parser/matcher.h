@@ -26,13 +26,13 @@ struct MatcherErrorInfo {
 
 class Matcher {
    private:
+    Parser* m_Parser{nullptr};
     std::span<const Token> m_Tokens;
     size_t m_Position{0};
 
    public:
     explicit Matcher() noexcept;
     explicit Matcher(Parser& parser) noexcept;
-    explicit Matcher(const Parser& parser) noexcept;
     explicit Matcher(std::span<const Token> parser, size_t pos = 0) noexcept;
     ~Matcher() noexcept = default;
 
@@ -42,6 +42,7 @@ class Matcher {
 
     size_t position() const noexcept { return m_Position; }
     void set_position(size_t position) noexcept { m_Position = position; }
+    Parser* parser() noexcept { return m_Parser; }
 
    public:
     explicit Matcher(const Matcher&) = default;
@@ -88,6 +89,10 @@ class Matcher {
     const Token& not_any(const std::span<const tk::TokenKind>& kinds) noexcept;
     const Token& require(tk::TokenKind kind, const SrcLoc& src = SrcLoc::current());
     const Token& require_real(tk::TokenKind kind, const SrcLoc& src = SrcLoc::current());
+    const Token& require_any(const std::span<const tk::TokenKind>& kinds, const SrcLoc& src = SrcLoc::current());
+
+   private:
+    friend Parser;
 };
 
 }  // namespace tm_parse

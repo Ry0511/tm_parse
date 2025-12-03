@@ -70,6 +70,12 @@ using assignment_expr_list_types = ExprTypeList<
     LiteralExpr
 >;
 
+using variable_expr_types = ExprTypeList<
+    ComposedExpr,
+    LiteralExpr,
+    UnquotedStrLiteral
+>;
+
 // TODO: Not sure if this is the most appropriate solution
 template bool AssignmentExpr::matches_with_expr_list<assignment_expr_types>(Matcher&);
 template bool AssignmentExpr::matches_with_expr_list<assignment_expr_list_types>(Matcher&);

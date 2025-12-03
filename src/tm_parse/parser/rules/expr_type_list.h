@@ -13,6 +13,8 @@
 
 namespace tm_parse {
 
+// TODO: This isn't fixed to just Expressions its any list of rules
+
 template <class... Rules>
     requires(sizeof...(Rules) > 0 && (std::derived_from<Rules, ParserRule> && ...))
 struct ExprTypeList {

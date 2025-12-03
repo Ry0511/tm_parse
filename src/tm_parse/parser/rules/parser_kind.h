@@ -40,8 +40,11 @@ enum ParserRuleKind : parser_rule_kind_int {
     MetaVarExpr,
     ParenExpr,
     UnquotedStrLiteral,
+    VariableExpr,
 
-    TokenRule,  // potentially planned for removal
+    PragmaToggle,
+
+    TokenRule,  // planned for removal
     Unknown,
     ENUM_COUNT,
 };

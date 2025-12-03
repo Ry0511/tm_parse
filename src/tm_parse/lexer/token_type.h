@@ -35,6 +35,11 @@ enum TokenKind : token_kind_int {
     Not,                    // Not
     And,                    // And
     Or,                     // Or
+    Pragma,                 // pragma
+    Toggle,                 // toggle
+    Enable,                 // enable
+    Disable,                // disable
+    Let,                    // let
     Keyword_Count,          // Count of keywords
     LeftParen,              // (
     RightParen,             // )
@@ -107,6 +112,11 @@ constexpr std::array<std::string_view, token_type_count + 1> token_type_names{
     "Not",
     "And",
     "Or",
+    "pragma",
+    "toggle",
+    "enable",
+    "disable",
+    "let",
     "Keyword_Count",
 
     "LeftParen",
@@ -173,6 +183,17 @@ constexpr tk::TokenKind str_to_token_kind(std::string_view text) {
         }
     }
     throw std::runtime_error{std::format("unknown token kind {}", std::string{text}).c_str()};
+}
+
+inline std::string create_str_from_kinds(const std::span<const tk::TokenKind>& kinds) {
+    std::stringstream ss{};
+    for (auto it = kinds.begin(); it != kinds.end(); ++it) {
+        ss << token_type_name(*it);
+        if (it + 1 != kinds.end()) {
+            ss << ", ";
+        }
+    }
+    return ss.str();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
