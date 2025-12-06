@@ -21,8 +21,8 @@ namespace tm_parse {
 
 struct Token {
    public:
-    tk::TokenKind Kind;
     TextRegion Region;
+    tk::TokenKind Kind;
     uint16_t Column{std::numeric_limits<uint16_t>::max()};
     uint16_t Line{std::numeric_limits<uint16_t>::max()};
     const str_char* Text{nullptr};

@@ -16,7 +16,7 @@ namespace {
 
 std::vector<Token> read_all_tokens(str_view text) {
     std::vector<Token> tokens{};
-    tokens.reserve(512);
+    tokens.reserve(1024);
     Lexer lexer{text};
 
     do {

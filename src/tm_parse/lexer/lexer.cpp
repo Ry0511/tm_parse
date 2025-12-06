@@ -103,7 +103,10 @@ Token Lexer::create_token(tk::TokenKind kind) {
 
     return Token{
         kind,
-        TextRegion{m_Start, m_Pos},
+        TextRegion{
+                   static_cast<text_region_int>(m_Start),
+                   static_cast<text_region_int>(m_Pos)
+        },
         m_Line,
         static_cast<int>(static_cast<size_t>(m_Column) - (m_Pos - m_Start)),
         m_Text.data(),

@@ -77,7 +77,7 @@ namespace tm_parse {
 // NOLINTNEXTLINE
 namespace fs = std::filesystem;
 
-constexpr size_t invalid_index_v = std::numeric_limits<size_t>::max();
+constexpr uint32_t invalid_index_v = std::numeric_limits<uint32_t>::max();
 
 // text
 using str_char = char;

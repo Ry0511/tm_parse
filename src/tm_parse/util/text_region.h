@@ -10,34 +10,46 @@
 
 namespace tm_parse {
 
+using text_region_int = uint32_t;
+
 struct TextRegion {
-    size_t Start;
-    size_t End;
+    text_region_int Start;
+    text_region_int End;
 
     constexpr TextRegion() noexcept
         : Start(invalid_index_v), End(invalid_index_v) {}
-    constexpr TextRegion(size_t start, size_t end) noexcept
+
+    constexpr TextRegion(text_region_int start, text_region_int end) noexcept
         : Start(start), End(end) {}
 
-    size_t length() const noexcept { return End - Start; }
-    bool is_empty() const noexcept { return Start == End; }
+    constexpr text_region_int length() const noexcept { return End - Start; }
+    constexpr bool is_empty() const noexcept { return Start == End; }
 
-    str_view create_str_view(const str_char* txt) const noexcept {
+    constexpr str_view create_str_view(const str_char* txt) const noexcept {
         return str_view{txt + Start, length()};
     }
 
-    str_view create_str_view(str_view vw) const noexcept { return vw.substr(Start, length()); }
-    str create_str(str_view vw) const noexcept { return str{vw.substr(Start, length())}; }
+    constexpr str_view create_str_view(str_view vw) const noexcept { return vw.substr(Start, length()); }
+    constexpr str create_str(str_view vw) const noexcept { return str{vw.substr(Start, length())}; }
 
-    TextRegion extend(const TextRegion& o) const noexcept {
-        return TextRegion{std::min(Start, o.Start), std::max(End, o.End)};
+    constexpr TextRegion extend(const TextRegion& other) const noexcept {
+        return TextRegion{
+            std::min(Start, other.Start),
+            std::max(End, other.End)
+        };
     }
-    bool operator==(const TextRegion& other) const noexcept {
-        return Start == other.Start && End == other.End;
-    }
-    bool operator!=(const TextRegion& other) const noexcept { return !(*this == other); }
 
-    operator bool() const noexcept { return operator==(TextRegion{}); }
+    constexpr bool operator==(const TextRegion& other) const noexcept {
+        return (Start == other.Start) && (End == other.End);
+    }
+
+    constexpr bool operator!=(const TextRegion& other) const noexcept {
+        return this->operator==(other);
+    }
+
+    constexpr operator bool() const noexcept {
+        return this->operator!=(TextRegion{invalid_index_v, invalid_index_v});
+    }
 };
 
 }  // namespace tm_parse
