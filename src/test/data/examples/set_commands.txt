@@ -1,0 +1,32 @@
+create_mod = (
+  name = "Set Commands",
+  description = "Example set commands",
+  author = "Author 1",
+  version = "1.0",
+)
+
+pragma disable unquotedliterals
+
+set foo baz 12345
+set foo baz "Hello World"
+set foo baz True
+set foo baz False
+set foo baz None
+set foo baz A * B / C + D - E
+set foo baz (A * (B / C + D - E))
+
+set $foo a(0).b[1][2].c(3)[4] 12345
+set $foo a(0).b[1][2].c(3)[4] "Hello World"
+set $foo a(0).b[1][2].c(3)[4] True
+set $foo a(0).b[1][2].c(3)[4] False
+set $foo a(0).b[1][2].c(3)[4] None
+set $foo a(0).b[1][2].c(3)[4] A * B / C + D - E
+set $foo a(0).b[1][2].c(3)[4] (A * (B / C + D - E))
+
+pragma enable unquotedliterals
+
+set foo baz A B C D E F
+set foo baz ABCDEF
+
+set foo baz(4)[3](2)[1] A B C D E F
+set foo baz(4)[3](2)[1] ABCDEF

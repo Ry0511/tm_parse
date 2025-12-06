@@ -1,0 +1,6 @@
+create_mod = (
+  name = "Mod Name",
+  description = "The mod description",
+  authors = ("Author 1", "Author 2", "Author 3"),
+  version = "1.0",
+)
