@@ -1,9 +1,7 @@
----
 Language: Cpp
 BasedOnStyle: Chromium
 
 BinPackArguments: false
-BinPackParameters: OnePerLine
 BreakInheritanceList: BeforeColon
 BreakBeforeBinaryOperators: All
 PackConstructorInitializers: CurrentLine
@@ -18,6 +16,4 @@ AllowShortBlocksOnASingleLine: Empty
 ColumnLimit: 0
 IndentWidth: 4
 InsertBraces: true
-SortIncludes:
-  Enabled: false
----
+SortIncludes: false
