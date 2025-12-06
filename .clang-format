@@ -5,6 +5,7 @@ BasedOnStyle: Chromium
 BinPackArguments: false
 BinPackParameters: OnePerLine
 BreakInheritanceList: BeforeColon
+BreakBeforeBinaryOperators: All
 PackConstructorInitializers: CurrentLine
 AlignArrayOfStructures: Right
 LambdaBodyIndentation: Signature
@@ -14,13 +15,9 @@ AllowAllArgumentsOnNextLine: false
 AllowAllParametersOfDeclarationOnNextLine: false
 
 AllowShortBlocksOnASingleLine: Empty
-BreakBeforeBinaryOperators: NonAssignment
-ColumnLimit: 100
+ColumnLimit: 0
 IndentWidth: 4
 InsertBraces: true
-SortIncludes: CaseInsensitive
-IncludeCategories:
-  - Regex: '".*pch\.h"'
-    Priority: -1
-    CaseSensitive: true
+SortIncludes:
+  Enabled: false
 ---
