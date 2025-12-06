@@ -11,17 +11,17 @@
 namespace tm_parse::rules {
 
 class AssignmentExpr;
+class ObjectDotIdentifier;
 
 class ObjectDefinition : public ParserRule {
    private:
-    str m_ClassName;
-    str m_ObjectName;
-    std::vector<std::unique_ptr<ObjectDefinition>> m_ChildObjects;
-    std::vector<std::unique_ptr<AssignmentExpr>> m_PropertyWrites; // TODO: bad name
+    std::unique_ptr<ObjectDotIdentifier> m_ClassName;
+    std::unique_ptr<ObjectDotIdentifier> m_ObjectName;
+    std::vector<std::unique_ptr<ParserRule>> m_ChildRules;
 
    public:
-    ObjectDefinition() = default;
-    ~ObjectDefinition() override;
+    ObjectDefinition() noexcept;
+    ~ObjectDefinition() noexcept override;
 
    public:
     ObjectDefinition(const ObjectDefinition&) = delete;

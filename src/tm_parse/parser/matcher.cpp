@@ -272,9 +272,29 @@ const Token& Matcher::require_real(tk::TokenKind kind, const SrcLoc& src) {
     return tk;
 }
 
-const Token& Matcher::require_any(const std::span<const tk::TokenKind>& kinds, const SrcLoc& src) {
+const Token& Matcher::require_any(
+    const std::span<const tk::TokenKind>& kinds,
+    const SrcLoc& src
+) {
     size_t pos = m_Position;
     const Token& tk = next();
+
+    for (const auto& kind : kinds) {
+        if (tk == kind) {
+            return tk;
+        }
+    }
+
+    m_Position = pos;
+    throw TokenError{get_error_string(create_str_from_kinds(kinds)), tk, src};
+}
+
+const Token& Matcher::require_any_real(
+    const std::span<const tk::TokenKind>& kinds,
+    const SrcLoc& src
+) {
+    size_t pos = m_Position;
+    const Token& tk = next_real();
 
     for (const auto& kind : kinds) {
         if (tk == kind) {

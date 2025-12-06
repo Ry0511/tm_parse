@@ -69,6 +69,15 @@ class Matcher {
         return (matches<T>() || ...);
     }
 
+    template <tk::TokenKind... Seq> bool match_seq() noexcept {
+        constexpr tk::TokenKind kinds[]{Seq...};
+        return try_match(kinds);
+    }
+    template <tk::TokenKind... Seq> bool match_real_seq() noexcept {
+        constexpr tk::TokenKind kinds[]{Seq...};
+        return try_match_real(kinds);
+    }
+
    public:
     bool try_match(std::span<const tk::TokenKind> kinds) noexcept;
     bool try_match_real(std::span<const tk::TokenKind> kinds) noexcept;
@@ -90,6 +99,7 @@ class Matcher {
     const Token& require(tk::TokenKind kind, const SrcLoc& src = SrcLoc::current());
     const Token& require_real(tk::TokenKind kind, const SrcLoc& src = SrcLoc::current());
     const Token& require_any(const std::span<const tk::TokenKind>& kinds, const SrcLoc& src = SrcLoc::current());
+    const Token& require_any_real(const std::span<const tk::TokenKind>& kinds, const SrcLoc& src = SrcLoc::current());
 
    private:
     friend Parser;
