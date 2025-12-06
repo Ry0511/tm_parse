@@ -13,19 +13,27 @@
 
 namespace tm_parse::rules {
 
+namespace {
+constexpr tk::TokenKind
+    literals[]{tk::Number, tk::None, tk::StringLiteral, tk::True, tk::False};
+}
+
 bool LiteralExpr::matches(Matcher& matcher) noexcept {
-    constexpr tk::TokenKind literals[]{tk::Number, tk::StringLiteral, tk::True, tk::False};
     return matcher.any_real(literals);
 }
 
 std::unique_ptr<LiteralExpr> LiteralExpr::create(Parser& parser) {
     auto rule = std::make_unique<LiteralExpr>();
-    Token next = parser.next_real();
+    Token next = parser.require_any_real(literals);
 
     switch (next.Kind) {
         case tk::True:
         case tk::False:
             rule->m_Value = (next == tk::True);
+            break;
+
+        case tk::None:
+            rule->m_Value = NoneType{};
             break;
 
         case tk::StringLiteral:

@@ -90,6 +90,8 @@ using str_fstream = std::basic_fstream<str_char>;
 using str_ifstream = std::basic_ifstream<str_char>;
 using str_stream = std::basic_stringstream<str_char>;
 
+using str_istreambuf_it = std::istreambuf_iterator<str_char>;
+
 #define TXT(S) S
 
 // Common type aliases
@@ -97,6 +99,7 @@ using Float = std::optional<double>;
 using Int = std::optional<int64_t>;
 using Bool = bool;
 using Str = str;
+struct NoneType {};
 
 #if defined(TM_PARSE_ARCH_X64)
 static_assert(sizeof(void*) == 8);

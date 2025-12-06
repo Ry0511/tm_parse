@@ -14,7 +14,7 @@ namespace tm_parse::rules {
 class LiteralExpr : public Expr {
    private:
     // Kinda torn here on if we should default std::nullopt to std::monostate
-    using ValueType = std::variant<std::monostate, Float, Int, Bool, Str>;
+    using ValueType = std::variant<std::monostate, NoneType, Float, Int, Bool, Str>;
     ValueType m_Value;
 
    public:
