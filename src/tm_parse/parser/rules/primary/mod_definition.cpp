@@ -18,8 +18,8 @@ ModDefinition::ModDefinition(ModDefinition&&) noexcept = default;
 ModDefinition& ModDefinition::operator=(ModDefinition&&) noexcept = default;
 
 bool ModDefinition::matches(Matcher& matcher) noexcept {
-    // create_mod = ( EXPR_LIST )
-    return matcher.maybe_real(tk::CreateMod) && matcher.maybe_real(tk::Equal)
+    return matcher.maybe_real(tk::CreateMod)
+           && matcher.maybe_real(tk::Equal)
            && matcher.matches<AssignmentExprList>();
 }
 

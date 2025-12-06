@@ -69,11 +69,14 @@ class Matcher {
         return (matches<T>() || ...);
     }
 
-    template <tk::TokenKind... Seq> bool match_seq() noexcept {
+    template <tk::TokenKind... Seq>
+    bool match_seq() noexcept {
         constexpr tk::TokenKind kinds[]{Seq...};
         return try_match(kinds);
     }
-    template <tk::TokenKind... Seq> bool match_real_seq() noexcept {
+
+    template <tk::TokenKind... Seq>
+    bool match_real_seq() noexcept {
         constexpr tk::TokenKind kinds[]{Seq...};
         return try_match_real(kinds);
     }

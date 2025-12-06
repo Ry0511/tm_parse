@@ -56,7 +56,6 @@ std::string_view get_log_level_name(LogLevel level, bool no_colour) {
 }
 
 void log(LogLevel level, std::string_view msg, const SrcLoc& src) {
-
     std::string_view file_name = src.file_name();
     std::string function_name = src.function();
 

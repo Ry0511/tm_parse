@@ -15,7 +15,8 @@ struct SrcLoc {
     using Impl = std::source_location;
     Impl Src;
 
-    constexpr explicit SrcLoc(const Impl& src = Impl::current()) : Src(src) {}
+    constexpr explicit SrcLoc(const Impl& src = Impl::current())
+        : Src(src) {}
     constexpr ~SrcLoc() noexcept = default;
 
     static consteval SrcLoc current(const Impl& src = Impl::current()) noexcept {

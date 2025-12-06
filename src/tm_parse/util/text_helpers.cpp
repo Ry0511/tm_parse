@@ -13,12 +13,12 @@ namespace {
 
 // TODO: This still assumes str_char == char
 template <class T>
-    requires( // clang-format off  - somtimes the formatter is genuinely retarded
+    requires(
         std::is_same_v<T, int32_t>
         || std::is_same_v<T, int64_t>
         || std::is_same_v<T, size_t>
         || std::is_same_v<T, double>
-    ) // clang-format on
+    )
 struct NumberParser {
     using Limits = std::numeric_limits<T>;
 

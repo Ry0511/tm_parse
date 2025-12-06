@@ -10,7 +10,8 @@
 
 namespace tm_parse {
 
-Lexer::Lexer(str_view source) : m_Text(source) {}
+Lexer::Lexer(str_view source)
+    : m_Text(source) {}
 
 Token Lexer::next_token() {
     return next_token_impl();

@@ -28,8 +28,10 @@ struct Token {
     const str_char* Text{nullptr};
 
    public:
-    constexpr Token() : Kind(tk::TokenKind::EndOfInput) {};
-    constexpr Token(tk::TokenKind kind) : Kind(kind) {};
+    constexpr Token()
+        : Kind(tk::TokenKind::EndOfInput) {};
+    constexpr Token(tk::TokenKind kind)
+        : Kind(kind) {};
 
     constexpr Token(
         tk::TokenKind kind,

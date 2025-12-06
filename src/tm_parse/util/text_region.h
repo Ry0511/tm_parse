@@ -14,8 +14,10 @@ struct TextRegion {
     size_t Start;
     size_t End;
 
-    constexpr TextRegion() noexcept : Start(invalid_index_v), End(invalid_index_v) {}
-    constexpr TextRegion(size_t start, size_t end) noexcept : Start(start), End(end) {}
+    constexpr TextRegion() noexcept
+        : Start(invalid_index_v), End(invalid_index_v) {}
+    constexpr TextRegion(size_t start, size_t end) noexcept
+        : Start(start), End(end) {}
 
     size_t length() const noexcept { return End - Start; }
     bool is_empty() const noexcept { return Start == End; }
