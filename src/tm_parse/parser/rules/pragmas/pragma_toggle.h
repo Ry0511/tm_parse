@@ -16,7 +16,8 @@ enum class PragmaToggleType : uint8_t {
 
 class PragmaToggle : public ParserRule {
    private:
-    PragmaToggleType m_Type;
+    PragmaToggleType m_Type{PragmaToggleType::UnquotedLiterals};
+    bool m_State{false};
 
    public:
     PragmaToggle() noexcept = default;

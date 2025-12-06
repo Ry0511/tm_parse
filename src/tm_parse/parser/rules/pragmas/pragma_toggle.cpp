@@ -17,7 +17,7 @@ constexpr tk::TokenKind toggle_type[]{tk::Enable, tk::Disable};
 
 void PragmaToggle::toggle_for(Parser& parser) const noexcept {
     if (m_Type == PragmaToggleType::UnquotedLiterals) {
-        parser.parse_state().AllowUnquotedStrings = !parser.parse_state().AllowUnquotedStrings;
+        parser.parse_state().AllowUnquotedStrings = m_State;
     }
 }
 
@@ -32,6 +32,7 @@ std::unique_ptr<PragmaToggle> PragmaToggle::create(Parser& parser) {
     const Token& last = parser.require(tk::AnyIdentifier);
 
     auto rule = std::make_unique<PragmaToggle>();
+    rule->m_State = (val == tk::Enable);
     rule->post_init(first, last);
 
     if (txt::equal_icase(last.text(), TXT("unquotedliterals"))) {
