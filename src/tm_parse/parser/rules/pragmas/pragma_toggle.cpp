@@ -22,7 +22,7 @@ struct Mapping {
 };
 
 constexpr Mapping all_mappings[]{
-    {TXT("UnquotedLiterals"), PragmaToggleType::UnquotedLiterals},
+    {TXT("unquotedliterals"), PragmaToggleType::UnquotedLiterals},
     {      TXT("create_mod"),        PragmaToggleType::CreateMod},
 };
 
@@ -35,7 +35,7 @@ void PragmaToggle::toggle_for(Parser& parser) const noexcept {
             break;
 
         case PragmaToggleType::CreateMod:
-            parser.parse_state().RequireCreateMod = m_State;
+            parser.parse_state().AllowCreateMod = m_State;
             break;
 
         default:

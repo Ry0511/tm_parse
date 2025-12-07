@@ -39,7 +39,6 @@ bool Matcher::try_match(std::span<const tk::TokenKind> kinds) noexcept {
         m_Position = pos;
         return false;
     }
-
     return true;
 }
 

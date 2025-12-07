@@ -87,15 +87,15 @@ bool Token::operator==(tk::TokenKind kind) const noexcept {
 }
 
 bool Token::operator!=(tk::TokenKind kind) const noexcept {
-    return !operator==(kind);
+    return !(*this == kind);
 }
 
 bool Token::operator==(const Token& other) const noexcept {
-    return operator==(other.Kind);
+    return *this == other.Kind;
 }
 
 bool Token::operator!=(const Token& other) const noexcept {
-    return operator!=(other.Kind);
+    return !(*this == other);
 }
 
 Token::operator bool() const noexcept {

@@ -38,45 +38,25 @@ std::unique_ptr<ProgramRule> ProgramRule::create(Parser& parser) {
         child->set_parent(*rule);
     }
 
-    // all mods must start with create_mod = ( ... )
-    if (parser.parse_state().RequireCreateMod) {
+    // if enabled create_mod = ( ... ) should be the first rule
+    if (parser.parse_state().AllowCreateMod) {
         auto& child = rule->m_ChildRules.emplace_back(parser.create<ModDefinition>());
         child->set_parent(*rule);
     }
 
-    // Any number of root level rules
+    Matcher m = parser.create_matcher();
     while (!parser.is_eof()) {
-        const Token& tok = parser.peek_real();
+        m.set_position(parser.position());
 
-        switch (tok.Kind) {
-            case tk::Begin: {
-                auto& child = rule->m_ChildRules.emplace_back(parser.create<ObjectDefinition>());
-                child->set_parent(*rule);
-                break;
-            }
-            case tk::Set: {
-                auto& child = rule->m_ChildRules.emplace_back(parser.create<SetCommand>());
-                child->set_parent(*rule);
-                break;
-            }
-            case tk::Pragma: {
-                auto& pragma = rule->m_ChildRules.emplace_back(parser.create<PragmaToggle>());
-                pragma->set_parent(*rule);
-                break;
-            }
-            case tk::Let: {
-                auto& child = rule->m_ChildRules.emplace_back(parser.create<VariableExpr>());
-                child->set_parent(*rule);
-                break;
-            }
-            default: {
-                throw TokenError{
-                    parser.get_error_string(
-                        "root level rule i.e., Set Command, Object Definition, Pragma, etc"
-                    ),
-                    tok
-                };
-            }
+        if (m.match_real_seq<tk::Begin, tk::Object, tk::AnyIdentifier, tk::Equal>()) {
+            auto& child = rule->m_ChildRules.emplace_back(parser.create<ObjectDefinition>());
+            child->set_parent(*rule);
+
+        } else {
+            auto& child = rule->m_ChildRules.emplace_back(
+                parser.create_one_of<SetCommand, PragmaToggle, VariableExpr>()
+            );
+            child->set_parent(*rule);
         }
     }
 
