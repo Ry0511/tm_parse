@@ -26,17 +26,7 @@ ProgramRule::~ProgramRule() noexcept = default;
 ProgramRule::ProgramRule(ProgramRule&&) noexcept = default;
 ProgramRule& ProgramRule::operator=(ProgramRule&&) noexcept = default;
 
-bool ProgramRule::matches(Matcher& matcher) noexcept {
-    if (!matcher.matches<ModDefinition>()) {
-        return false;
-    }
-
-    while (!matcher.is_eof()) {
-        if (!program_child_rules{}.matches(matcher)) {
-            return false;
-        }
-    }
-
+bool ProgramRule::matches(Matcher& /*matcher*/) noexcept {
     return true;
 }
 
