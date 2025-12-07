@@ -5,6 +5,7 @@
 //
 
 #include "tm_parse/pch.h"
+#include "tm_parse/util/text_helpers.h"
 #include "test_file.h"
 #include "test_runner.h"
 
@@ -22,7 +23,6 @@ bool log_everything = false;
 bool has_parent(const fs::path& file, std::string_view name) {
     fs::path cur = file;
     while (cur.has_parent_path()) {
-
         if (cur == cur.parent_path()) {
             return false;
         }
@@ -66,7 +66,9 @@ void run_all_tests(const fs::path& directory) {
                     run_test(entry.path());
                 } else if (has_parent(file, "examples")) {
                     str_ifstream ss{file};
-                    Parser parser{str{str_istreambuf_it{ss}, str_istreambuf_it{}}};
+                    Parser parser{
+                        str{str_istreambuf_it{ss}, str_istreambuf_it{}}
+                    };
                     auto rule = parser.parse();
                     LOG_INFO("Successfully parsed example file: {}", file.filename().string());
                 }
