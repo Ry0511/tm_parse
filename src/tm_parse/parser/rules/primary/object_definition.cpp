@@ -22,17 +22,21 @@ ObjectDefinition& ObjectDefinition::operator=(ObjectDefinition&&) noexcept = def
 bool ObjectDefinition::matches(Matcher& m) noexcept {
     // Name = ? Class = ?
     if (m.match_real_seq<tk::Begin, tk::Object, tk::Name, tk::Equal>()) {
-        if (!(m.matches<ObjectDotIdentifier>()
+        if (
+            !(m.matches<ObjectDotIdentifier>()
               && m.match_real_seq<tk::Class, tk::Equal>()
-              && m.matches<ObjectDotIdentifier>())) {
+              && m.matches<ObjectDotIdentifier>())
+        ) {
             return false;
         }
     }
     // Class = ? Name = ?
     else if (m.match_real_seq<tk::Begin, tk::Object, tk::Class, tk::Equal>()) {
-        if (!(m.matches<ObjectDotIdentifier>()
+        if (
+            !(m.matches<ObjectDotIdentifier>()
               && m.match_real_seq<tk::Name, tk::Equal>()
-              && m.matches<ObjectDotIdentifier>())) {
+              && m.matches<ObjectDotIdentifier>())
+        ) {
             return false;
         }
     }
