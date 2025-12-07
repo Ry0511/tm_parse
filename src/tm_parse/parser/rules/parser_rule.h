@@ -17,6 +17,8 @@ namespace tm_parse {
 
 class Parser;
 class ParserRule;
+class OutputDevice;
+class RuleEvaluator;
 
 class ParserRule {
    public:
@@ -55,6 +57,14 @@ class ParserRule {
     virtual str_view rule_name() const noexcept = 0;
     virtual rkind::ParserRuleKind rule_kind() const noexcept = 0;
 
+    // TODO: Work this one out
+    virtual bool validate_rule(
+        OutputDevice* /*out*/ = nullptr,
+        RuleEvaluator* /*eval*/ = nullptr
+    ) const noexcept {
+        return true;
+    }
+
     virtual void visit(const std::function<void(const ParserRule&)>& func) const noexcept {
         func(*this);
     }
@@ -74,11 +84,16 @@ class ParserRule {
     }
 
    public:
-    // TODO: The nature of const and non-const here is something to consider
     template <class T>
         requires std::is_base_of_v<ParserRule, T>
     const T* is() const noexcept {
         return (rule_kind() == T::KIND) ? static_cast<const T*>(this) : nullptr;
+    }
+
+    template <class T>
+        requires std::is_base_of_v<ParserRule, T>
+    T* is() noexcept {
+        return (rule_kind() == T::KIND) ? static_cast<T*>(this) : nullptr;
     }
 
     template <class T>
@@ -91,7 +106,21 @@ class ParserRule {
     }
 
     template <class T>
+        requires std::is_base_of_v<ParserRule, T>
+    T* as() {
+        if (T* ptr = is<T>()) {
+            return ptr;
+        }
+        throw std::runtime_error{std::format("can not cast {} to {}", rule_name(), T::NAME)};
+    }
+
+    template <class T>
     const T& as_ref() const {
+        return *as<T>();
+    }
+
+    template <class T>
+    T& as_ref() {
         return *as<T>();
     }
 
