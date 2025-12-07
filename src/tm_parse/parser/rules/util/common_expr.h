@@ -18,10 +18,9 @@
 #include "tm_parse/parser/rules/expr/tuple_expr.h"
 #include "tm_parse/parser/rules/expr/unquoted_str_literal.h"
 #include "tm_parse/parser/rules/expr_type_list.h"
+#include "tm_parse/parser/rules/common/class_obj_ref.h"
 
 namespace tm_parse::rules {
-
-// clang-format off
 
 // All expressions in order of precedence.
 using all_expressions = ExprTypeList<
@@ -31,17 +30,14 @@ using all_expressions = ExprTypeList<
     AssignmentExpr,
     LiteralExpr,
     TupleExpr,
-    UnquotedStrLiteral
->;
+    UnquotedStrLiteral>;
 
-// All expressions in order of precedence.
 // TODO: Remove this and remove ParenExpr
 using paren_expr_types = ExprTypeList<
     MetaVarExpr,
     AssignmentExprList,
     AssignmentExpr,
-    LiteralExpr
->;
+    LiteralExpr>;
 
 //
 // What is allowed on the right hand side of an assignment
@@ -54,11 +50,11 @@ using assignment_expr_types = ExprTypeList<
     AssignmentExprList,
     LiteralExpr,
     TupleExpr,
-    UnquotedStrLiteral
->;
+    UnquotedStrLiteral,
+    ClassObjectRef>;
 
 //
-// What is allowed on the right hand side of an assignment inside of an expression list?
+// What is allowed on the right hand side of an assignment inside of an expression list
 // i.e.,
 //   ( A = EXPR, B = EXPR )
 //
@@ -67,21 +63,24 @@ using assignment_expr_list_types = ExprTypeList<
     ComposedExpr,
     AssignmentExprList,
     TupleExpr,
-    LiteralExpr
->;
+    LiteralExpr,
+    ClassObjectRef>;
 
+//
+// What is allowed on the right hand side of an variable assignment expression
+// i.e.,
+//   let identifier = EXPR
+//
 using variable_expr_types = ExprTypeList<
     ComposedExpr,
     LiteralExpr,
-    UnquotedStrLiteral
->;
+    UnquotedStrLiteral,
+    ClassObjectRef>;
 
 // TODO: Not sure if this is the most appropriate solution
 template bool AssignmentExpr::matches_with_expr_list<assignment_expr_types>(Matcher&);
 template bool AssignmentExpr::matches_with_expr_list<assignment_expr_list_types>(Matcher&);
 template std::unique_ptr<AssignmentExpr> AssignmentExpr::create_with_expr_list<assignment_expr_types>(Parser& parser);
 template std::unique_ptr<AssignmentExpr> AssignmentExpr::create_with_expr_list<assignment_expr_list_types>(Parser& parser);
-
-// clang-format on
 
 }  // namespace tm_parse::rules
