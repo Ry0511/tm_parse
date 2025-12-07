@@ -41,7 +41,8 @@ std::unique_ptr<ProgramRule> ProgramRule::create(Parser& parser) {
     // if enabled create_mod = ( ... ) should be the first rule
     if (parser.parse_state().AllowCreateMod) {
         auto& child = rule->m_ChildRules.emplace_back(parser.create<ModDefinition>());
-        child->set_parent(*rule);
+        rule->m_ModDefinition = child->as<ModDefinition>();
+        rule->m_ModDefinition->set_parent(*rule);
     }
 
     Matcher m = parser.create_matcher();
@@ -76,20 +77,6 @@ void ProgramRule::cascade_assign_parents(ParserRule* parent) noexcept {
     for (const auto& rule : m_ChildRules) {
         rule->cascade_assign_parents(this);
     }
-}
-
-const ModDefinition* ProgramRule::mod_definition() const noexcept {
-    if (m_ChildRules.empty()) {
-        return nullptr;
-    }
-
-    for (auto it = m_ChildRules.begin(); it != m_ChildRules.end(); ++it) {
-        if (auto ptr = (*it)->is<ModDefinition>()) {
-            return ptr;
-        }
-    }
-
-    return nullptr;
 }
 
 }  // namespace tm_parse::rules

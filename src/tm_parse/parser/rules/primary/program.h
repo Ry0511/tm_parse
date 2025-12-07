@@ -18,6 +18,7 @@ class ObjectDefinitionRule;
 // Going to keep the Rule suffix here but all other rules don't use it
 class ProgramRule : public ParserRule {
    private:
+    ModDefinition* m_ModDefinition{nullptr};
     std::vector<std::unique_ptr<ParserRule>> m_ChildRules;
 
    public:
@@ -33,7 +34,7 @@ class ProgramRule : public ParserRule {
     void cascade_assign_parents(ParserRule* parent) noexcept override;
 
    public:
-    const ModDefinition* mod_definition() const noexcept;
+    const ModDefinition* mod_definition() const noexcept { return m_ModDefinition; }
 
    public:
     RULE_STATIC_API(ProgramRule);
