@@ -6,6 +6,8 @@
 
 #include "tm_parse/pch.h"
 #include "tm_parse/util/text_helpers.h"
+#include "tm_parse/lexer/token_error.h"
+
 #include "test_file.h"
 #include "test_runner.h"
 
@@ -72,6 +74,8 @@ void run_all_tests(const fs::path& directory) {
                     auto rule = parser.parse();
                     LOG_INFO("Successfully parsed example file: {}", file.filename().string());
                 }
+            } catch (const TokenError& err) {
+                err.log_error();
             } catch (const std::exception& err) {
                 LOG_INFO("Error running test {}", entry.path().string());
                 LOG_INFO("With message: {}", err.what());
