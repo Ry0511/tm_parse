@@ -10,6 +10,8 @@
 
 namespace tm_parse::txt {
 
+str_char to_lower(str_char c) noexcept;
+
 bool is_whitespace(str_char c) noexcept;
 
 bool is_alpha(str_char c) noexcept;

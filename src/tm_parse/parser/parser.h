@@ -20,6 +20,7 @@ namespace tm_parse {
 
 struct ParseStateInfo {
     bool AllowUnquotedStrings{true};
+    bool RequireCreateMod{true};
 };
 
 class Parser : public Matcher {

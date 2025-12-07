@@ -11,12 +11,14 @@
 namespace tm_parse::rules {
 
 enum class PragmaToggleType : uint8_t {
-    UnquotedLiterals
+    UnquotedLiterals,
+    CreateMod,
+    None,
 };
 
 class PragmaToggle : public ParserRule {
    private:
-    PragmaToggleType m_Type{PragmaToggleType::UnquotedLiterals};
+    PragmaToggleType m_Type{PragmaToggleType::None};
     bool m_State{false};
 
    public:

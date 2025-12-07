@@ -13,17 +13,39 @@
 namespace tm_parse::rules {
 
 namespace {
+
 constexpr tk::TokenKind toggle_type[]{tk::Enable, tk::Disable};
-}
+
+struct Mapping {
+    str_view Text;
+    PragmaToggleType Type;
+};
+
+constexpr Mapping all_mappings[]{
+    {TXT("UnquotedLiterals"), PragmaToggleType::UnquotedLiterals},
+    {      TXT("create_mod"),        PragmaToggleType::CreateMod},
+};
+
+}  // namespace
 
 void PragmaToggle::toggle_for(Parser& parser) const noexcept {
-    if (m_Type == PragmaToggleType::UnquotedLiterals) {
-        parser.parse_state().AllowUnquotedStrings = m_State;
+    switch (m_Type) {
+        case PragmaToggleType::UnquotedLiterals:
+            parser.parse_state().AllowUnquotedStrings = m_State;
+            break;
+
+        case PragmaToggleType::CreateMod:
+            parser.parse_state().RequireCreateMod = m_State;
+            break;
+
+        default:
+            break;
     }
 }
 
 bool PragmaToggle::matches(Matcher& matcher) noexcept {
-    return matcher.maybe_real(tk::Pragma) && matcher.any(toggle_type)
+    return matcher.maybe_real(tk::Pragma)
+           && matcher.any(toggle_type)
            && matcher.maybe(tk::AnyIdentifier);
 }
 
@@ -36,8 +58,11 @@ std::unique_ptr<PragmaToggle> PragmaToggle::create(Parser& parser) {
     rule->m_State = (val == tk::Enable);
     rule->post_init(first, last);
 
-    if (txt::equal_icase(last.text(), TXT("unquotedliterals"))) {
-        rule->m_Type = PragmaToggleType::UnquotedLiterals;
+    for (const auto& mapping : all_mappings) {
+        if (txt::equal_icase(last.text(), mapping.Text)) {
+            rule->m_Type = mapping.Type;
+            break;
+        }
     }
 
     rule->toggle_for(parser);

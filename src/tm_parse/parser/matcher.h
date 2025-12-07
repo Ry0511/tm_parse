@@ -63,6 +63,14 @@ class Matcher {
         return false;
     }
 
+    template <class T>
+    bool peek_matches() noexcept {
+        const size_t pos = m_Position;
+        const bool res = T::matches(*this);
+        m_Position = pos;
+        return res;
+    }
+
     template <class... T>
     bool matches_one_of() noexcept {
         static_assert(sizeof...(T) > 0, "atleast 1 type is required");

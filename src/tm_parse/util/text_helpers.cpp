@@ -57,6 +57,14 @@ struct NumberParser {
 
 }  // namespace
 
+str_char to_lower(str_char c) noexcept {
+    if constexpr (std::is_same_v<str_char, char>) {
+        return static_cast<str_char>(std::tolower(c));
+    } else {
+        return static_cast<str_char>(std::towlower(c));
+    }
+}
+
 bool is_whitespace(str_char c) noexcept {
     switch (c) {
         case TXT('\v'):
@@ -92,10 +100,12 @@ bool is_newline(str_char c) noexcept {
 }
 
 bool equal_icase(str_view a, str_view b) noexcept {
-    return a.size() == b.size()
-           && std::equal(a.begin(), a.end(), b.begin(), [](auto&& a, auto&& b) {
-                  return std::tolower(a) == std::tolower(b);
-              });
+    if (a.size() != b.size()) {
+        return false;
+    }
+    return std::equal(a.begin(), a.end(), b.begin(), [](const auto& a, const auto& b) {
+        return to_lower(a) == to_lower(b);
+    });
 }
 
 str escape_string(str_view in, bool flatten_whitespace) noexcept {

@@ -43,9 +43,16 @@ bool ProgramRule::matches(Matcher& matcher) noexcept {
 std::unique_ptr<ProgramRule> ProgramRule::create(Parser& parser) {
     auto rule = std::make_unique<ProgramRule>();
 
+    if (parser.peek_matches<PragmaToggle>()) {
+        auto& child = rule->m_ChildRules.emplace_back(parser.create<PragmaToggle>());
+        child->set_parent(*rule);
+    }
+
     // all mods must start with create_mod = ( ... )
-    rule->m_ModDefinition = parser.create<ModDefinition>();
-    rule->m_ModDefinition->set_parent(*rule);
+    if (parser.parse_state().RequireCreateMod) {
+        auto& child = rule->m_ChildRules.emplace_back(parser.create<ModDefinition>());
+        child->set_parent(*rule);
+    }
 
     // Any number of root level rules
     while (!parser.is_eof()) {
@@ -53,22 +60,22 @@ std::unique_ptr<ProgramRule> ProgramRule::create(Parser& parser) {
 
         switch (tok.Kind) {
             case tk::Begin: {
-                auto& child = rule->m_BodyRules.emplace_back(parser.create<ObjectDefinition>());
+                auto& child = rule->m_ChildRules.emplace_back(parser.create<ObjectDefinition>());
                 child->set_parent(*rule);
                 break;
             }
             case tk::Set: {
-                auto& child = rule->m_BodyRules.emplace_back(parser.create<SetCommand>());
+                auto& child = rule->m_ChildRules.emplace_back(parser.create<SetCommand>());
                 child->set_parent(*rule);
                 break;
             }
             case tk::Pragma: {
-                auto& pragma = rule->m_BodyRules.emplace_back(parser.create<PragmaToggle>());
+                auto& pragma = rule->m_ChildRules.emplace_back(parser.create<PragmaToggle>());
                 pragma->set_parent(*rule);
                 break;
             }
             case tk::Let: {
-                auto& child = rule->m_BodyRules.emplace_back(parser.create<VariableExpr>());
+                auto& child = rule->m_ChildRules.emplace_back(parser.create<VariableExpr>());
                 child->set_parent(*rule);
                 break;
             }
@@ -83,29 +90,36 @@ std::unique_ptr<ProgramRule> ProgramRule::create(Parser& parser) {
         }
     }
 
-    if (!rule->m_BodyRules.empty()) {
-        rule->post_init(*rule->m_ModDefinition, *rule->m_BodyRules.back());
-    } else {
-        rule->post_init(*rule->m_ModDefinition, *rule->m_ModDefinition);
-    }
-
+    rule->post_init(*rule->m_ChildRules.front(), *rule->m_ChildRules.back());
     return rule;
 }
 
 void ProgramRule::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
     ParserRule::visit(func);
-    m_ModDefinition->visit(func);
-    for (const auto& rule : m_BodyRules) {
+    for (const auto& rule : m_ChildRules) {
         rule->visit(func);
     }
 }
 
 void ProgramRule::cascade_assign_parents(ParserRule* parent) noexcept {
     ParserRule::cascade_assign_parents(parent);
-    m_ModDefinition->cascade_assign_parents(this);
-    for (const auto& rule : m_BodyRules) {
+    for (const auto& rule : m_ChildRules) {
         rule->cascade_assign_parents(this);
     }
+}
+
+const ModDefinition* ProgramRule::mod_definition() const noexcept {
+    if (m_ChildRules.empty()) {
+        return nullptr;
+    }
+
+    for (auto it = m_ChildRules.begin(); it != m_ChildRules.end(); ++it) {
+        if (auto ptr = (*it)->is<ModDefinition>()) {
+            return ptr;
+        }
+    }
+
+    return nullptr;
 }
 
 }  // namespace tm_parse::rules
