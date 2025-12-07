@@ -15,12 +15,13 @@ VariableExpr::VariableExpr() noexcept = default;
 VariableExpr::~VariableExpr() noexcept = default;
 
 bool VariableExpr::matches(Matcher& matcher) noexcept {
-    return matcher.maybe_real(tk::Let) && matcher.maybe_real(tk::AnyIdentifier)
-           && matcher.maybe_real(tk::Equal) && variable_expr_types{}.matches(matcher);
+    return matcher.maybe_real(tk::Let)
+           && matcher.maybe_real(tk::AnyIdentifier)
+           && matcher.maybe_real(tk::Equal)
+           && variable_expr_types{}.matches(matcher);
 }
 
 std::unique_ptr<VariableExpr> VariableExpr::create(Parser& parser) {
-
     // let ID = EXPR
     const Token& first = parser.require_real(tk::Let);
     const Token& id = parser.require_real(tk::AnyIdentifier);

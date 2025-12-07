@@ -18,8 +18,10 @@ ClassObjectRef::ClassObjectRef(ClassObjectRef&&) noexcept = default;
 ClassObjectRef& ClassObjectRef::operator=(ClassObjectRef&&) noexcept = default;
 
 bool ClassObjectRef::matches(Matcher& matcher) noexcept {
-    return matcher.maybe_real(tk::AnyIdentifier) && matcher.maybe_real(tk::SingleQuote)
-           && ObjectDotIdentifier::matches(matcher) && matcher.maybe_real(tk::SingleQuote);
+    return matcher.maybe_real(tk::AnyIdentifier)
+           && matcher.maybe_real(tk::SingleQuote)
+           && ObjectDotIdentifier::matches(matcher)
+           && matcher.maybe_real(tk::SingleQuote);
 }
 
 std::unique_ptr<ClassObjectRef> ClassObjectRef::create(Parser& parser) {

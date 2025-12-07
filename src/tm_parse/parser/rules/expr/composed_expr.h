@@ -12,7 +12,12 @@
 namespace tm_parse::rules {
 
 // TODO: Probably a good idea to scrap the Expr base class as it just makes things harder to work
-// with.
+//  with.
+
+// TODO: At some point we will want to evaluate expressions, not just composed expressions but all
+//  expressions. This evaluation needs to know of things we just don't have access to i.e., the
+//  Type of the expression. Some rules have a trivial type deduction i.e., LiteralExpr, but others
+//  i.e., VariableExpr and MetaVarExpr don't neccesarily have trivial type deduction.
 
 enum class Operator : uint8_t {
     Add,            // +    Binary
@@ -20,7 +25,7 @@ enum class Operator : uint8_t {
     Divide,         // /    Binary
     Multiply,       // *    Binary
     Negate,         // -A   Unary
-    Positive,       // +A   Unary
+    Positive,       // +A   Unary; Omitted from parse tree
     LogicalNegate,  // !A   Unary
     LogicalOr,      // or   Binary
     LogicalAnd,     // and  Binary
