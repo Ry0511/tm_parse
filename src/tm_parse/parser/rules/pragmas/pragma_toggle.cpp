@@ -8,6 +8,7 @@
 
 #include "tm_parse/parser/parser.h"
 #include "tm_parse/parser/rules/expr/unquoted_str_literal.h"
+#include "tm_parse/util/text_helpers.h"
 
 namespace tm_parse::rules {
 
