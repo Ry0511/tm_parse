@@ -1,0 +1,25 @@
+test_type = ParserTest
+
+test_content = {
+  $foo
+  $foo.baz
+  $foo(0)
+  $foo(0).baz[1]
+  $foo[0](1).baz(2)[3]
+}
+
+expected_parse_content = {
+  MetaVarExpr = ( PropertyDotIdentifier["foo"]                 )
+  MetaVarExpr = ( PropertyDotIdentifier["foo.baz"]             )
+  MetaVarExpr = ( PropertyDotIdentifier["foo(0)"]              )
+  MetaVarExpr = ( PropertyDotIdentifier["foo(0).baz[1]"]       )
+  MetaVarExpr = ( PropertyDotIdentifier["foo[0](1).baz(2)[3]"] )
+}
+
+expected_text = {
+  "$foo"
+  "$foo.baz"
+  "$foo(0)"
+  "$foo(0).baz[1]"
+  "$foo[0](1).baz(2)[3]"
+}

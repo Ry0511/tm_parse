@@ -35,6 +35,7 @@ Checks: >
     -readability-magic-numbers,
     -readability-implicit-bool-conversion,
     -readability-static-definition-in-anonymous-namespace,
+    -readability-named-parameter,
   
   -bugprone-narrowing-conversions,
   -cppcoreguidelines-avoid-c-arrays,

@@ -1,0 +1,36 @@
+//
+// Date       : 28/09/2025
+// Project    : tm_parse
+// Author     : -Ry
+//
+
+#pragma once
+
+#include "tm_parse/pch.h"
+#include "tm_parse/parser/rules/parser_rule.h"
+
+namespace tm_parse::rules {
+
+class PropertyDotIdentifier;
+
+class ObjectRef : public ParserRule {
+   private:
+    std::unique_ptr<ParserRule> m_Ref;
+
+   public:
+    ObjectRef() = default;
+    ~ObjectRef() override;
+
+   public:
+    ObjectRef(const ObjectRef&) = delete;
+    ObjectRef& operator=(const ObjectRef&) = delete;
+    ObjectRef(ObjectRef&&) noexcept;
+    ObjectRef& operator=(ObjectRef&&) noexcept;
+
+   public:
+    void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
+    void cascade_assign_parents(ParserRule* parent) noexcept override;
+    RULE_STATIC_API(ObjectRef);
+};
+
+}  // namespace tm_parse::rules

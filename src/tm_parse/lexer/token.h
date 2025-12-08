@@ -7,22 +7,23 @@
 #pragma once
 
 #include "tm_parse/pch.h"
-
-#include "tm_parse/lexer/token_type.h"
 #include "tm_parse/util/text_region.h"
 
 namespace tm_parse {
 
 struct Token {
-   public:
-    tk::TokenKind Kind;
     TextRegion Region;
-    int Line{-1};
-    int Column{-1};
+    tk::TokenKind Kind;
+    uint16_t Column{std::numeric_limits<uint16_t>::max()};
+    uint16_t Line{std::numeric_limits<uint16_t>::max()};
     const str_char* Text{nullptr};
 
    public:
-    constexpr Token() : Kind(tk::TokenKind::EndOfInput) {};
+    constexpr Token()
+        : Kind(tk::TokenKind::EndOfInput) {};
+
+    constexpr Token(tk::TokenKind kind)
+        : Kind(kind) {};
 
     constexpr Token(
         tk::TokenKind kind,
@@ -31,10 +32,10 @@ struct Token {
         int column,
         const str_char* text = nullptr
     ) noexcept
-        : Kind(kind),
-          Region(region),
-          Line(line),
+        : Region(region),
+          Kind(kind),
           Column(column),
+          Line(line),
           Text(text) {};
 
     ~Token() = default;
@@ -45,51 +46,32 @@ struct Token {
     constexpr Token& operator=(Token&&) = default;
 
    public:
-    constexpr str_view token_name() const noexcept { return tm_parse::token_type_name(Kind); }
+    str_view token_name() const noexcept;
+    str to_string() const;
+    str_view text() const;
+    str_view inner_text() const;
+    str literal_text() const;
+    bool has_radix() const noexcept;
 
    public:
-    str to_string() const {
-        return std::format("{:>3}:{:<3} - {}, ( {}, {} )", Line, Column, str{token_name()}, Region.Start, Region.End);
-    }
+    TextRegion extend(const Token& other) const noexcept { return Region.extend(other.Region); }
 
    public:
-    str_view text() const {
-        if (Text == nullptr) {
-            throw std::runtime_error("token text is unavailable");
-        }
-
-        str_view text{Text + Region.Start, Region.length()};
-        return text;
-    }
-
-    str_view inner_text() const {
-
-        // No inner text, no point in throwing just return the full text, if it exists...
-        if (Kind != tk::StringLiteral) {
-            return text();
-        }
-
-        // Should always be exactly 2
-        str_view text = this->text();
-        if (text.size() <= 2) {
-            return str_view{};
-        }
-
-        return text.substr(1, text.size() - 2);
-    }
+    bool is_eof() const noexcept;
+    bool is_identifier() const noexcept;
+    bool is_keyword() const noexcept;
+    bool is_symbol() const noexcept;
+    bool is_one_of(const std::span<const tk::TokenKind>& kinds) const noexcept;
+    bool is_none_of(const std::span<const tk::TokenKind>& kinds) const noexcept;
 
    public:
-    constexpr bool is_eof() const noexcept { return Kind == tk::EndOfInput; }
-    constexpr bool is_identifier() const noexcept { return tm_parse::is_identifier(Kind) || is_keyword(); }
-    constexpr bool is_keyword() const noexcept { return tm_parse::is_keyword(Kind); }
-    constexpr bool is_symbol() const noexcept { return tm_parse::is_symbol(Kind); }
-
-   public:
-    constexpr bool operator==(tk::TokenKind kind) const noexcept { return Kind == kind; }
-    constexpr bool operator!=(tk::TokenKind kind) const noexcept { return Kind != kind; }
-
-    constexpr bool operator==(const Token& other) const noexcept { return Kind == other.Kind; }
-    constexpr bool operator!=(const Token& other) const noexcept { return Kind != other.Kind; }
+    bool operator==(tk::TokenKind kind) const noexcept;
+    bool operator!=(tk::TokenKind kind) const noexcept;
+    bool operator==(const Token& other) const noexcept;
+    bool operator!=(const Token& other) const noexcept;
+    operator bool() const noexcept;
 };
+
+constexpr Token invalid_token_v{tk::InvalidToken};
 
 }  // namespace tm_parse

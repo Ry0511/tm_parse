@@ -32,13 +32,16 @@ class Lexer {
     Token peek_token();
 
    public:
-    Token require(tk::TokenKind kind);
-    Token require_next_real(tk::TokenKind kind);
+    Token require(tk::TokenKind kind) noexcept(false);
+    Token require_next_real(tk::TokenKind kind) noexcept(false);
+    Token maybe(tk::TokenKind kind) noexcept;
+    Token maybe_next_real(tk::TokenKind kind) noexcept;
 
-   private:
+   public:
     Lexer save_state() const noexcept { return *this; }
     void restore_state(const Lexer& lexer) noexcept { *this = lexer; }
 
+   private:
     void skip_whitespace();
     str_char peek() const;
     str_char peek(int offset) const;

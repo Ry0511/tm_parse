@@ -7,117 +7,37 @@
 #include "tm_parse/pch.h"
 
 #include "lexer_test_runner.h"
+#include "parser_test_runner.h"
 #include "test_file.h"
 
-#include "tm_parse/lexer/lexer.h"
+#include "tm_parse/lexer/token_error.h"
+#include "tm_parse/parser/parser.h"
 #include "tm_parse/util/text_helpers.h"
 
 namespace tm_parse::tests {
 
-TestFile::TestFile(const fs::path& test_file) : m_TestFile(test_file) {
+namespace {
+str read_file(const fs::path& path) {
+    using It = std::istreambuf_iterator<str_char>;
+    str_ifstream ss{path};
+    return str{It{ss}, It{}};
+}
+}
+
+TestFile::TestFile(const fs::path& test_file) : m_TestFile(test_file), m_Parser(read_file(test_file)) {
     if (!fs::is_regular_file(test_file)) {
         throw std::runtime_error(std::format("file not found {}", test_file.string()).c_str());
     }
-
-    using It = std::istreambuf_iterator<str_char>;
-    str_ifstream ss{test_file};
-    m_TestContent = str{It{ss}, It{}};
-
-    Lexer lexer{m_TestContent};
-
-    // TODO: This needs a rewrite, but for now this is fine
-
-    while (!lexer.is_eof()) {
-        Token id = lexer.next_real_token();
-
-        if (id != tk::Identifier) {
-            throw std::runtime_error{
-                std::format("unexpected token in test file: {}", id.to_string()).c_str()
-            };
-        }
-
-        lexer.require_next_real(tk::Equal);
-        Token val = lexer.next_real_token();
-        str key = str{id.text()};
-
-        if (val == tk::LeftBrace) {
-            m_TestData[key] = std::make_unique<std::any>(lexer);
-            while (lexer.next_token() != tk::RightBrace) {}
-        }
-        // Read bool value
-        else if (val == tk::True || val == tk::False) {
-            m_TestData[key] = std::make_unique<std::any>(val == tk::True);
-        }
-        // Read number value
-        else if (val == tk::Number) {
-            m_TestData[key] = std::make_unique<std::any>(txt::parse_number(val.text()));
-        }
-        // Consume to BlankLine as a string
-        else {
-            TextRegion region = val.Region;
-            do {
-                region = region.extend(val.Region);
-            } while ((val = lexer.next_token()) != tk::BlankLine);
-
-            m_TestData[key] =
-                std::make_unique<std::any>(str{region.create_str_view(m_TestContent)});
-        }
-    }
-
-    process_lexer_values();
+    m_TestContent = str{m_Parser.text()};
+    read_values(m_Parser);
 }
 
-void TestFile::process_lexer_values() {
-    // Second pass go through any Lexer values and parse the internal data
-    for (auto& [key, val] : m_TestData) {
-        if (val->type() != typeid(Lexer)) {
-            continue;
-        }
-
-        Lexer lexer = std::any_cast<Lexer>(*val);
-        std::vector<Token> tokens{};
-        std::vector<tk::TokenKind> skip_tokens{};
-
-        // Skip everything in the expected output blocks
-        if (key.find("expected_") != std::string::npos) {
-            skip_tokens = {
-                tk::BlankLine,
-                tk::LineComment,
-                tk::MultiLineComment,
-            };
-        }
-        // optional skip tokens
-        else {
-            if (this->get<bool>("skip_comments", true)) {
-                skip_tokens.push_back(tk::LineComment);
-                skip_tokens.push_back(tk::MultiLineComment);
-            }
-
-            if (this->get<bool>("skip_blank_lines", true)) {
-                skip_tokens.push_back(tk::BlankLine);
-            }
-        }
-
-        Token tk = lexer.next_token();
-        while (tk != tk::RightBrace) {
-
-            if (tk == tk::EndOfInput) {
-                throw std::runtime_error{"unexpected end of input when parsing block: Identifier = { ... }"};
-            }
-
-            bool skip = std::ranges::any_of(skip_tokens, [&tk](const tk::TokenKind& token) -> bool {
-                return tk == token;
-            });
-
-            if (!skip) {
-                tokens.push_back(tk);
-            }
-
-            tk = lexer.next_token();
-        }
-
-        *m_TestData[key] = std::move(tokens);
+const std::any& TestFile::get_impl(const str& key) const {
+    auto it = m_TestData.find(key);
+    if (it == m_TestData.end()) {
+        throw std::runtime_error{std::format("key {} not found", key).c_str()};
     }
+    return it->second;
 }
 
 std::unique_ptr<TestRunner> TestFile::create_test_runner() const {
@@ -127,17 +47,233 @@ std::unique_ptr<TestRunner> TestFile::create_test_runner() const {
         return std::make_unique<LexerTestRunner>();
     }
 
-    return nullptr;
-}
-
-const std::any& TestFile::get_impl(const str& key) const {
-    auto it = m_TestData.find(key);
-
-    if (it == m_TestData.end()) {
-        throw std::runtime_error{std::format("key {} not found", key).c_str()};
+    if (txt::equal_icase(test_runner, "ParserTest")) {
+        return std::make_unique<ParserTestRunner>();
     }
 
-    return *it->second;
+    throw std::runtime_error{
+        std::format("no runner for test type {}", test_file().filename().string())
+    };
+}
+
+void TestFile::read_values(Parser& parser) {
+    constexpr tk::TokenKind simple_value_tokens[]{
+        tk::True,
+        tk::False,
+        tk::Number,
+        tk::StringLiteral,
+        tk::AnyIdentifier
+    };
+
+    do {
+        // isn't currently handled by the is_eof function
+        if (parser.maybe_real(tk::EndOfInput)) {
+            break;
+        }
+
+        Token id = parser.require_real(tk::AnyIdentifier);
+        str text_id = str{id.text()};
+        parser.require_real(tk::Equal);
+
+        Matcher m = parser.create_matcher();
+        if (Token value = m.any_real(simple_value_tokens)) {
+            m_TestData[text_id] = read_simple(parser);
+        }
+        // A = { ... }
+        else if (parser.maybe_real(tk::LeftBrace)) {
+            m_TestData[text_id] = read_block(text_id, parser);
+            parser.require_real(tk::RightBrace);
+        } else {
+            Token cur = parser.next_real();
+            throw TokenError{
+                std::format(
+                    "unknown token found when parsing test file: '{}'",
+                    m_TestFile.string()
+                ),
+                cur
+            };
+        }
+
+    } while (!parser.is_eof());
+}
+
+std::any TestFile::read_simple(Parser& parser) {
+    Token cur = parser.next_real();
+
+    if (cur == tk::StringLiteral) {
+        return std::make_any<str>(cur.inner_text());
+    }
+
+    if (cur == tk::True || cur == tk::False) {
+        return std::make_any<bool>(cur == tk::True);
+    }
+
+    // Sequence of identifiers
+    if (cur == tk::AnyIdentifier) {
+        Token first = cur;
+        Token last = cur;
+        while (Token cur = parser.maybe(tk::AnyIdentifier)) {
+            last = cur;
+        }
+
+        return std::make_any<str>(first.extend(last).create_str(first.Text));
+    }
+
+    if (cur == tk::Number) {
+        const str_char* data = cur.text().data();
+        return std::make_any<double>(std::strtod(data, nullptr));
+    }
+
+    throw std::runtime_error{std::format("unsupported token {}", cur.token_name())};
+}
+
+std::any TestFile::read_block(str_view id, Parser& parser) {
+    if (id == TXT("test_content")) {
+        return read_test_content(parser);
+    }
+
+    if (id == TXT("expected_tokens")) {
+        return read_expected_tokens(parser);
+    }
+
+    if (id == TXT("expected_text")) {
+        return read_expected_text(parser);
+    }
+
+    if (id == TXT("expected_parse_content")) {
+        return read_expected_parse_content(parser);
+    }
+
+    throw std::runtime_error{std::format("unknown test block item '{}'", id)};
+}
+
+namespace {
+constexpr tk::TokenKind default_skip_tokens[]{tk::BlankLine, tk::LineComment, tk::MultiLineComment};
+}
+
+std::any TestFile::read_test_content(Parser& parser) {
+    std::vector<tk::TokenKind> skip_tokens;
+
+    if (get<bool>(TXT("skip_blank_lines"), true)) {
+        skip_tokens.emplace_back(tk::BlankLine);
+    }
+
+    if (get<bool>(TXT("skip_comments"), true)) {
+        skip_tokens.emplace_back(tk::LineComment);
+        skip_tokens.emplace_back(tk::MultiLineComment);
+    }
+
+    str_view text{};
+    std::any ret = read_generic_block(skip_tokens, parser, &text);
+    m_TestData["test_content_str"] = text;
+    return ret;
+}
+
+std::any TestFile::read_expected_tokens(Parser& parser) {
+    return read_generic_block(default_skip_tokens, parser);
+}
+
+std::any TestFile::read_expected_text(Parser& parser) {
+    return read_generic_block(default_skip_tokens, parser);
+}
+
+std::any TestFile::read_expected_parse_content(Parser& parser) {
+    std::vector<ParserTestEntry> test_entries{};
+
+    while (!parser.maybe_real(tk::EndOfInput)) {
+        // TODO: implement peek and peek_real to check the next N tokens forward
+        Matcher m = parser.create_matcher();
+        if (m.maybe_real(tk::RightBrace)) {
+            break;
+        }
+
+        ParserTestEntry entry{};
+        entry.Class = str{parser.require_real(tk::AnyIdentifier).text()};
+
+        if (!parser.maybe_real(tk::Equal)) {
+            test_entries.push_back(entry);
+            continue;
+        }
+
+        parser.require_real(tk::LeftParen);
+        while (!parser.is_eof()) {
+
+            if (parser.maybe_real(tk::RightParen)) {
+                break;
+            }
+
+            Token id = parser.require_real(tk::AnyIdentifier);
+
+            if (parser.maybe(tk::LeftBracket)) {
+                Token text = parser.require_real(tk::StringLiteral);
+                parser.maybe(tk::RightBracket);
+                entry.VisitorTree.emplace_back(str{id.text()}, text.literal_text());
+            } else {
+                entry.VisitorTree.emplace_back(str{id.text()}, str{});
+            }
+        }
+
+        test_entries.push_back(entry);
+    }
+
+    return test_entries;
+}
+
+std::any TestFile::read_generic_block(
+    std::span<const tk::TokenKind> skip_tokens,
+    Parser& parser,
+    str_view* out_text
+) {
+    bool should_exit = false;
+    std::vector<Token> tokens{};
+    tokens.reserve(512);
+
+    bool skip_blank_lines = false;
+
+    for (const auto& token : skip_tokens) {
+        if (token == tk::BlankLine) {
+            skip_blank_lines = true;
+        }
+    }
+
+    Token first{tk::InvalidToken};
+    Token last{tk::InvalidToken};
+
+    do {
+        Token cur = parser.next();
+
+        if (!first) {
+            first = cur;
+        }
+        last = cur;
+
+        bool should_skip = false;
+        for (const auto& kind : skip_tokens) {
+            if (cur == kind) {
+                should_skip = true;
+            }
+        }
+
+        if (should_skip) {
+            continue;
+        }
+
+        if (cur.is_eof()) {
+            throw std::runtime_error{"unexpected eof when parsing block"};
+        }
+
+        Matcher m = parser.create_matcher();
+        should_exit = skip_blank_lines ? m.maybe_real(tk::RightBrace) : m.maybe(tk::RightBrace);
+        tokens.push_back(cur);
+    } while (!should_exit);
+
+    tokens.shrink_to_fit();
+
+    if (out_text != nullptr) {
+        *out_text = first.extend(last).create_str_view(m_TestContent);
+    }
+
+    return tokens;
 }
 
 }  // namespace tm_parse::tests

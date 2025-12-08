@@ -1,0 +1,15 @@
+create_mod = (
+  name = "My Mod Name",
+  version = "1.0",
+  options = (
+    lower_level_mult=( type=SliderOption, name="XP for Lower Level", value=1.0, min=0.0, max=100.0, step=0.1 )
+    higher_level_mult=( type=SliderOption, name="XP for Higher Level", value=1.0, min=0.0, max=100.0, step=0.1 )
+  )
+)
+
+set $(Globals) ExpScaleByLevelDifference(0).HigherLevelEnemyExpScale 100.0
+
+set $(Globals) ExpScaleByLevelDifference(0).HigherLevelEnemyExpScale 1.00 * lower_level_mult
+
+Begin Object Class=Foo Name=Baz
+End Object

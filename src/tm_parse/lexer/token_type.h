@@ -15,45 +15,64 @@ using token_kind_int = uint8_t;
 
 namespace tk {
 enum TokenKind : token_kind_int {
-    Set = 0,           // Set
-    None,              // None
-    Level,             // level
-    True,              // True
-    False,             // False
-    Begin,             // Begin
-    Object,            // Object
-    Class,             // Class
-    Name,              // Name
-    Package,           // Package
-    End,               // End
-    Keyword_Count,     // Count of keywords
-    LeftParen,         // (
-    RightParen,        // )
-    Dot,               // .
-    Colon,             // :
-    Slash,             // /
-    Star,              // *
-    Comma,             // ,
-    LeftBracket,       // [
-    RightBracket,      // ]
-    Equal,             // =
-    SingleQuote,       // '
-    QuestionMark,      // ?
-    DollarSign,        // $
-    LeftBrace,         // {
-    RightBrace,        // }
-    Ampersand,         // &
-    Symbol_Count,      // Keep this last
-    Number,            // [0-9]+ ( \. [0-9]+ )?
-    Identifier,        // [a-zA-Z_][\w\d_]+
-    StringLiteral,     // ".*?"
-    NameLiteral,       // '.*?'
-    OtherText,         // Any unhandled/unknown text literal
-    LineComment,       // # ...
-    MultiLineComment,  // /* ... */
-    BlankLine,         // [\n\r]
-    EndOfInput,        // EOF
-    TokenKind_Count,   // Keep this last
+    Set = 0,                // Set
+    None,                   // None
+    Level,                  // level
+    True,                   // True
+    False,                  // False
+    Begin,                  // Begin
+    Object,                 // Object
+    Class,                  // Class
+    Name,                   // Name
+    Package,                // Package
+    End,                    // End
+    On,                     // on
+    LogInfo,                // log_info
+    CreateMod,              // create_mod
+    PreCall,                // PRE
+    PostCall,               // POST
+    PostUnconditionalCall,  // POST_UNCONDITIONAL
+    Not,                    // Not
+    And,                    // And
+    Or,                     // Or
+    Pragma,                 // pragma
+    Toggle,                 // toggle
+    Enable,                 // enable
+    Disable,                // disable
+    Let,                    // let
+    Keyword_Count,          // Count of keywords
+    LeftParen,              // (
+    RightParen,             // )
+    Dot,                    // .
+    Colon,                  // :
+    Slash,                  // /
+    Star,                   // *
+    Plus,                   // +
+    Minus,                  // -
+    Comma,                  // ,
+    LeftBracket,            // [
+    RightBracket,           // ]
+    Equal,                  // =
+    SingleQuote,            // '
+    ExclamationMark,        // !
+    QuestionMark,           // ?
+    DollarSign,             // $
+    LeftBrace,              // {
+    RightBrace,             // }
+    Ampersand,              // &
+    Symbol_Count,           // Keep this last
+    Number,                 // [0-9]+ ( \. [0-9]+ )?
+    Identifier,             // [a-zA-Z_][\w\d_]+
+    StringLiteral,          // ".*?"
+    NameLiteral,            // '.*?'
+    OtherText,              // Any unhandled/unknown text literal
+    LineComment,            // # ...
+    MultiLineComment,       // /* ... */
+    BlankLine,              // [\n\r]
+    EndOfInput,             // EOF
+    InvalidToken,           // Special
+    AnyIdentifier,          // Special; allows keywords to pass as identifiers in equality checks
+    TokenKind_Count,        // Keep this last
 };
 }
 
@@ -84,6 +103,20 @@ constexpr std::array<std::string_view, token_type_count + 1> token_type_names{
     "Name",
     "Package",
     "End",
+    "on",
+    "log_info",
+    "create_mod",
+    "PRE",
+    "POST",
+    "POST_UNCONDITIONAL",
+    "Not",
+    "And",
+    "Or",
+    "pragma",
+    "toggle",
+    "enable",
+    "disable",
+    "let",
     "Keyword_Count",
 
     "LeftParen",
@@ -92,11 +125,14 @@ constexpr std::array<std::string_view, token_type_count + 1> token_type_names{
     "Colon",
     "Slash",
     "Star",
+    "Plus",
+    "Minus",
     "Comma",
     "LeftBracket",
     "RightBracket",
     "Equal",
     "SingleQuote",
+    "ExclamationMark",
     "QuestionMark",
     "DollarSign",
     "LeftBrace",
@@ -113,6 +149,8 @@ constexpr std::array<std::string_view, token_type_count + 1> token_type_names{
     "MultiLineComment",
     "BlankLine",
     "EndOfInput",
+    "InvalidToken",
+    "AnyIdentifier",
     "TokenKind_Count",
 };
 
@@ -145,6 +183,17 @@ constexpr tk::TokenKind str_to_token_kind(std::string_view text) {
         }
     }
     throw std::runtime_error{std::format("unknown token kind {}", std::string{text}).c_str()};
+}
+
+inline std::string create_str_from_kinds(const std::span<const tk::TokenKind>& kinds) {
+    std::stringstream ss{};
+    for (auto it = kinds.begin(); it != kinds.end(); ++it) {
+        ss << token_type_name(*it);
+        if (it + 1 != kinds.end()) {
+            ss << ", ";
+        }
+    }
+    return ss.str();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

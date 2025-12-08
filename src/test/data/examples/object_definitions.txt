@@ -1,0 +1,37 @@
+create_mod = (
+  name = "Object Definitions",
+  description = "Various examples on Object Definitions",
+  authors = "Author 1",
+  version = "1.0",
+)
+
+BEGIN OBJECT CLASS=Foo NAME=baz
+
+  pragma disable unquotedliterals
+
+  AAA = 12345
+  AAA = True
+  AAA = False
+  AAA = None
+  AAA = "Some String"
+  AAA = A * B / C + D - E
+  AAA = (A * B / (C + D - E))
+
+  pragma enable unquotedliterals
+
+  AAA(4)[3](2)[1] = 12345
+  AAA(4)[3](2)[1] = True
+  AAA(4)[3](2)[1] = False
+  AAA(4)[3](2)[1] = None
+  AAA(4)[3](2)[1] = "Some String"
+  AAA(4)[3](2)[1] = Unquoted String Literal
+  AAA(4)[3](2)[1] = A * B / C + D - E
+  AAA(4)[3](2)[1] = (A * B / (C + D - E))
+
+  AAA             = A B C D E F
+  AAA             = ABCDEF
+  AAA             = Unquoted String Literal
+  AAA(4)[3](2)[1] = A B C D E F
+  AAA(4)[3](2)[1] = ABCDEF
+
+END OBJECT

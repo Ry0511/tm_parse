@@ -5,11 +5,13 @@
 //
 
 #include "tm_parse/lexer/lexer.h"
+#include "tm_parse/lexer/token_error.h"
 #include "tm_parse/util/text_helpers.h"
 
 namespace tm_parse {
 
-Lexer::Lexer(str_view source) : m_Text(source) {}
+Lexer::Lexer(str_view source)
+    : m_Text(source) {}
 
 Token Lexer::next_token() {
     return next_token_impl();
@@ -101,7 +103,10 @@ Token Lexer::create_token(tk::TokenKind kind) {
 
     return Token{
         kind,
-        TextRegion{m_Start, m_Pos},
+        TextRegion{
+                   static_cast<text_region_int>(m_Start),
+                   static_cast<text_region_int>(m_Pos)
+        },
         m_Line,
         static_cast<int>(static_cast<size_t>(m_Column) - (m_Pos - m_Start)),
         m_Text.data(),
@@ -137,8 +142,9 @@ Token Lexer::next_token_impl() {
         return read_string_literal();
     }
 
-    // -?\d+(\.\d+)?
-    if (txt::is_digit(peek()) || (peek() == TXT('-') && txt::is_digit(peek(1)))) {
+    // [+-]?\d+(\.\d+)?
+    bool has_prefix = (peek() == TXT('-') || peek() == TXT('+'));
+    if (txt::is_digit(peek()) || (has_prefix && txt::is_digit(peek(1)))) {
         return read_number();
     }
 
@@ -155,27 +161,49 @@ Token Lexer::next_token_impl() {
 // | UTILITY FUNCTIONS |
 ////////////////////////////////////////////////////////////////////////////////
 
-Token Lexer::require(tk::TokenKind kind) {
+Token Lexer::require(tk::TokenKind kind) noexcept(false) {
     Lexer state = save_state();
     Token tk = next_token();
 
     if (tk != kind) {
         restore_state(state);
-        std::string expected = std::string{token_type_name(kind)};
-        std::string actual = std::string{token_type_name(tk.Kind)};
-        throw std::runtime_error{std::format("expecting {} but got {}", expected, actual).c_str()};
+        throw TokenError{std::format("Expecting token of type {}", token_type_name(kind)), tk};
     }
 
     return tk;
 }
 
-Token Lexer::require_next_real(tk::TokenKind kind) {
+Token Lexer::require_next_real(tk::TokenKind kind) noexcept(false) {
+    Lexer state = save_state();
     Token tk = next_real_token();
 
     if (tk != kind) {
-        std::string expected = std::string{token_type_name(kind)};
-        std::string actual = std::string{token_type_name(tk.Kind)};
-        throw std::runtime_error{std::format("expecting {} but got {}", expected, actual).c_str()};
+        restore_state(state);
+        throw TokenError{std::format("Expecting token of type {}", token_type_name(kind)), tk};
+    }
+
+    return tk;
+}
+
+Token Lexer::maybe(tk::TokenKind kind) noexcept {
+    Lexer state = save_state();
+    Token tk = next_token();
+
+    if (tk != kind) {
+        restore_state(state);
+        return Token{tk::InvalidToken};
+    }
+
+    return tk;
+}
+
+Token Lexer::maybe_next_real(tk::TokenKind kind) noexcept {
+    Lexer state = save_state();
+    Token tk = next_real_token();
+
+    if (tk != kind) {
+        restore_state(state);
+        return Token{tk::InvalidToken};
     }
 
     return tk;
@@ -235,7 +263,7 @@ Token Lexer::read_identifier() {
 Token Lexer::read_number() {
     m_Start = m_Pos;  // Start token
 
-    if (peek() == TXT('-')) {
+    if (peek() == TXT('-') || peek() == TXT('+')) {
         advance();
     }
 
@@ -273,9 +301,12 @@ Token Lexer::read_other() {
         case TXT(':'):  return _create_token(tk::Colon);
         case TXT('/'):  return _create_token(tk::Slash);
         case TXT('*'):  return _create_token(tk::Star);
+        case TXT('+'):  return _create_token(tk::Plus);
+        case TXT('-'):  return _create_token(tk::Minus);
         case TXT(','):  return _create_token(tk::Comma);
         case TXT('='):  return _create_token(tk::Equal);
         case TXT('\''): return _create_token(tk::SingleQuote);
+        case TXT('!'):  return _create_token(tk::ExclamationMark);
         case TXT('?'):  return _create_token(tk::QuestionMark);
         case TXT('$'):  return _create_token(tk::DollarSign);
         case TXT('{'):  return _create_token(tk::LeftBrace);
@@ -327,7 +358,7 @@ Token Lexer::read_string_literal() {
 
     bool terminator_found = false;
 
-    // Consume until we reach the terminating sequence */ or the end of the input
+    // Consume until we reach the terminating sequence " or the end of the input
     while (!is_eof() && !terminator_found) {
         str_char c = advance();
         // peek(-1) == c

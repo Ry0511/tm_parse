@@ -21,6 +21,7 @@
 #endif
 
 #include <algorithm>
+#include <any>
 #include <array>
 #include <atomic>
 #include <cctype>
@@ -36,6 +37,7 @@
 #include <initializer_list>
 #include <iostream>
 #include <limits>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -51,6 +53,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
+#include <variant>
 
 using std::int16_t;
 using std::int32_t;
@@ -67,31 +70,45 @@ using std::uint8_t;
 
 #include "tm_parse/lexer/token_type.h"
 #include "tm_parse/util/logging.h"
+#include "tm_parse/util/src_loc.h"
 
 namespace tm_parse {
 
+// NOLINTNEXTLINE
 namespace fs = std::filesystem;
 
-constexpr size_t invalid_index_v = std::numeric_limits<size_t>::max();
+constexpr uint32_t invalid_index_v = std::numeric_limits<uint32_t>::max();
 
+// text
 using str_char = char;
 using str = std::string;
 using str_view = std::string_view;
 
+// streams
 using str_istream = std::basic_istream<str_char>;
 using str_fstream = std::basic_fstream<str_char>;
 using str_ifstream = std::basic_ifstream<str_char>;
 using str_stream = std::basic_stringstream<str_char>;
 
+using str_istreambuf_it = std::istreambuf_iterator<str_char>;
+
 #define TXT(S) S
+
+// Common type aliases
+using Float = std::optional<double>;
+using Int = std::optional<int64_t>;
+using Bool = bool;
+using Str = str;
+struct NoneType {};
 
 #if defined(TM_PARSE_ARCH_X64)
 static_assert(sizeof(void*) == 8);
+
 #elif defined(TM_PARSE_ARCH_X86)
 static_assert(sizeof(void*) == 4);
+
 #else
 #error "unsupported architecture defined"
 #endif
-
 
 }  // namespace tm_parse

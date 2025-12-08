@@ -1,0 +1,46 @@
+test_type = ParserTest
+
+test_content = {
+  create_mod = ( A = 1 )
+  create_mod = ( A = 1, B = 2 )
+  create_mod = ( A = 1, )
+}
+
+expected_parse_content = {
+
+  ModDefinition = (
+    AssignmentExprList["( A = 1 )"]
+      AssignmentExpr["A = 1"]
+        PropertyAccess["A"]
+          PropertyDotIdentifier["A"]
+        LiteralExpr["1"]
+  )
+
+  ModDefinition = (
+    AssignmentExprList["( A = 1, B = 2 )"]
+      AssignmentExpr["A = 1"]
+        PropertyAccess["A"]
+          PropertyDotIdentifier["A"]
+        LiteralExpr["1"]
+
+      AssignmentExpr["B = 2"]
+        PropertyAccess["B"]
+          PropertyDotIdentifier["B"]
+        LiteralExpr["2"]
+  )
+
+  ModDefinition = (
+    AssignmentExprList["( A = 1, )"]
+      AssignmentExpr["A = 1"]
+        PropertyAccess["A"]
+          PropertyDotIdentifier["A"]
+        LiteralExpr["1"]
+  )
+
+}
+
+expected_text = {
+  "create_mod = ( A = 1 )"
+  "create_mod = ( A = 1, B = 2 )"
+  "create_mod = ( A = 1, )"
+}

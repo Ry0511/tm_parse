@@ -1,0 +1,69 @@
+test_type = ParserTest
+
+test_content = {
+  A = my unquoted string literal
+  A = (Hello There)
+  A = True
+  A = 50
+  A = (50 + 100) * 65
+  A = (10, "String", $var, (5, 6))
+}
+
+expected_parse_content = {
+  AssignmentExpr = (
+    PropertyAccess["A"]
+      PropertyDotIdentifier["A"]
+    UnquotedStrLiteral["my unquoted string literal"]
+  )
+
+  AssignmentExpr = (
+    PropertyAccess["A"]
+      PropertyDotIdentifier["A"]
+    UnquotedStrLiteral["(Hello There)"]
+  )
+
+  AssignmentExpr = (
+    PropertyAccess["A"]
+      PropertyDotIdentifier["A"]
+    LiteralExpr["True"]
+  )
+
+  AssignmentExpr = (
+    PropertyAccess["A"]
+      PropertyDotIdentifier["A"]
+    LiteralExpr["50"]
+  )
+
+  AssignmentExpr = (
+    PropertyAccess["A"]
+      PropertyDotIdentifier["A"]
+    ComposedExpr["(50 + 100) * 65"]
+      BinaryOpExpr["(50 + 100) * 65"]
+        BinaryOpExpr["(50 + 100)"]
+          LiteralExpr["50"]
+          LiteralExpr["100"]
+        LiteralExpr["65"]
+  )
+
+  AssignmentExpr = (
+    PropertyAccess["A"]
+      PropertyDotIdentifier["A"]
+    TupleExpr["(10, \"String\", $var, (5, 6))"]
+      LiteralExpr["10"]
+      LiteralExpr["String"]
+      MetaVarExpr["$var"]
+        PropertyDotIdentifier["var"]
+      TupleExpr["(5, 6)"]
+        LiteralExpr["5"]
+        LiteralExpr["6"]
+  )
+}
+
+expected_text = {
+  "A = my unquoted string literal"
+  "A = (Hello There)"
+  "A = True"
+  "A = 50"
+  "A = (50 + 100) * 65"
+  "A = (10, \"String\", $var, (5, 6))"
+}

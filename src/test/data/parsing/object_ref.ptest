@@ -1,0 +1,28 @@
+test_type = ParserTest
+
+test_content = {
+  foo
+  foo.baz
+  foo:baz
+  foo.baz:bar
+  $foo.baz.bar
+  foo'baz.bar'
+}
+
+expected_parse_content = {
+  ObjectRef = ( FullObjectRef["foo"]           ObjectDotIdentifier["foo"]                                )
+  ObjectRef = ( FullObjectRef["foo.baz"]       ObjectDotIdentifier["foo.baz"]                            )
+  ObjectRef = ( FullObjectRef["foo:baz"]       ObjectDotIdentifier["foo"]     ObjectDotIdentifier["baz"] )
+  ObjectRef = ( FullObjectRef["foo.baz:bar"]   ObjectDotIdentifier["foo.baz"] ObjectDotIdentifier["bar"] )
+  ObjectRef = ( MetaVarExpr["$foo.baz.bar"]    PropertyDotIdentifier["foo.baz.bar"]                      )
+  ObjectRef = ( ClassObjectRef["foo'baz.bar'"] ObjectDotIdentifier["baz.bar"]                            )
+}
+
+expected_text = {
+  "foo"
+  "foo.baz"
+  "foo:baz"
+  "foo.baz:bar"
+  "$foo.baz.bar"
+  "foo'baz.bar'"
+}

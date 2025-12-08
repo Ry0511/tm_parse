@@ -10,6 +10,8 @@
 
 namespace tm_parse::txt {
 
+str_char to_lower(str_char c) noexcept;
+
 bool is_whitespace(str_char c) noexcept;
 
 bool is_alpha(str_char c) noexcept;
@@ -24,8 +26,16 @@ bool is_newline(str_char c) noexcept;
 
 bool equal_icase(str_view a, str_view b) noexcept;
 
-str escape_string(str_view str) noexcept;
+str escape_string(str_view str, bool flatten_whitespace = false) noexcept;
 
-double parse_number(str_view str) noexcept;
+str sanitise_string(str_view text);
+
+std::optional<double> parse_double(str_view str) noexcept;
+
+std::optional<int32_t> parse_int32(str_view text) noexcept;
+
+std::optional<int64_t> parse_int64(str_view text) noexcept;
+
+std::optional<size_t> parse_size_t(str_view text) noexcept;
 
 }  // namespace tm_parse::txt

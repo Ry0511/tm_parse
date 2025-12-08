@@ -1,0 +1,28 @@
+test_type = ParserTest
+
+test_content = {
+  a
+  a.b
+  a.b.c
+  _
+  _._
+  _._._
+}
+
+expected_parse_content = {
+  PropertyDotIdentifier
+  PropertyDotIdentifier
+  PropertyDotIdentifier
+  ObjectDotIdentifier
+  ObjectDotIdentifier
+  ObjectDotIdentifier
+}
+
+expected_text = {
+  "a"
+  "a.b"
+  "a.b.c"
+  "_"
+  "_._"
+  "_._._"
+}

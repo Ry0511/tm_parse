@@ -1,0 +1,6 @@
+pragma disable create_mod
+
+begin object name=foo.baz.bar class=bar.baz.foo
+end object
+
+set foo baz (1, "Two", (Three = 3, Four = 4))

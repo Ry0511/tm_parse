@@ -1,0 +1,78 @@
+test_type = ParserTest
+
+test_content = {
+  set foo baz ( 5 * 10 )
+  set foo:bar baz(+1.5) 1
+  set foo:bar baz[-1.5] True
+  set foo'baz' bar 1
+  set $foo baz bar
+  set $foo[0].baz(10) baz(0).bar[1] 10
+}
+
+expected_parse_content = {
+  SetCommand = (
+    ObjectRef
+      FullObjectRef["foo"]
+        ObjectDotIdentifier["foo"]
+    PropertyAccess
+      PropertyDotIdentifier["baz"]
+    ComposedExpr["( 5 * 10 )"]
+      BinaryOpExpr["( 5 * 10 )"]
+  )
+
+  SetCommand = (
+    ObjectRef["foo:bar"]
+      FullObjectRef["foo:bar"]
+        ObjectDotIdentifier["foo"]
+        ObjectDotIdentifier["bar"]
+    PropertyAccess["baz(+1.5)"]
+      PropertyDotIdentifier["baz(+1.5)"]
+    LiteralExpr["1"]
+  )
+
+  SetCommand = (
+    ObjectRef["foo:bar"]
+      FullObjectRef["foo:bar"]
+        ObjectDotIdentifier["foo"]
+        ObjectDotIdentifier["bar"]
+    PropertyAccess["baz[-1.5]"]
+      PropertyDotIdentifier["baz[-1.5]"]
+    LiteralExpr["True"]
+  )
+
+  SetCommand = (
+    ObjectRef["foo'baz'"]
+      ClassObjectRef["foo'baz'"]
+        ObjectDotIdentifier["baz"]
+    PropertyAccess["bar"]
+      PropertyDotIdentifier["bar"]
+    LiteralExpr["1"]
+  )
+
+  SetCommand = (
+    ObjectRef["$foo"]
+      MetaVarExpr["$foo"]
+        PropertyDotIdentifier["foo"]
+    PropertyAccess["baz"]
+      PropertyDotIdentifier["baz"]
+    UnquotedStrLiteral["bar"]
+  )
+
+  SetCommand = (
+    ObjectRef["$foo[0].baz(10)"]
+      MetaVarExpr["$foo[0].baz(10)"]
+        PropertyDotIdentifier["foo[0].baz(10)"]
+    PropertyAccess["baz(0).bar[1]"]
+      PropertyDotIdentifier["baz(0).bar[1]"]
+    LiteralExpr["10"]
+  )
+}
+
+expected_text = {
+  "set foo baz ( 5 * 10 )"
+  "set foo:bar baz(+1.5) 1"
+  "set foo:bar baz[-1.5] True"
+  "set foo'baz' bar 1"
+  "set $foo baz bar"
+  "set $foo[0].baz(10) baz(0).bar[1] 10"
+}
