@@ -121,8 +121,8 @@ bool ParserTestRunner::run(TestFile& file) {
             str_view rule_name = child.rule_name();
             str rule_text = txt::escape_string(child.full_text());
 
-            if (const auto* lit = child.is<rules::LiteralExpr>()) {
-                if (const Str* text = lit->get_if<Str>()) {
+            if (const auto* lit = child.template is<rules::LiteralExpr>()) {
+                if (const Str* text = lit->template get_if<Str>()) {
                     rule_text = *text;
                 }
             }

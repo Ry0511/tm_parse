@@ -49,4 +49,6 @@ target_compile_options(
 )
 target_precompile_headers(tm_parse PRIVATE src/tm_parse/pch.h)
 
-add_subdirectory(tm_viewer EXCLUDE_FROM_ALL)
+if (WIN32)
+    add_subdirectory(tm_viewer EXCLUDE_FROM_ALL)
+endif ()

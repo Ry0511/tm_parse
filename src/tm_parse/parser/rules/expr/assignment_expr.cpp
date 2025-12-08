@@ -57,4 +57,9 @@ void AssignmentExpr::cascade_assign_parents(ParserRule* parent) noexcept {
     m_Expr->cascade_assign_parents(this);
 }
 
+template bool AssignmentExpr::matches_with_expr_list<assignment_expr_types>(Matcher&);
+template bool AssignmentExpr::matches_with_expr_list<assignment_expr_list_types>(Matcher&);
+template std::unique_ptr<AssignmentExpr> AssignmentExpr::create_with_expr_list<assignment_expr_types>(Parser& parser);
+template std::unique_ptr<AssignmentExpr> AssignmentExpr::create_with_expr_list<assignment_expr_list_types>(Parser& parser);
+
 }  // namespace tm_parse::rules

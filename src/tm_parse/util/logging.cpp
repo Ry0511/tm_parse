@@ -73,7 +73,6 @@ void log(LogLevel level, std::string_view msg, const SrcLoc& src) {
     size_t begin{0};
     for (size_t i = 0; i <= msg.size(); ++i) {
         if (i < msg.size()) {
-            char ch = msg[i];
             if (msg[i] != '\n' && msg[i] != '\r') {
                 continue;
             }

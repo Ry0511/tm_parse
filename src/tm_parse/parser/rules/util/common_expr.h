@@ -77,10 +77,4 @@ using variable_expr_types = ExprTypeList<
     UnquotedStrLiteral,
     ClassObjectRef>;
 
-// TODO: Not sure if this is the most appropriate solution
-template bool AssignmentExpr::matches_with_expr_list<assignment_expr_types>(Matcher&);
-template bool AssignmentExpr::matches_with_expr_list<assignment_expr_list_types>(Matcher&);
-template std::unique_ptr<AssignmentExpr> AssignmentExpr::create_with_expr_list<assignment_expr_types>(Parser& parser);
-template std::unique_ptr<AssignmentExpr> AssignmentExpr::create_with_expr_list<assignment_expr_list_types>(Parser& parser);
-
 }  // namespace tm_parse::rules

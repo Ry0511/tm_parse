@@ -32,10 +32,10 @@ struct Token {
         int column,
         const str_char* text = nullptr
     ) noexcept
-        : Kind(kind),
-          Region(region),
-          Line(line),
+        : Region(region),
+          Kind(kind),
           Column(column),
+          Line(line),
           Text(text) {};
 
     ~Token() = default;

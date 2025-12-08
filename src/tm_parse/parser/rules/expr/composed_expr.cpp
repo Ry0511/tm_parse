@@ -99,29 +99,37 @@ constexpr tk::TokenKind op_high_precedence[]{tk::Star, tk::Slash, tk::And};
 constexpr tk::TokenKind op_low_precedence[]{tk::Plus, tk::Minus, tk::Or};
 
 Operator get_unary_op_kind(const Token& tok) noexcept {
-    // clang-format off
     switch (tok.Kind) {
-        case tk::Plus:            return Operator::Positive;
-        case tk::Minus:           return Operator::Negate;
-        case tk::Not:             return Operator::LogicalNegate;
-        case tk::ExclamationMark: return Operator::LogicalNegate;
+        case tk::Plus:
+            return Operator::Positive;
+        case tk::Minus:
+            return Operator::Negate;
+        case tk::Not:
+            return Operator::LogicalNegate;
+        case tk::ExclamationMark:
+            return Operator::LogicalNegate;
+        default:
+            return Operator::Unknown;
     }
-    // clang-format on
-    return Operator::Unknown;
 }
 
 Operator get_binary_op_kind(const Token& tok) noexcept {
-    // clang-format off
     switch (tok.Kind) {
-        case tk::Plus:  return Operator::Add;
-        case tk::Minus: return Operator::Subtract;
-        case tk::Star:  return Operator::Multiply;
-        case tk::Slash: return Operator::Divide;
-        case tk::And:   return Operator::LogicalAnd;
-        case tk::Or:    return Operator::LogicalOr;
+        case tk::Plus:
+            return Operator::Add;
+        case tk::Minus:
+            return Operator::Subtract;
+        case tk::Star:
+            return Operator::Multiply;
+        case tk::Slash:
+            return Operator::Divide;
+        case tk::And:
+            return Operator::LogicalAnd;
+        case tk::Or:
+            return Operator::LogicalOr;
+        default:
+            return Operator::Unknown;
     }
-    // clang-format on
-    return Operator::Unknown;
 }
 
 bool match_expr(Matcher& matcher, bool& has_any_op);
