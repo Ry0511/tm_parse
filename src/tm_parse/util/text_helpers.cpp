@@ -140,15 +140,28 @@ str sanitise_string(str_view text) {
 }
 
 std::optional<double> parse_double(str_view text) noexcept {
-    return std::stod(str{text});
+    try {
+        // NOLINTNEXTLINE
+        return static_cast<double>(std::stod(str{text}));
+    } catch (const std::logic_error&) {
+        return std::nullopt;
+    }
 }
 
 std::optional<int32_t> parse_int32(str_view text) noexcept {
-    return std::stoi(str{text});
+    try {
+        return static_cast<int32_t>(std::stoi(str{text}));
+    } catch (const std::logic_error&) {
+        return std::nullopt;
+    }
 }
 
 std::optional<int64_t> parse_int64(str_view text) noexcept {
-    return std::stoll(str{text});
+    try {
+        return static_cast<int64_t>(std::stoll(str{text}));
+    } catch (const std::logic_error&) {
+        return std::nullopt;
+    }
 }
 
 std::optional<size_t> parse_size_t(str_view text) noexcept {
@@ -164,12 +177,16 @@ std::optional<size_t> parse_size_t(str_view text) noexcept {
         return std::nullopt;
     }
 
-    auto val = std::stoull(str{text});
-    if (std::cmp_less(val, Limits::min()) || std::cmp_greater(val, Limits::max())) {
+    try {
+        auto val = std::stoull(str{text});
+        if (std::cmp_less(val, Limits::min()) || std::cmp_greater(val, Limits::max())) {
+            return std::nullopt;
+        }
+        return static_cast<size_t>(val);
+
+    } catch (const std::logic_error&) {
         return std::nullopt;
     }
-
-    return static_cast<size_t>(val);
 }
 
 }  // namespace tm_parse::txt
