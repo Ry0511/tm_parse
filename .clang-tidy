@@ -36,6 +36,7 @@ Checks: >
     -readability-implicit-bool-conversion,
     -readability-static-definition-in-anonymous-namespace,
     -readability-named-parameter,
+    -readability-function-cognitive-complexity,
   
   -bugprone-narrowing-conversions,
   -cppcoreguidelines-avoid-c-arrays,
