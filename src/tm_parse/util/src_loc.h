@@ -57,11 +57,11 @@ struct SrcLoc {
         func_str.reserve(func_view.size());
 
         for (size_t i = 0; i < func_view.size(); ++i) {
-            if (func_view[i] == '`') {
-                func_str += "`anon':";
+            if (func_view.at(i) == '`') {
+                func_str += "$:";
                 i += sizeof("`anonymous-namespace`") - 1;
             } else {
-                func_str += func_view[i];
+                func_str += func_view.at(i);
             }
         }
 

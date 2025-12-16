@@ -83,7 +83,7 @@ ImVec4 get_colour_log_level(LogLevel level);
 }  // namespace
 
 int main() {
-    add_log_callback([](LogLevel level, std::string_view msg, const SrcLoc&) -> void {
+    set_log_callback([](LogLevel level, std::string_view msg, const SrcLoc&) -> void {
         bool has_space = (log_messages.size() + 1) < max_log_messages;
 
         if (!has_space && auto_clear) {
@@ -120,7 +120,6 @@ int main() {
         end_frame();
 
         parse_timeout = std::max(parse_timeout - ImGui::GetIO().DeltaTime, -1.0F);
-
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 }
