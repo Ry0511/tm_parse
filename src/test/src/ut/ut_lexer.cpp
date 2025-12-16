@@ -4,15 +4,8 @@
 // Author     : -Ry
 //
 
-#include <utility>
-
 #include "tm_parse/pch.h"
-#include "tm_parse/lexer/lexer.h"
-
-#undef INFO
-#undef WARN
-
-#include "catch.hpp"
+#include "ut_common.h"
 
 namespace tm_parse::tests {
 
@@ -21,7 +14,8 @@ namespace {
 struct TestData {
     str Text;
     Lexer Lexer;
-    TestData(str text) : Text(std::move(text)), Lexer(Text) {};
+    TestData(str text)
+        : Text(std::move(text)), Lexer(Text) {};
 };
 
 }  // namespace

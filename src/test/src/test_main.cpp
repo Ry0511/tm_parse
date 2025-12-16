@@ -12,7 +12,7 @@
 #include "test_runner.h"
 
 #define CATCH_CONFIG_RUNNER
-#include "catch.hpp"
+#include "catch2/catch.hpp"
 
 namespace tm_parse::tests {
 
@@ -96,6 +96,9 @@ int main() {
 
     LOG_INFO("Running all catch2 tests...");
     Catch::Session session{};
+    const char* catch2_args[]{"tm_parse_tests.exe", "-b", "-i", "-s"};
+    session.applyCommandLine(std::size(catch2_args), catch2_args);
+
     int res = session.run();
 
     if (res != 0) {
