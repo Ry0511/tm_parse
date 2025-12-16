@@ -241,8 +241,8 @@ Token Lexer::read_identifier() {
 
     // If the length of the token content is within the bounds of a keyword see if it matches any
     // known keyword tokens
-    constinit static size_t min_len = smallest_keyword_length();
-    constinit static size_t max_len = largest_keyword_length();
+    constexpr static size_t min_len = smallest_keyword_length();
+    constexpr static size_t max_len = largest_keyword_length();
     size_t len = tk.Region.length();
 
     if (len >= min_len && len <= max_len) {

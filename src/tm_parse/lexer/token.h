@@ -14,8 +14,8 @@ namespace tm_parse {
 struct Token {
     TextRegion Region;
     tk::TokenKind Kind;
-    uint16_t Column{std::numeric_limits<uint16_t>::max()};
-    uint16_t Line{std::numeric_limits<uint16_t>::max()};
+    int32_t Column{std::numeric_limits<int32_t>::max()};
+    int32_t Line{std::numeric_limits<int32_t>::max()};
     const str_char* Text{nullptr};
 
    public:
@@ -28,8 +28,8 @@ struct Token {
     constexpr Token(
         tk::TokenKind kind,
         const TextRegion& region,
-        int line,
-        int column,
+        int32_t line,
+        int32_t column,
         const str_char* text = nullptr
     ) noexcept
         : Region(region),
@@ -54,7 +54,9 @@ struct Token {
     bool has_radix() const noexcept;
 
    public:
-    TextRegion extend(const Token& other) const noexcept { return Region.extend(other.Region); }
+    TextRegion extend(const Token& other) const noexcept {
+        return Region.extend(other.Region);
+    }
 
    public:
     bool is_eof() const noexcept;
