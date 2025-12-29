@@ -27,8 +27,6 @@ bool is_whitespace(str_char c) noexcept {
         default:
             return false;
     }
-
-    return std::isspace(static_cast<int>(c));
 }
 
 bool is_alpha(str_char c) noexcept {
