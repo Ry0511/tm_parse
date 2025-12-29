@@ -53,7 +53,6 @@ std::unique_ptr<ArrayAccess> ArrayAccess::create(Parser& parser) {
 
     size_t i = 0;
     do {
-
         // dynamic array access
         if (Token open = parser.maybe(tk::LeftParen)) {
             Token index = parser.require(tk::Number);

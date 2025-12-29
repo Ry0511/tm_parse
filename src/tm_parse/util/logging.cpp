@@ -24,7 +24,6 @@ std::string_view truncate_left(std::string_view str, size_t len) {
 }  // namespace
 
 void log(LogLevel level, std::string_view msg, const SrcLoc& src) {
-
     const std::string_view file_name = src.file_name();
     const std::string& function_name = src.function();
 

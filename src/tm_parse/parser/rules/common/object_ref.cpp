@@ -19,7 +19,6 @@ ObjectRef::ObjectRef(ObjectRef&&) noexcept = default;
 ObjectRef& ObjectRef::operator=(ObjectRef&&) noexcept = default;
 
 bool ObjectRef::matches(Matcher& matcher) noexcept {
-
     if (matcher.matches<MetaVarExpr>()) {
         return true;
     }

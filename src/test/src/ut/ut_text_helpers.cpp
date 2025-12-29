@@ -10,8 +10,7 @@
 namespace tm_parse::tests {
 
 TEST_CASE("tm_parse::txt::sanitise_string", "txt") {
-
-    auto test = []{
+    auto test = [] {
         REQUIRE(txt::sanitise_string(R"(\tHello\nThere)") == "\tHello\nThere");
         REQUIRE(txt::sanitise_string(R"()").empty());
         REQUIRE(txt::sanitise_string(R"(\n)") == "\n");
@@ -26,7 +25,6 @@ TEST_CASE("tm_parse::txt::sanitise_string", "txt") {
 }
 
 TEST_CASE("tm_parse::txt::") {
-
     // f64
     REQUIRE(txt::parse_double("3.1415").has_value());
     REQUIRE(txt::parse_double("-3.1415").has_value());
@@ -66,4 +64,4 @@ TEST_CASE("tm_parse::txt::") {
     REQUIRE(txt::parse_size_t(std::to_string(std::numeric_limits<size_t>::max())).has_value());
 }
 
-}
+}  // namespace tm_parse::tests
