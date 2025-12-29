@@ -28,7 +28,7 @@
       }
     },
     {
-      "name": "_msvc",
+      "name": "_msvc_x86",
       "hidden": true,
       "condition": {
         "type": "equals",
@@ -38,6 +38,29 @@
       "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": "cmake_crap/msvc.cmake"
+      },
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "VS2022-x86"
+        }
+      }
+    },
+    {
+      "name": "_msvc_x64",
+      "hidden": true,
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "cmake_crap/msvc.cmake"
+      },
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "VS2022-x64"
+        }
       }
     },
     {
@@ -51,6 +74,11 @@
       "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": "cmake_crap/clang_x86.cmake"
+      },
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "Clang 18"
+        }
       }
     },
     {
@@ -64,6 +92,11 @@
       "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": "cmake_crap/clang_x64.cmake"
+      },
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "Clang 18"
+        }
       }
     },
     {
@@ -85,7 +118,7 @@
       "displayName": "msvc debug x64",
       "inherits": [
         "_base",
-        "_msvc",
+        "_msvc_x64",
         "_debug",
         "_x64"
       ]
@@ -95,7 +128,7 @@
       "displayName": "msvc release x64",
       "inherits": [
         "_base",
-        "_msvc",
+        "_msvc_x64",
         "_release",
         "_x64"
       ]
@@ -105,7 +138,7 @@
       "displayName": "msvc debug x86",
       "inherits": [
         "_base",
-        "_msvc",
+        "_msvc_x86",
         "_debug",
         "_x86"
       ]
@@ -115,7 +148,7 @@
       "displayName": "msvc release x86",
       "inherits": [
         "_base",
-        "_msvc",
+        "_msvc_x86",
         "_release",
         "_x86"
       ]
