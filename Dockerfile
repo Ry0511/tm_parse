@@ -46,8 +46,6 @@ RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 100 && 
 
 RUN gcc --version && g++ --version && clang --version && clang++ --version && cmake --version
 
-RUN mkdir git_repos
-
-WORKDIR /git_repos
+WORKDIR /git_repo
 
 CMD [ "bash" ]

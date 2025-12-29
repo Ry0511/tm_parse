@@ -9,54 +9,6 @@
 
 namespace tm_parse::txt {
 
-namespace {
-
-// TODO: This still assumes str_char == char
-template <class T>
-    requires(
-        std::is_same_v<T, int32_t>
-        || std::is_same_v<T, int64_t>
-        || std::is_same_v<T, size_t>
-        || std::is_same_v<T, double>
-    )
-struct NumberParser {
-    using Limits = std::numeric_limits<T>;
-
-    std::optional<T> parse(const str& text) noexcept {
-        try {
-            // simple i32
-            if constexpr (std::is_same_v<T, int32_t>) {
-                return static_cast<T>(std::stoi(text));
-            }
-            // simple i64
-            else if constexpr (std::is_same_v<T, int64_t>) {
-                return static_cast<T>(std::stoll(text));
-            }
-            // need to check bounds
-            else if constexpr (std::is_same_v<T, size_t>) {
-                if (text.empty() || text[0] == TXT('-')) {
-                    return std::nullopt;
-                }
-
-                auto val = std::stoull(text);
-                if (std::cmp_less(val, Limits::min()) || std::cmp_greater(val, Limits::max())) {
-                    return std::nullopt;
-                }
-                return static_cast<T>(val);
-            }
-            // simple float
-            else if constexpr (std::is_same_v<T, double>) {
-                return static_cast<T>(std::stod(text));
-            }
-        } catch (const std::logic_error& error) {
-            LOG_WARN("Error parsing number from '{}' ~ {}", text, error.what());
-            return std::nullopt;
-        }
-    }
-};
-
-}  // namespace
-
 str_char to_lower(str_char c) noexcept {
     if constexpr (std::is_same_v<str_char, char>) {
         return static_cast<str_char>(std::tolower(c));
@@ -75,8 +27,6 @@ bool is_whitespace(str_char c) noexcept {
         default:
             return false;
     }
-
-    return std::isspace(static_cast<int>(c));
 }
 
 bool is_alpha(str_char c) noexcept {
@@ -131,9 +81,8 @@ str escape_string(str_view in, bool flatten_whitespace) noexcept {
 
         switch (c) {
             case '\t': { out += "\\t"; break; }
-            case '\v': { out += "\\v"; break; }
-            case '\n': { out += "\\n"; break; }
             case '\r': { out += "\\r"; break; }
+            case '\n': { out += "\\n"; break; }
             case '\0': { out += "\\0"; break; }
             default  : { out += c;     break; }
         }
@@ -152,7 +101,7 @@ str sanitise_string(str_view text) {
 
     for (str_char c : text) {
         // enable escape sequence start
-        if (c == TXT('\\')) {
+        if (!escape_sequence && c == TXT('\\')) {
             escape_sequence = true;
         }
         // not escaping anything just put the literal char
@@ -162,27 +111,26 @@ str sanitise_string(str_view text) {
         // escape sequence; next character is special
         else {
             // Not exhaustive but should cover the common cases
-            // clang-format off
             switch (c) {
+                    // clang-format off
                 case TXT('\\'): out.push_back(TXT('\\')); break;
                 case TXT('n'):  out.push_back(TXT('\n')); break;
                 case TXT('r'):  out.push_back(TXT('\r')); break;
                 case TXT('t'):  out.push_back(TXT('\t')); break;
-                case TXT('v'):  out.push_back(TXT('\v')); break;
-                case TXT('\b'): out.push_back(TXT('\b')); break;
-                case TXT('\0'): out.push_back(TXT('\0')); break;
                 case TXT('"'):
                 case TXT('\''): out.push_back(c); break;
+                    // clang-format on
                 default:
-                    throw std::logic_error(std::format("invalid escape sequence \\{} in '{}'", c, text));
+                    throw std::logic_error{
+                        std::format("invalid escape sequence \\{} in '{}'", c, text)
+                    };
             }
-            // clang-format on
             escape_sequence = false;
         }
     }
 
     if (escape_sequence) {
-        throw std::logic_error(std::format("string has trailing escape sequence; {}", text));
+        throw std::logic_error{std::format("string has trailing escape sequence; {}", text)};
     }
 
     out.shrink_to_fit();
@@ -190,19 +138,51 @@ str sanitise_string(str_view text) {
 }
 
 std::optional<double> parse_double(str_view text) noexcept {
-    return NumberParser<double>{}.parse(str{text});
+    try {
+        return std::stod(str{text});
+    } catch (const std::logic_error&) {
+        return std::nullopt;
+    }
 }
 
 std::optional<int32_t> parse_int32(str_view text) noexcept {
-    return NumberParser<int32_t>{}.parse(str{text});
+    try {
+        return static_cast<int32_t>(std::stoi(str{text}));
+    } catch (const std::logic_error&) {
+        return std::nullopt;
+    }
 }
 
 std::optional<int64_t> parse_int64(str_view text) noexcept {
-    return NumberParser<int64_t>{}.parse(str{text});
+    try {
+        return static_cast<int64_t>(std::stoll(str{text}));
+    } catch (const std::logic_error&) {
+        return std::nullopt;
+    }
 }
 
 std::optional<size_t> parse_size_t(str_view text) noexcept {
-    return NumberParser<size_t>{}.parse(str{text});
+    using Limits = std::numeric_limits<size_t>;
+
+    // Assumes no leading whitespace
+    if (text.empty() || text.front() == TXT('-')) {
+        return std::nullopt;
+    }
+
+    // decimal value in index
+    if (text.find_first_of(TXT('.')) != str::npos) {
+        return std::nullopt;
+    }
+
+    try {
+        auto val = std::stoull(str{text});
+        if (std::cmp_less(val, Limits::min()) || std::cmp_greater(val, Limits::max())) {
+            return std::nullopt;
+        }
+        return static_cast<size_t>(val);
+    } catch (const std::logic_error&) {
+        return std::nullopt;
+    }
 }
 
 }  // namespace tm_parse::txt

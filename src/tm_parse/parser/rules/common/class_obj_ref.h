@@ -26,8 +26,8 @@ class ClassObjectRef : public ParserRule {
    public:
     ClassObjectRef(const ClassObjectRef&) = delete;
     ClassObjectRef& operator=(const ClassObjectRef&) = delete;
-    ClassObjectRef(ClassObjectRef&&) noexcept ;
-    ClassObjectRef& operator=(ClassObjectRef&&) noexcept ;
+    ClassObjectRef(ClassObjectRef&&) noexcept;
+    ClassObjectRef& operator=(ClassObjectRef&&) noexcept;
 
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;

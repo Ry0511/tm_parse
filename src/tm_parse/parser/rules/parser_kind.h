@@ -12,7 +12,7 @@ namespace tm_parse::rkind {
 
 using parser_rule_kind_int = uint8_t;
 
-// TODO: this can be replaced with a static variable on the class
+// NOLINTNEXTLINE
 enum ParserRuleKind : parser_rule_kind_int {
     ArrayAccess,
     ObjectDotIdentifier,
@@ -43,8 +43,6 @@ enum ParserRuleKind : parser_rule_kind_int {
     VariableExpr,
 
     PragmaToggle,
-
-    TokenRule,  // planned for removal
     Unknown,
     ENUM_COUNT,
 };

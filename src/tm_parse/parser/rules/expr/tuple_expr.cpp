@@ -27,7 +27,6 @@ bool TupleExpr::matches(Matcher& matcher) noexcept {
 }
 
 std::unique_ptr<TupleExpr> TupleExpr::create(Parser& parser) {
-
     Token first = parser.require_real(tk::LeftParen);
     auto rule = std::make_unique<TupleExpr>();
     assignment_expr_list_types exprs{};

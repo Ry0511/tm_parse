@@ -55,15 +55,6 @@
 #include <utility>
 #include <variant>
 
-using std::int16_t;
-using std::int32_t;
-using std::int64_t;
-using std::int8_t;
-
-using std::uint16_t;
-using std::uint32_t;
-using std::uint8_t;
-
 ////////////////////////////////////////////////////////////////////////////////
 // | TM_PARSE |
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,10 +65,23 @@ using std::uint8_t;
 
 namespace tm_parse {
 
+using std::int16_t;
+using std::int32_t;
+using std::int64_t;
+using std::int8_t;
+
+using std::uint16_t;
+using std::uint32_t;
+using std::uint8_t;
+
 // NOLINTNEXTLINE
 namespace fs = std::filesystem;
 
 constexpr uint32_t invalid_index_v = std::numeric_limits<uint32_t>::max();
+
+// TODO: Although these are defined in a way that 'should' allow you to change it to another string
+//  type i.e., std::wstring, wchar, etc its not tested and assumptions are still made about the
+//  actual encoding.
 
 // text
 using str_char = char;
@@ -92,6 +96,7 @@ using str_stream = std::basic_stringstream<str_char>;
 
 using str_istreambuf_it = std::istreambuf_iterator<str_char>;
 
+// NOLINTNEXTLINE
 #define TXT(S) S
 
 // Common type aliases
@@ -101,6 +106,8 @@ using Bool = bool;
 using Str = str;
 struct NoneType {};
 
+// Only doing this because msvc splits the compilers out and CLion will try to build x64 on x86
+//  and vice versa
 #if defined(TM_PARSE_ARCH_X64)
 static_assert(sizeof(void*) == 8);
 

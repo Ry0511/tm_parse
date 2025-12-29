@@ -77,7 +77,7 @@ bool ParserTestRunner::run(TestFile& file) {
 
         // TODO: we never verify the index for pos
         str left = txt::escape_string(rule->full_text());
-        str right = txt::escape_string(expected_text[pos].literal_text());
+        str right = txt::escape_string(expected_text.at(pos).literal_text());
         ++pos;
 
         if (left != right) {
@@ -109,7 +109,7 @@ bool ParserTestRunner::run(TestFile& file) {
 
             // Sanity check to ensure no child node doesn't have a parent
             str key = str{rule->rule_name()} + str{child.rule_name()};
-            const auto&[_, added] = missing_parent_warnings.insert(key);
+            const auto& [_, added] = missing_parent_warnings.insert(key);
             if (child.parent() == nullptr && added) {
                 LOG_WARN(
                     "Child rule of '{}' does not set the parent for '{}'",

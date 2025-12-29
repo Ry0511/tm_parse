@@ -7,7 +7,7 @@
 #include "tm_parse/pch.h"
 #include "tm_parse/parser/parser.h"
 
-#include "catch.hpp"
+#include "catch2/catch.hpp"
 
 namespace tm_parse::tests {
 

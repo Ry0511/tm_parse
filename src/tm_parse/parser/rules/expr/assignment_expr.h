@@ -16,8 +16,8 @@ class PropertyAccess;
 class AssignmentExpr : public Expr {
    private:
     friend class AssignmentExprList;
-    std::unique_ptr<PropertyAccess> m_Property;
-    std::unique_ptr<ParserRule> m_Expr;
+    std::unique_ptr<PropertyAccess> m_Property{nullptr};
+    std::unique_ptr<ParserRule> m_Expr{nullptr};
 
    public:
     AssignmentExpr() = default;

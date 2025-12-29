@@ -56,8 +56,8 @@ void LexerTestRunner::assert_expected_tokens(TestFile& test) {
     }
 
     for (size_t i = 0; i < len; ++i) {
-        Token actual = test_content[i];
-        Token expected = expected_output[i];
+        Token actual = test_content.at(i);
+        Token expected = expected_output.at(i);
         expected.Kind = str_to_token_kind(expected.text());
 
         if (actual == expected || (actual.is_identifier() && expected.is_identifier())) {
@@ -88,8 +88,8 @@ void LexerTestRunner::assert_expected_text(TestFile& test) {
     size_t len = std::min(actual.size(), expected.size());
 
     for (size_t i = 0; i < len; ++i) {
-        Token actual_token = actual[i];
-        Token expected_token = expected[i];
+        Token actual_token = actual.at(i);
+        Token expected_token = expected.at(i);
 
         str left = txt::escape_string(actual_token.inner_text());
         str right = txt::escape_string(expected_token.inner_text());

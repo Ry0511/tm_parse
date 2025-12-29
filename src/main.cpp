@@ -28,11 +28,13 @@ int main() {
     // )");
 
     str source = TXT(R"(
+      create_mod = (
+        name    = "Test Name",
+        version = "1.0",
+        author  = "Foo"
+      )
       Begin Object Class=SomeClass Name=SomeName
-
-        A = ( A * B / -( C / D + 5.0 ) )
-        B = "Swear" / "Word" * "uh oh"
-
+        X = not A and B or not !C
       End Object
     )");
 
@@ -42,10 +44,8 @@ int main() {
     try {
         do {
             auto ptr = parser.parse();
-            ptr->cascade_assign_parents(nullptr);
 
             ptr->visit([](const ParserRule& node) -> void {
-
                 int depth = node.get_depth() * 2;
                 int len = std::max(0, 36 - depth);
                 str indent(depth, TXT(' '));
@@ -54,11 +54,13 @@ int main() {
                 if (const auto* ptr = node.is<BinaryOpExpr>()) {
                     // clang-format off
                     switch (ptr->op()) {
-                        case Operator::Add:      { suffix += TXT(" + "); break; }
-                        case Operator::Subtract: { suffix += TXT(" - "); break; }
-                        case Operator::Divide:   { suffix += TXT(" / "); break; }
-                        case Operator::Multiply: { suffix += TXT(" * "); break; }
-                        default:                 { suffix += TXT(" ? "); break; }
+                        case Operator::Add:        { suffix += TXT(" + ");   break; }
+                        case Operator::Subtract:   { suffix += TXT(" - ");   break; }
+                        case Operator::Divide:     { suffix += TXT(" / ");   break; }
+                        case Operator::Multiply:   { suffix += TXT(" * ");   break; }
+                        case Operator::LogicalAnd: { suffix += TXT(" And "); break; }
+                        case Operator::LogicalOr:  { suffix += TXT(" Or ");  break; }
+                        default:                   { suffix += TXT(" ? ");   break; }
                     }
                     // clang-format on
 

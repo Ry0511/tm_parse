@@ -55,7 +55,7 @@ str_char Lexer::peek() const {
     if (is_eof()) {
         return TXT('\0');
     }
-    return m_Text[m_Pos];
+    return m_Text.at(m_Pos);
 }
 
 str_char Lexer::peek(int offset) const {
@@ -69,14 +69,14 @@ str_char Lexer::peek(int offset) const {
         if (abs_offset > m_Pos) {
             return TXT('\0');
         }
-        return m_Text[m_Pos - abs_offset];
+        return m_Text.at(m_Pos - abs_offset);
     }
 
     // Lookahead
     if ((m_Pos + abs_offset) >= m_Text.size()) {
         return TXT('\0');
     }
-    return m_Text[m_Pos + abs_offset];
+    return m_Text.at(m_Pos + abs_offset);
 }
 
 str_char Lexer::advance() {
@@ -84,7 +84,7 @@ str_char Lexer::advance() {
         return TXT('\0');
     }
 
-    const str_char c = m_Text[m_Pos];
+    const str_char c = m_Text.at(m_Pos);
     m_Pos++;
 
     if (c == TXT('\n')) {
@@ -96,7 +96,7 @@ str_char Lexer::advance() {
     return c;
 }
 
-Token Lexer::create_token(tk::TokenKind kind) {
+Token Lexer::create_token(tk::TokenKind kind) const {
     if (m_Pos < m_Start) {
         throw std::logic_error{"invalid lexer state"};
     }
@@ -241,8 +241,8 @@ Token Lexer::read_identifier() {
 
     // If the length of the token content is within the bounds of a keyword see if it matches any
     // known keyword tokens
-    constinit static size_t min_len = smallest_keyword_length();
-    constinit static size_t max_len = largest_keyword_length();
+    constexpr static size_t min_len = smallest_keyword_length();
+    constexpr static size_t max_len = largest_keyword_length();
     size_t len = tk.Region.length();
 
     if (len >= min_len && len <= max_len) {

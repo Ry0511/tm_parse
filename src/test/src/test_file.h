@@ -28,7 +28,7 @@ class TestFile {
    private:
     fs::path m_TestFile;
     str m_TestContent;
-    Parser m_Parser; // TODO: The parser really shouldn't own the string
+    Parser m_Parser;  // TODO: The parser really shouldn't own the string
     std::map<str, std::any> m_TestData;
 
    public:

@@ -44,7 +44,7 @@ target_compile_features(tm_parse PRIVATE cxx_std_20)
 target_compile_options(
         tm_parse
         PRIVATE
-        $<$<CXX_COMPILER_ID:MSVC>:/W3>
+        $<$<CXX_COMPILER_ID:MSVC>:/W4>
         $<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra>
 )
 target_precompile_headers(tm_parse PRIVATE src/tm_parse/pch.h)

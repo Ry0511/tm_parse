@@ -22,9 +22,10 @@ str read_file(const fs::path& path) {
     str_ifstream ss{path};
     return str{It{ss}, It{}};
 }
-}
+}  // namespace
 
-TestFile::TestFile(const fs::path& test_file) : m_TestFile(test_file), m_Parser(read_file(test_file)) {
+TestFile::TestFile(const fs::path& test_file)
+    : m_TestFile(test_file), m_Parser(read_file(test_file)) {
     if (!fs::is_regular_file(test_file)) {
         throw std::runtime_error(std::format("file not found {}", test_file.string()).c_str());
     }
@@ -197,7 +198,6 @@ std::any TestFile::read_expected_parse_content(Parser& parser) {
 
         parser.require_real(tk::LeftParen);
         while (!parser.is_eof()) {
-
             if (parser.maybe_real(tk::RightParen)) {
                 break;
             }

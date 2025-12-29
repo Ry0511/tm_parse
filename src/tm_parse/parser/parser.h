@@ -31,7 +31,6 @@ class Parser : public Matcher {
 
    public:
     explicit Parser(str text);
-    explicit Parser(const fs::path& file);
     ~Parser() = default;
 
    public:

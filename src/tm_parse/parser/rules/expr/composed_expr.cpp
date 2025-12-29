@@ -105,7 +105,6 @@ Operator get_unary_op_kind(const Token& tok) noexcept {
         case tk::Minus:
             return Operator::Negate;
         case tk::Not:
-            return Operator::LogicalNegate;
         case tk::ExclamationMark:
             return Operator::LogicalNegate;
         default:
@@ -167,8 +166,11 @@ bool match_term(Matcher& matcher, bool& has_any_op) {
 }
 
 bool match_factor(Matcher& matcher, bool& has_any_op) {
-    if (LiteralExpr::matches(matcher) || PropertyDotIdentifier::matches(matcher)
-        || MetaVarExpr::matches(matcher)) {
+    if (
+        LiteralExpr::matches(matcher)
+        || PropertyDotIdentifier::matches(matcher)
+        || MetaVarExpr::matches(matcher)
+    ) {
         return true;
     }
 
