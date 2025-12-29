@@ -22,7 +22,7 @@ target_compile_features(tm_viewer PRIVATE cxx_std_20)
 target_compile_options(
     tm_viewer
     PRIVATE
-    $<$<CXX_COMPILER_ID:MSVC>:/W3>
+    $<$<CXX_COMPILER_ID:MSVC>:/W4>
     $<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra>
 )
 
