@@ -141,8 +141,7 @@ str sanitise_string(str_view text) {
 
 std::optional<double> parse_double(str_view text) noexcept {
     try {
-        // NOLINTNEXTLINE
-        return static_cast<double>(std::stod(str{text}));
+        return std::stod(str{text});
     } catch (const std::logic_error&) {
         return std::nullopt;
     }
@@ -183,7 +182,6 @@ std::optional<size_t> parse_size_t(str_view text) noexcept {
             return std::nullopt;
         }
         return static_cast<size_t>(val);
-
     } catch (const std::logic_error&) {
         return std::nullopt;
     }
