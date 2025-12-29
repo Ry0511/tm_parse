@@ -77,7 +77,7 @@ bool ParserTestRunner::run(TestFile& file) {
 
         // TODO: we never verify the index for pos
         str left = txt::escape_string(rule->full_text());
-        str right = txt::escape_string(expected_text[pos].literal_text());
+        str right = txt::escape_string(expected_text.at(pos).literal_text());
         ++pos;
 
         if (left != right) {

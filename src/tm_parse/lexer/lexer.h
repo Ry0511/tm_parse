@@ -48,7 +48,7 @@ class Lexer {
     str_char advance();
 
    private:
-    Token create_token(tk::TokenKind kind);
+    Token create_token(tk::TokenKind kind) const;
     Token next_token_impl();
 
    private:

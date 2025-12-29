@@ -33,7 +33,7 @@ class Matcher {
    public:
     explicit Matcher() noexcept;
     explicit Matcher(Parser& parser) noexcept;
-    explicit Matcher(std::span<const Token> parser, size_t pos = 0) noexcept;
+    explicit Matcher(std::span<const Token> tokens, size_t pos = 0) noexcept;
     ~Matcher() noexcept = default;
 
    public:
