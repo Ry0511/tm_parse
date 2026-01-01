@@ -44,11 +44,11 @@ struct TextRegion {
     }
 
     constexpr bool operator!=(const TextRegion& other) const noexcept {
-        return this->operator==(other);
+        return !this->operator==(other);
     }
 
     constexpr operator bool() const noexcept {
-        return this->operator!=(TextRegion{invalid_index_v, invalid_index_v});
+        return Start != invalid_index_v && End != invalid_index_v;
     }
 };
 
