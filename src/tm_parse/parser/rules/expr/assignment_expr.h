@@ -8,10 +8,9 @@
 
 #include "tm_parse/pch.h"
 #include "tm_parse/parser/rules/expr/expr.h"
+#include "tm_parse/parser/rules/common/property_access.h"
 
 namespace tm_parse::rules {
-
-class PropertyAccess;
 
 class AssignmentExpr : public Expr {
    private:
@@ -32,6 +31,10 @@ class AssignmentExpr : public Expr {
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
     void cascade_assign_parents(ParserRule* parent) noexcept override;
+
+   public:
+    const ParserRule& property() const { return m_Property->property(); }
+    const ParserRule& expr() const { return *m_Expr; }
 
    public:
     RULE_STATIC_API(AssignmentExpr);

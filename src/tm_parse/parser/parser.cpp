@@ -27,7 +27,6 @@ std::vector<Token> read_all_tokens(str_view text) {
     Token last = tokens.back();
     last.Kind = tk::EndOfInput;
     tokens.emplace_back(last);
-
     tokens.shrink_to_fit();
 
     return tokens;

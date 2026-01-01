@@ -26,6 +26,9 @@ class ModDefinition : public ParserRule {
     ModDefinition& operator=(ModDefinition&&) noexcept;
 
    public:
+    const AssignmentExprList& expr_list() const noexcept { return *m_InitArgs; }
+
+   public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
     void cascade_assign_parents(ParserRule* parent) noexcept override;
 

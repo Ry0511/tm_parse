@@ -32,7 +32,6 @@ class PropertyAccess : public ParserRule {
 
    public:
     const ParserRule& property() const noexcept { return *m_Property; }
-    const PropertyDotIdentifier& property_dot_identifier() const { return m_Property->as_ref<PropertyDotIdentifier>(); }
 
    public:
     RULE_STATIC_API(PropertyAccess);

@@ -32,6 +32,8 @@ std::unique_ptr<ModDefinition> ModDefinition::create(Parser& parser) {
     rule->m_InitArgs->set_parent(*rule);
     rule->post_init(first, rule->m_InitArgs->last_token());
 
+    // TODO: Need to implement a post-validate check here to ensure that the mod definition has the
+    //  required fields i.e., name, version, author and that only trivial structures are used.
     return rule;
 }
 

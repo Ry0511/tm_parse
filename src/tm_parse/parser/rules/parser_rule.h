@@ -20,11 +20,15 @@ class ParserRule;
 class OutputDevice;
 class RuleEvaluator;
 
+// TODO: This is not accurately named this is closer to an AstNode. The static api is closer to
+//  what a 'Parser Rule' actually is. But even then the generated result from the Rule::create call
+//  is AST like.
 class ParserRule {
    public:
     using Ptr = std::unique_ptr<ParserRule>;
     using Vec = std::vector<Ptr>;
     using Iterator = std::vector<Ptr>::iterator;
+    using VisitorFunc = std::function<void(const ParserRule&)>;
 
    protected:
     ParserRule* m_Parent{nullptr};
@@ -56,32 +60,18 @@ class ParserRule {
    public:
     virtual str_view rule_name() const noexcept = 0;
     virtual rkind::ParserRuleKind rule_kind() const noexcept = 0;
-
-    // TODO: Work this one out
-    virtual bool validate_rule(
-        OutputDevice* /*out*/ = nullptr,
-        RuleEvaluator* /*eval*/ = nullptr
-    ) const noexcept {
-        return true;
-    }
-
-    virtual void visit(const std::function<void(const ParserRule&)>& func) const noexcept {
-        func(*this);
-    }
-
+    virtual void visit(const VisitorFunc& func) const noexcept { func(*this); }
     void set_parent(ParserRule& parent) noexcept { m_Parent = &parent; }
+    int get_depth() const noexcept;
 
-    int get_depth() const noexcept {
-        int depth = 0;
-        const ParserRule* ptr = parent();
+   public:
+    void post_init(const Token& first, const Token& last) noexcept;
+    void post_init(const Token& first) noexcept;
+    void post_init(const ParserRule& first, const ParserRule& last) noexcept;
+    void copy_state(const ParserRule& other) noexcept;
 
-        while (ptr) {
-            ptr = ptr->parent();
-            ++depth;
-        }
-
-        return depth;
-    }
+   public:
+    virtual void cascade_assign_parents(ParserRule* parent) noexcept { m_Parent = parent; };
 
    public:
     template <class T>
@@ -123,15 +113,6 @@ class ParserRule {
     T& as_ref() {
         return *as<T>();
     }
-
-   public:
-    void post_init(const Token& first, const Token& last) noexcept;
-    void post_init(const Token& first) noexcept;
-    void post_init(const ParserRule& first, const ParserRule& last) noexcept;
-    void copy_state(const ParserRule& other) noexcept;
-
-   public:
-    virtual void cascade_assign_parents(ParserRule* parent) noexcept { m_Parent = parent; };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

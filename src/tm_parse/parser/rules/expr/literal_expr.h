@@ -28,6 +28,7 @@ class LiteralExpr : public Expr {
     LiteralExpr& operator=(LiteralExpr&&) noexcept = default;
 
    public:
+    const ValueType& value() const noexcept { return m_Value; }
     bool has_value() const noexcept { return !std::holds_alternative<std::monostate>(m_Value); }
 
     template <class T>

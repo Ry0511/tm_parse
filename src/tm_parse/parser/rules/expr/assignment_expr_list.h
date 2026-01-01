@@ -32,6 +32,9 @@ class AssignmentExprList : public Expr {
     void cascade_assign_parents(ParserRule* parent) noexcept override;
 
    public:
+    const auto& assignments() const noexcept { return m_Assignments; }
+
+   public:
     RULE_STATIC_API(AssignmentExprList);
 };
 

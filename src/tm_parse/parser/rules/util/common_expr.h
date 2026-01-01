@@ -50,8 +50,8 @@ using assignment_expr_types = ExprTypeList<
     AssignmentExprList,
     LiteralExpr,
     TupleExpr,
-    UnquotedStrLiteral,
-    ClassObjectRef>;
+    ClassObjectRef,
+    UnquotedStrLiteral>;
 
 //
 // What is allowed on the right hand side of an assignment inside of an expression list
@@ -74,7 +74,7 @@ using assignment_expr_list_types = ExprTypeList<
 using variable_expr_types = ExprTypeList<
     ComposedExpr,
     LiteralExpr,
-    UnquotedStrLiteral,
-    ClassObjectRef>;
+    ClassObjectRef,
+    UnquotedStrLiteral>;
 
 }  // namespace tm_parse::rules

@@ -23,6 +23,7 @@ struct ParseStateInfo {
     bool AllowCreateMod{true};
 };
 
+// TODO: Move ownership of the string out of this
 class Parser : public Matcher {
    private:
     str m_Text;

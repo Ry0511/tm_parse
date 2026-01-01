@@ -79,14 +79,13 @@ namespace fs = std::filesystem;
 
 constexpr uint32_t invalid_index_v = std::numeric_limits<uint32_t>::max();
 
-// TODO: Although these are defined in a way that 'should' allow you to change it to another string
-//  type i.e., std::wstring, wchar, etc its not tested and assumptions are still made about the
-//  actual encoding.
-
 // text
 using str_char = char;
 using str = std::string;
 using str_view = std::string_view;
+
+// we assume that std::string can safely handle the text so its either ascii or utf-8
+static_assert(sizeof(str_char) == 1, "str_char is assumed to be 1 byte");
 
 // streams
 using str_istream = std::basic_istream<str_char>;
@@ -100,20 +99,17 @@ using str_istreambuf_it = std::istreambuf_iterator<str_char>;
 #define TXT(S) S
 
 // Common type aliases
+// TODO: Check if its possible to remove the std::optional here
 using Float = std::optional<double>;
 using Int = std::optional<int64_t>;
 using Bool = bool;
 using Str = str;
-struct NoneType {};
+struct NoneType {}; // proxy type
 
-// Only doing this because msvc splits the compilers out and CLion will try to build x64 on x86
-//  and vice versa
 #if defined(TM_PARSE_ARCH_X64)
 static_assert(sizeof(void*) == 8);
-
 #elif defined(TM_PARSE_ARCH_X86)
 static_assert(sizeof(void*) == 4);
-
 #else
 #error "unsupported architecture defined"
 #endif

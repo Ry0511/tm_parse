@@ -10,97 +10,29 @@
 #include "tm_parse/lexer/token_error.h"
 #include "tm_parse/parser/parser.h"
 #include "tm_parse/util/text_helpers.h"
-
-#include "tm_parse/parser/rules/expr/composed_expr.h"
-#include "tm_parse/parser/rules/primary/object_definition.h"
+#include "tm_parse/parser/rules.h"
+#include "tm_parse/gen/asm_generator.h"
 
 using namespace tm_parse;
 
 int main() {
-    // str source = TXT(R"(
-    //     set
-    //       foo.baz:bar
-    //       property.bar(1)
-    //       ( A = ( X= 10, Y=20 )
-    //       , B = ( Z=-10, W=3  )
-    //       , C = ( D=(A=FALSE,B=TRUE,C=True,D=False) )
-    //       )
-    // )");
 
     str source = TXT(R"(
       create_mod = (
-        name    = "Test Name",
-        version = "1.0",
-        author  = "Foo"
+        name            = "My Mod Name",
+        version         = (1, 0),
+        authors         = ((name="-Ry"), (name="Other")),
+        supported_games = ("BL1", "BL2", "TPS"),
+        description     = "this is an example mod",
+        license         = (name = "GPL3", url = "https://choosealicense.com/licenses/gpl-3.0/"),
+        float_number    = 3.14159265358979323846264338327950
       )
-      Begin Object Class=SomeClass Name=SomeName
-        X = not A and B or not !C
-      End Object
     )");
 
     Parser parser{source};
-    using namespace rules;
-
-    try {
-        do {
-            auto ptr = parser.parse();
-
-            ptr->visit([](const ParserRule& node) -> void {
-                int depth = node.get_depth() * 2;
-                int len = std::max(0, 36 - depth);
-                str indent(depth, TXT(' '));
-                str suffix{};
-
-                if (const auto* ptr = node.is<BinaryOpExpr>()) {
-                    // clang-format off
-                    switch (ptr->op()) {
-                        case Operator::Add:        { suffix += TXT(" + ");   break; }
-                        case Operator::Subtract:   { suffix += TXT(" - ");   break; }
-                        case Operator::Divide:     { suffix += TXT(" / ");   break; }
-                        case Operator::Multiply:   { suffix += TXT(" * ");   break; }
-                        case Operator::LogicalAnd: { suffix += TXT(" And "); break; }
-                        case Operator::LogicalOr:  { suffix += TXT(" Or ");  break; }
-                        default:                   { suffix += TXT(" ? ");   break; }
-                    }
-                    // clang-format on
-
-                    LOG_INFO(
-                        "{}{:<{}} ~ ({}){}({})",
-                        indent,
-                        str{node.rule_name()} + suffix,
-                        len,
-                        txt::escape_string(ptr->left().full_text()).substr(0, 50),
-                        suffix,
-                        txt::escape_string(ptr->right().full_text()).substr(0, 50)
-                    );
-
-                } else {
-                    LOG_INFO(
-                        "{}{:<{}} ~ {}",
-                        indent,
-                        str{node.rule_name()} + suffix,
-                        len,
-                        txt::escape_string(node.full_text()).substr(0, 50)
-                    );
-                }
-            });
-
-            LOG_INFO(
-                "ParsedRule ~ {} from '{}'",
-                ptr->rule_name(),
-                txt::escape_string(ptr->full_text(), true)
-            );
-
-            // TODO: Fix
-            if (parser.maybe_real(tk::EndOfInput)) {
-                break;
-            }
-
-        } while (!parser.is_eof());
-
-    } catch (const TokenError& err) {
-        err.log_error();
-    }
+    auto prog = parser.parse();
+    gen::AsmGenerator generator{};
+    generator.evaluate(prog->as_ref<rules::ProgramRule>(), GeneratorContext{});
 
     LOG_INFO("Parser created with string: {}", source);
 }

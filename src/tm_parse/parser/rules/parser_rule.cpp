@@ -19,6 +19,16 @@ str_view ParserRule::full_text() const {
     return full_text_region().create_str_view(m_TextSource);
 }
 
+int ParserRule::get_depth() const noexcept {
+    int depth = 0;
+    const ParserRule* ptr = parent();
+    while (ptr) {
+        ptr = ptr->parent();
+        ++depth;
+    }
+    return depth;
+}
+
 void ParserRule::post_init(const Token& first, const Token& last) noexcept {
     m_TextSource = first.Text;
     m_FullTextRegion = first.Region.extend(last.Region);
