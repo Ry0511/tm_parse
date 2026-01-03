@@ -31,7 +31,7 @@ file(GLOB_RECURSE TM_PARSE_HEADER_FILES "src/tm_parse/*.h")
 message(STATUS "tm_parse source files '${TM_PARSE_SOURCE_FILES}'")
 message(STATUS "tm_parse header files '${TM_PARSE_HEADER_FILES}'")
 
-add_library(tm_parse STATIC ${TM_PARSE_SOURCE_FILES})
+add_library(tm_parse STATIC)
 
 if (${TM_PARSE_ARCH} STREQUAL "x86")
     target_compile_definitions(tm_parse PUBLIC -DTM_PARSE_ARCH_X86=1)
@@ -49,6 +49,16 @@ target_compile_options(
 )
 target_precompile_headers(tm_parse PRIVATE src/tm_parse/pch.h)
 
+set(CONFIGURE_FILES_DIR "${CMAKE_CURRENT_BINARY_DIR}/configure")
+set(PRE_CONFIGURE_FILE "src/tm_parse/git.inl.in")
+set(POST_CONFIGURE_FILE "${CONFIGURE_FILES_DIR}/tm_parse/git.inl")
+include(cmake_crap/git_watcher.cmake)
+
+target_include_directories(tm_parse PRIVATE ${CONFIGURE_FILES_DIR})
+
 if (WIN32)
     add_subdirectory(tm_viewer EXCLUDE_FROM_ALL)
 endif ()
+
+list(APPEND TM_PARSE_SOURCE_FILES "${CONFIGURE_FILES_DIR}/tm_parse/git.inl")
+target_sources(tm_parse PRIVATE ${TM_PARSE_SOURCE_FILES} ${TM_PARSE_HEADER_FILES})

@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gdb \
     valgrind \
     gnupg \
+    git \
     apt-transport-https \
     build-essential \
     ninja-build \
