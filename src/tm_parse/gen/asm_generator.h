@@ -31,6 +31,10 @@ enum class CodeType : uint8_t {
 };
 
 class AsmGenerator : public CodeGenerator {
+   public:
+    static constexpr int32_t FILE_MAGIC_NUMBER = 0x0;
+    static constexpr int32_t FILE_VERSION_NUMBER = 1;
+
    private:
     std::vector<uint8_t> m_Instructions{};
 
@@ -43,6 +47,9 @@ class AsmGenerator : public CodeGenerator {
 
    public:
     void evaluate(const rules::ProgramRule& program, const GeneratorContext& context) override;
+
+   private:
+    void write_file_header(void);
 };
 
 }  // namespace tm_parse::gen

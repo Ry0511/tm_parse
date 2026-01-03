@@ -5,8 +5,11 @@
 //
 
 #include "tm_parse/pch.h"
-#include "tm_parse/parser/rules.h"
+#include "tm_parse/git.inl"
 #include "tm_parse/gen/asm_generator.h"
+
+#include "tm_parse/parser/rules.h"
+#include "tm_parse/util/text_helpers.h"
 
 namespace tm_parse::gen {
 
@@ -105,6 +108,8 @@ void AsmGenerator::evaluate(
     m_Instructions.clear();
     m_Instructions.reserve(PRE_ALLOC_SIZE);
 
+    write_file_header();
+
     if (const auto* def = program.mod_definition()) {
         m_Instructions.emplace_back(code_int<CodeType::BeginMetadata>());
         emit(m_Instructions, def->expr_list());
@@ -114,7 +119,6 @@ void AsmGenerator::evaluate(
     m_Instructions.shrink_to_fit();
 
     LOG_INFO("[Program Assembly]\n{}", AsmGenerator::decompile(m_Instructions));
-
 
     // for (const auto& rule : program.child_rules()) {
     //     rkind::ParserRuleKind kind = rule->rule_kind();
@@ -127,6 +131,18 @@ void AsmGenerator::evaluate(
     //         //  only way we can know is at runtime in the game
     //     }
     // }
+}
+
+void AsmGenerator::write_file_header(void) {
+    write_int_t<int32_t>(m_Instructions, FILE_MAGIC_NUMBER);
+    write_int_t<int32_t>(m_Instructions, FILE_VERSION_NUMBER);
+    constexpr std::string_view git_head_sha1{TM_PARSE_GIT_HEAD_SHA1};
+    write_str(m_Instructions, git_head_sha1);
+    write_str(m_Instructions, txt::iso_date_now_str());
+
+    // hash of the current content bytes
+    uint32_t hash = txt::hash_data({m_Instructions.data(), m_Instructions.size()});
+    write_int_t<uint32_t>(m_Instructions, hash);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
