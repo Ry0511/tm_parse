@@ -137,6 +137,26 @@ str sanitise_string(str_view text) {
     return out;
 }
 
+str iso_date_now_str(void) noexcept {
+    return std::format(
+        TXT("{:%Y/%m/%d %H:%M}"),
+        std::chrono::zoned_time{
+            std::chrono::current_zone(),
+            std::chrono::system_clock::now()
+        }
+    );
+}
+
+uint32_t hash_data(std::span<const uint8_t> data) noexcept {
+    constexpr uint32_t initial_hash_seed = 5381;
+    constexpr uint32_t multiplier = 33;
+    uint32_t hash{initial_hash_seed};
+    for (const uint8_t val : data) {
+        hash = (hash * multiplier) + static_cast<uint32_t>(val);
+    }
+    return hash;
+}
+
 std::optional<double> parse_double(str_view text) noexcept {
     try {
         return std::stod(str{text});

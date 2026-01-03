@@ -30,6 +30,10 @@ str escape_string(str_view str, bool flatten_whitespace = false) noexcept;
 
 str sanitise_string(str_view text);
 
+str iso_date_now_str(void) noexcept;
+
+uint32_t hash_data(std::span<const uint8_t> data) noexcept;
+
 std::optional<double> parse_double(str_view str) noexcept;
 
 std::optional<int32_t> parse_int32(str_view text) noexcept;
