@@ -32,11 +32,11 @@ enum class CodeType : uint8_t {
 
 class AsmGenerator : public CodeGenerator {
    public:
-    static constexpr int32_t FILE_MAGIC_NUMBER = 0x0;
-    static constexpr int32_t FILE_VERSION_NUMBER = 1;
+    static constexpr int32_t FILE_MAGIC_NUMBER = 0x69626D74;
+    static constexpr int32_t FILE_VERSION_NUMBER{1};
 
    private:
-    std::vector<uint8_t> m_Instructions{};
+    std::vector<uint8_t> m_Instructions;
 
    public:
     static str decompile(const std::vector<uint8_t>& ins);

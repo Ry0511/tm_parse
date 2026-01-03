@@ -7,6 +7,8 @@
 #include "tm_parse/pch.h"
 #include "tm_parse/gen/asm_generator.h"
 
+#include "tm_parse/util/text_helpers.h"
+
 namespace tm_parse::gen {
 
 namespace {
@@ -30,6 +32,7 @@ constexpr std::array<str_view, 16> op_codes{
     TXT("BeginExpr"),
 };
 
+void read_file_header(str_stream& out, const std::vector<uint8_t>& ins, size_t& index);
 int64_t read_int(str_stream& out, const std::vector<uint8_t>& ins, size_t& index);
 void read_f64(str_stream& out, const std::vector<uint8_t>& ins, size_t& index);
 void read_bool(str_stream& out, const std::vector<uint8_t>& ins, size_t& index);
@@ -41,10 +44,11 @@ void read_obj(str_stream& out, const std::vector<uint8_t>& ins, size_t& index);
 str AsmGenerator::decompile(const std::vector<uint8_t>& ins) {
     str_stream out{};
 
-    const char* data = reinterpret_cast<const char*>(ins.data());
+    size_t index{0};
+    read_file_header(out, ins, index);
 
-    for (size_t i = 0; i < ins.size();) {
-        uint8_t code = ins.at(i);
+    for (; index < ins.size();) {
+        uint8_t code = ins.at(index);
 
         switch (static_cast<CodeType>(code)) {
             case CodeType::Nothing:
@@ -56,25 +60,25 @@ str AsmGenerator::decompile(const std::vector<uint8_t>& ins) {
             case CodeType::BeginSetCommand:
             case CodeType::BeginExpr:
                 out << op_codes.at(code);
-                ++i;
+                ++index;
                 break;
             case CodeType::Int8:
             case CodeType::Int16:
             case CodeType::Int32:
             case CodeType::Int64:
-                read_int(out, ins, i);
+                read_int(out, ins, index);
                 break;
             case CodeType::Float:
-                read_f64(out, ins, i);
+                read_f64(out, ins, index);
                 break;
             case CodeType::Bool:
-                read_bool(out, ins, i);
+                read_bool(out, ins, index);
                 break;
             case CodeType::Str:
-                read_str(out, ins, i);
+                read_str(out, ins, index);
                 break;
             case CodeType::Object:
-                read_obj(out, ins, i);
+                read_obj(out, ins, index);
                 break;
             default: {
                 throw std::runtime_error{"unhandled code type"};
@@ -88,6 +92,34 @@ str AsmGenerator::decompile(const std::vector<uint8_t>& ins) {
 }
 
 namespace {
+
+void read_file_header(str_stream& out, const std::vector<uint8_t>& ins, size_t& index) {
+    size_t start_index{index};
+    out << TXT("[File Header]\n");
+    out << TXT("Magic Number  => ");
+    read_int(out, ins, index);
+    out << TXT("\n");
+
+    out << TXT("File Version  => ");
+    read_int(out, ins, index);
+    out << TXT("\n");
+
+    out << TXT("Git SHA-1     => ");
+    read_str(out, ins, index);
+    out << TXT("\n");
+
+    out << TXT("Compile Date  => ");
+    read_str(out, ins, index);
+    out << TXT("\n");
+
+    uint32_t calculated_hash = txt::hash_data({ins.data() + start_index, index});
+    out << TXT("Content Hash  => ");
+    read_int(out, ins, index);
+    out << TXT("\n");
+
+    out << std::format(TXT("Computed Hash => Int32 {}\n"), calculated_hash);
+    out << TXT("[End File Header]\n");
+}
 
 int64_t read_int(str_stream& out, const std::vector<uint8_t>& ins, size_t& index) {
     uint8_t int_code = ins.at(index++);

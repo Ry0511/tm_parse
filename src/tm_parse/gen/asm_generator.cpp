@@ -134,14 +134,19 @@ void AsmGenerator::evaluate(
 }
 
 void AsmGenerator::write_file_header(void) {
+    m_Instructions.emplace_back(code_int<CodeType::Int32>());
     write_int_t<int32_t>(m_Instructions, FILE_MAGIC_NUMBER);
+
+    m_Instructions.emplace_back(code_int<CodeType::Int32>());
     write_int_t<int32_t>(m_Instructions, FILE_VERSION_NUMBER);
+
     constexpr std::string_view git_head_sha1{TM_PARSE_GIT_HEAD_SHA1};
     write_str(m_Instructions, git_head_sha1);
     write_str(m_Instructions, txt::iso_date_now_str());
 
     // hash of the current content bytes
     uint32_t hash = txt::hash_data({m_Instructions.data(), m_Instructions.size()});
+    m_Instructions.emplace_back(code_int<CodeType::Int32>());
     write_int_t<uint32_t>(m_Instructions, hash);
 }
 
