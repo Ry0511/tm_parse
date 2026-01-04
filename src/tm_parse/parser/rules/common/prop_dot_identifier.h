@@ -14,9 +14,6 @@ namespace tm_parse::rules {
 
 class ArrayAccess;
 
-// TODO: There always was and is a plan to introduce a NameContext or something similar to resolve
-//  duplicated identifiers but currently that does not exist so just going to use Token as a
-//  placeholder until that is ready.
 struct PropertyDotIdentifierData {
     Token IdentifierPart;
     std::unique_ptr<ArrayAccess> ArrayPart;

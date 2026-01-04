@@ -13,7 +13,7 @@ namespace tm_parse::rules {
 
 struct ArrayAccessData {
     size_t Index{invalid_index_v};  // Index Value
-    bool IsDynamicAccess{false};    // Initialised with (\d) or [\d]
+    bool IsDynamicAccess{false};    // Dynamic=(T) Static=[T]
     bool IsValidNumber{false};      // Was the value of \d valid?
     bool IsInitialised{false};      // Have we been initialised?
 };

@@ -25,6 +25,10 @@ bool ClassObjectRef::matches(Matcher& matcher) noexcept {
 }
 
 std::unique_ptr<ClassObjectRef> ClassObjectRef::create(Parser& parser) {
+
+    // TODO: This should allow for: foo.baz.bar'bar.baz:foo' currently it assumes single identifier
+    //  class names
+
     Token first = parser.require_real(tk::AnyIdentifier);
     parser.require_real(tk::SingleQuote);
 

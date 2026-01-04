@@ -11,6 +11,8 @@
 
 namespace tm_parse::rules {
 
+// TODO: I want to re-introduce this back into the hierarchy now that I know where it can fit/be
+
 class Expr : public ParserRule {
    public:
     Expr() = default;
