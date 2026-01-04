@@ -24,12 +24,13 @@ namespace tm_parse::rules {
 
 // All expressions in order of precedence.
 using all_expressions = ExprTypeList<
-    MetaVarExpr,
-    ComposedExpr,
-    AssignmentExprList,
-    AssignmentExpr,
     LiteralExpr,
+    MetaVarExpr,
+    ClassObjectRef,
+    PropertyDotIdentifier,
+    AssignmentExprList,
     TupleExpr,
+    ComposedExpr,
     UnquotedStrLiteral>;
 
 // TODO: Remove this and remove ParenExpr
@@ -45,12 +46,13 @@ using paren_expr_types = ExprTypeList<
 //   A = EXPR
 //
 using assignment_expr_types = ExprTypeList<
-    MetaVarExpr,
-    ComposedExpr,
-    AssignmentExprList,
     LiteralExpr,
-    TupleExpr,
+    MetaVarExpr,
     ClassObjectRef,
+    PropertyDotIdentifier,
+    AssignmentExprList,
+    TupleExpr,
+    ComposedExpr,
     UnquotedStrLiteral>;
 
 //
@@ -59,12 +61,13 @@ using assignment_expr_types = ExprTypeList<
 //   ( A = EXPR, B = EXPR )
 //
 using assignment_expr_list_types = ExprTypeList<
+    LiteralExpr,
     MetaVarExpr,
-    ComposedExpr,
+    ClassObjectRef,
+    PropertyDotIdentifier,
     AssignmentExprList,
     TupleExpr,
-    LiteralExpr,
-    ClassObjectRef>;
+    ComposedExpr>;
 
 //
 // What is allowed on the right hand side of an variable assignment expression
