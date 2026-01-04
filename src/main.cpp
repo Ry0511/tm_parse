@@ -16,7 +16,6 @@
 using namespace tm_parse;
 
 int main() {
-
     str source = TXT(R"(
       create_mod = (
         name            = "My Mod Name",
@@ -32,7 +31,12 @@ int main() {
     Parser parser{source};
     auto prog = parser.parse();
     gen::AsmGenerator generator{};
-    generator.evaluate(prog->as_ref<rules::ProgramRule>(), GeneratorContext{});
+
+    try {
+        generator.evaluate(prog->as_ref<rules::ProgramRule>(), GeneratorContext{});
+    } catch (const std::exception& err) {
+        LOG_ERR("Error - {}", err.what());
+    }
 
     LOG_INFO("Parser created with string: {}", source);
 }
