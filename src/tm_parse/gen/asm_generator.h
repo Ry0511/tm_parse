@@ -8,27 +8,26 @@
 
 #include "tm_parse/pch.h"
 #include "tm_parse/gen/code_generator.h"
+#include "tm_parse/gen/binary_file.h"
+
+namespace tm_parse {
+class ParserRule;
+
+namespace rules {
+class SetCommand;
+class AssignmentExprList;
+class AssignmentExpr;
+class TupleExpr;
+class LiteralExpr;
+class ComposedExpr;
+class MetaVarExpr;
+class ClassObjectRef;
+class UnquotedStrLiteral;
+}  // namespace rules
+
+}  // namespace tm_parse
 
 namespace tm_parse::gen {
-
-enum class CodeType : uint8_t {
-    Nothing = 0,
-    BeginMetadata,
-    BeginOptions,
-    BeginKeyValue,
-    BeginArray,
-    End,
-    Int8,
-    Int16,
-    Int32,
-    Int64,
-    Float,
-    Bool,
-    Str,
-    Object,
-    BeginSetCommand,
-    BeginExpr,
-};
 
 class AsmGenerator : public CodeGenerator {
    public:
@@ -36,7 +35,7 @@ class AsmGenerator : public CodeGenerator {
     static constexpr int32_t FILE_VERSION_NUMBER{1};
 
    private:
-    std::vector<uint8_t> m_Instructions;
+    BinaryFileWriter m_Writer;
 
    public:
     static str decompile(const std::vector<uint8_t>& ins);
@@ -50,6 +49,23 @@ class AsmGenerator : public CodeGenerator {
 
    private:
     void write_file_header(void);
+    void emit(const rules::SetCommand& cmd);
+    void emit(const rules::TupleExpr& expr);
+    void emit(const rules::ComposedExpr& expr);
+    void emit(const rules::MetaVarExpr& expr);
+    void emit(const rules::ClassObjectRef& expr);
+    void emit(const rules::UnquotedStrLiteral& expr);
+    void emit(const rules::AssignmentExpr& assign);
+    void emit(const rules::AssignmentExprList& list);
+    void emit(const rules::LiteralExpr& expr);
+
+    void emit_expr(const ParserRule& expr);
+
+    void emit_literal_value(const Int& value);
+    void emit_literal_value(const Float& value);
+    void emit_literal_value(Bool value);
+    void emit_literal_value(const Str& value);
+    void emit_literal_value(const NoneType& value);
 };
 
 }  // namespace tm_parse::gen

@@ -15,246 +15,149 @@ namespace tm_parse::gen {
 
 using namespace tm_parse::rules;
 
-namespace {
-
-template <CodeType Type>
-uint8_t code_int() noexcept {
-    return static_cast<uint8_t>(Type);
-}
-
-// pedantic
-static_assert(std::endian::native == std::endian::little);
-
-template <class T>
-void write_int_t(std::vector<uint8_t>& buf, T val) {
-    constexpr auto max_shifts = sizeof(T);
-    constexpr auto shift_size = 8;
-    using UnsignedType = std::make_unsigned_t<T>;
-
-    auto uval = static_cast<UnsignedType>(val);
-    for (size_t i = 0; i < max_shifts; ++i) {
-        buf.emplace_back(
-            static_cast<uint8_t>((uval >> (shift_size * i)) & 0xFF)
-        );
-    }
-}
-
-void write_int(std::vector<uint8_t>& buf, int64_t val) {
-    constexpr auto fits_into = [](int64_t value, const auto& bounds) {
-        return std::cmp_greater_equal(value, bounds.min())
-               && std::cmp_less_equal(value, bounds.max());
-    };
-
-    if (fits_into(val, std::numeric_limits<int8_t>{})) {
-        buf.emplace_back(code_int<CodeType::Int8>());
-        write_int_t<int8_t>(buf, static_cast<int8_t>(val));
-
-    } else if (fits_into(val, std::numeric_limits<int16_t>{})) {
-        buf.emplace_back(code_int<CodeType::Int16>());
-        write_int_t<int16_t>(buf, static_cast<int16_t>(val));
-
-    } else if (fits_into(val, std::numeric_limits<int32_t>{})) {
-        buf.emplace_back(code_int<CodeType::Int32>());
-        write_int_t<int32_t>(buf, static_cast<int32_t>(val));
-
-    } else if (fits_into(val, std::numeric_limits<int64_t>{})) {
-        buf.emplace_back(code_int<CodeType::Int64>());
-        write_int_t<int64_t>(buf, val);
-
-    } else {
-        throw std::overflow_error{"int value can't be written"};
-    }
-}
-
-void write_f64(std::vector<uint8_t>& buf, double val) {
-    static_assert(sizeof(double) == sizeof(uint64_t));
-    uint64_t bits{0};
-    std::memcpy(&bits, &val, sizeof(bits));
-    write_int_t<uint64_t>(buf, bits);
-}
-
-void write_str(std::vector<uint8_t>& buf, const str_view& val) {
-    static_assert(sizeof(str_view::value_type) == sizeof(uint8_t));
-    buf.emplace_back(code_int<CodeType::Str>());
-    write_int(buf, static_cast<int64_t>(val.size()));
-    for (const str_char elem : val) {
-        buf.emplace_back(static_cast<uint8_t>(elem));
-    }
-}
-
-void emit(std::vector<uint8_t>& ins, const SetCommand& cmd);
-void emit(std::vector<uint8_t>& ins, const AssignmentExprList& list);
-void emit(std::vector<uint8_t>& ins, const AssignmentExpr& assign);
-void emit(std::vector<uint8_t>& ins, const TupleExpr& expr);
-void emit(std::vector<uint8_t>& ins, const LiteralExpr& expr);
-void emit(std::vector<uint8_t>& ins, const ComposedExpr& expr);
-
-void write(std::vector<uint8_t>& ins, const Int& val);
-void write(std::vector<uint8_t>& ins, const Float& val);
-void write(std::vector<uint8_t>& ins, const Bool& val);
-void write(std::vector<uint8_t>& ins, const Str& val);
-void write(std::vector<uint8_t>& ins, const NoneType& val);
-void write(std::vector<uint8_t>& ins, const std::monostate& val);
-
-void emit_expr(std::vector<uint8_t>& ins, const ParserRule& expr);
-
-}  // namespace
-
 void AsmGenerator::evaluate(
-    const rules::ProgramRule& program,
+    const ProgramRule& program,
     const GeneratorContext& /*context*/
 ) {
     constexpr static size_t PRE_ALLOC_SIZE = (1024 * 512);
-    m_Instructions.clear();
-    m_Instructions.reserve(PRE_ALLOC_SIZE);
+    m_Writer = BinaryFileWriter{};
+    m_Writer.reserve(PRE_ALLOC_SIZE);
 
     write_file_header();
 
     if (const auto* def = program.mod_definition()) {
-        m_Instructions.emplace_back(code_int<CodeType::BeginMetadata>());
-        emit(m_Instructions, def->expr_list());
-        m_Instructions.emplace_back(code_int<CodeType::End>());
+        m_Writer.write_marker_byte(MarkerByte::BeginMetadata);
+        emit(def->expr_list());
+        m_Writer.write_marker_byte(MarkerByte::End);
     }
 
-    m_Instructions.shrink_to_fit();
+    m_Writer.data().shrink_to_fit();
 
-    LOG_INFO("[Program Assembly]\n{}", AsmGenerator::decompile(m_Instructions));
-
-    // for (const auto& rule : program.child_rules()) {
-    //     rkind::ParserRuleKind kind = rule->rule_kind();
-    //
-    //     if (kind == rkind::SetCommand) {
-    //         emit(m_Instructions, rule->as_ref<SetCommand>());
-    //     } else if (kind == rkind::ObjectDefinition) {
-    //         // TODO: although support for this does exist, i am not sure how this one should be
-    //         //  implemented. i.e., is it creating an object or mutating one?
-    //         //  only way we can know is at runtime in the game
-    //     }
-    // }
+    LOG_INFO("[Program Assembly]\n{}", AsmGenerator::decompile(m_Writer.data()));
 }
 
 void AsmGenerator::write_file_header(void) {
-    m_Instructions.emplace_back(code_int<CodeType::Int32>());
-    write_int_t<int32_t>(m_Instructions, FILE_MAGIC_NUMBER);
-
-    m_Instructions.emplace_back(code_int<CodeType::Int32>());
-    write_int_t<int32_t>(m_Instructions, FILE_VERSION_NUMBER);
+    m_Writer.write_int_fixed<int32_t>(FILE_MAGIC_NUMBER);
+    m_Writer.write_int_fixed<int32_t>(FILE_VERSION_NUMBER);
 
     constexpr std::string_view git_head_sha1{TM_PARSE_GIT_HEAD_SHA1};
-    write_str(m_Instructions, git_head_sha1);
-    write_str(m_Instructions, txt::iso_date_now_str());
+    m_Writer.write_str(git_head_sha1);
+    m_Writer.write_str(txt::iso_date_now_str());
 
     // hash of the current content bytes
-    uint32_t hash = txt::hash_data({m_Instructions.data(), m_Instructions.size()});
-    m_Instructions.emplace_back(code_int<CodeType::Int32>());
-    write_int_t<uint32_t>(m_Instructions, hash);
+    uint32_t hash = txt::hash_data(m_Writer.data());
+    m_Writer.write_int_fixed<uint32_t>(hash);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// | IMPL |
-////////////////////////////////////////////////////////////////////////////////
-
-namespace {
-
-void emit(std::vector<uint8_t>& /*ins*/, const SetCommand& /*cmd*/) {
-    // TODO: Implement
+void AsmGenerator::emit(const SetCommand& /*cmd*/) {
+    m_Writer.write_str("SetCommand not implemented");
 }
 
-void emit(std::vector<uint8_t>& ins, const AssignmentExprList& list) {
-    ins.emplace_back(code_int<CodeType::BeginKeyValue>());
-    write_int(ins, static_cast<int64_t>(list.assignments().size()));
-
+void AsmGenerator::emit(const AssignmentExprList& list) {
+    m_Writer.write_marker_byte(MarkerByte::BeginKeyValue);
+    m_Writer.write_int(list.assignments().size());
     for (const auto& inner : list.assignments()) {
-        emit(ins, *inner);
+        emit(*inner);
     }
-    ins.emplace_back(code_int<CodeType::End>());
+    m_Writer.write_marker_byte(MarkerByte::End);
 }
 
-void emit(std::vector<uint8_t>& ins, const AssignmentExpr& assign) {
-    write_str(ins, assign.property().full_text());
-    emit_expr(ins, assign.expr());
+void AsmGenerator::emit(const AssignmentExpr& assign) {
+    // TODO: Property access should be a separate entity
+    m_Writer.write_str(assign.property().full_text());
+    emit_expr(assign.expr());
 }
 
-void emit(std::vector<uint8_t>& ins, const TupleExpr& expr) {
-    ins.emplace_back(code_int<CodeType::BeginArray>());
-    write_int(ins, static_cast<int64_t>(expr.elements().size()));
+void AsmGenerator::emit(const TupleExpr& expr) {
+    m_Writer.write_marker_byte(MarkerByte::BeginArray);
+    m_Writer.write_int(expr.elements().size());
     for (const auto& inner : expr.elements()) {
-        emit_expr(ins, *inner);
+        emit_expr(*inner);
     }
-    ins.emplace_back(code_int<CodeType::End>());
+    m_Writer.write_marker_byte(MarkerByte::End);
 }
 
-void emit(std::vector<uint8_t>& ins, const LiteralExpr& expr) {
+void AsmGenerator::emit(const LiteralExpr& expr) {
     std::visit(
-        [&ins](const auto& val) { write(ins, val); },
+        [this](const auto& value) -> void {
+            using T = std::remove_cvref_t<decltype(value)>;
+            if constexpr (!std::is_same_v<T, std::monostate>) {
+                this->emit_literal_value(value);
+            } else {
+                this->m_Writer.write_marker_byte(MarkerByte::Nothing);
+            }
+        },
         expr.value()
     );
 }
 
-void emit(std::vector<uint8_t>& ins, const ComposedExpr& /*expr*/) {
-    ins.emplace_back(code_int<CodeType::BeginExpr>());
-    write_int(ins, int64_t{0});
+void AsmGenerator::emit(const rules::MetaVarExpr& /*expr*/) {
+    // TODO: This is the SrcObject, well, MetaVar ( $Primary ) ( Dot Id ArrayAccess? )*
+    m_Writer.write_str("MetaVarExpr not implemented");
 }
 
-void write(std::vector<uint8_t>& ins, const Int& val) {
-    if (!val.has_value()) {
-        ins.emplace_back(code_int<CodeType::Nothing>());
-    } else {
-        write_int(ins, static_cast<int64_t>(*val));
-    }
+void AsmGenerator::emit(const rules::ClassObjectRef& /*expr*/) {
+    m_Writer.write_str("ClassObjectRef not implemented");
 }
 
-void write(std::vector<uint8_t>& ins, const Float& val) {
-    if (!val.has_value()) {
-        ins.emplace_back(code_int<CodeType::Nothing>());
-    } else {
-        ins.emplace_back(code_int<CodeType::Float>());
-        write_f64(ins, *val);
-    }
+void AsmGenerator::emit(const rules::UnquotedStrLiteral& expr) {
+    // Not sure if this is enough
+    m_Writer.write_str(expr.full_text());
 }
 
-void write(std::vector<uint8_t>& ins, const Bool& val) {
-    constexpr uint8_t true_value{1};
-    constexpr uint8_t false_value{0};
-    ins.emplace_back(code_int<CodeType::Bool>());
-    ins.emplace_back(val ? true_value : false_value);
+void AsmGenerator::emit(const ComposedExpr& /*expr*/) {
+    m_Writer.write_str("ComposedExpr not implemented");
 }
 
-void write(std::vector<uint8_t>& ins, const Str& val) {
-    write_str(ins, val);
-}
+void AsmGenerator::emit_expr(const ParserRule& expr) {
+    const auto kind = expr.rule_kind();
 
-void write(std::vector<uint8_t>& ins, const NoneType& /*val*/) {
-    ins.emplace_back(code_int<CodeType::Object>());
-    ins.emplace_back(code_int<CodeType::Nothing>());
-}
-
-void write(std::vector<uint8_t>& ins, const std::monostate& /*val*/) {
-    ins.emplace_back(code_int<CodeType::Nothing>());
-}
-
-void emit_expr(std::vector<uint8_t>& ins, const ParserRule& expr) {
-    const rkind::ParserRuleKind kind = expr.rule_kind();
-
-#define TM_PARSE_EMIT(ord, cls)        \
-    case rkind::ord:                   \
-        emit(ins, expr.as_ref<cls>()); \
-        break
-
+    // clang-format off
     switch (kind) {
-        TM_PARSE_EMIT(AssignmentExprList, AssignmentExprList);
-        TM_PARSE_EMIT(AssignmentExpr, AssignmentExpr);
-        TM_PARSE_EMIT(TupleExpr, TupleExpr);
-        TM_PARSE_EMIT(LiteralExpr, LiteralExpr);
+        case rkind::LiteralExpr:         ( emit(expr.as_ref<LiteralExpr>())        ); break;
+        case rkind::TupleExpr:           ( emit(expr.as_ref<TupleExpr>())          ); break;
+        case rkind::ComposedExpr:        ( emit(expr.as_ref<ComposedExpr>())       ); break;
+        case rkind::MetaVarExpr:         ( emit(expr.as_ref<MetaVarExpr>())        ); break;
+        case rkind::ClassObjectRef:      ( emit(expr.as_ref<ClassObjectRef>())     ); break;
+        case rkind::UnquotedStrLiteral:  ( emit(expr.as_ref<UnquotedStrLiteral>()) ); break;
+        case rkind::AssignmentExpr:      ( emit(expr.as_ref<AssignmentExpr>())     ); break;
+        case rkind::AssignmentExprList:  ( emit(expr.as_ref<AssignmentExprList>()) ); break;
 
-        default: {
-            break;
-        }
+        // clang-format on
+        default:
+            throw std::runtime_error{
+                std::format("unhandled rule in emit_expr '{}'", expr.rule_name())
+            };
     }
-
-#undef TM_PARSE_EMIT
 }
 
-}  // namespace
+void AsmGenerator::emit_literal_value(const Int& value) {
+    if (value.has_value()) {
+        m_Writer.write_int(*value);
+    } else {
+        m_Writer.write_marker_byte(MarkerByte::Nothing);
+    }
+}
+
+void AsmGenerator::emit_literal_value(const Float& value) {
+    if (value.has_value()) {
+        m_Writer.write_float(*value);
+    } else {
+        m_Writer.write_marker_byte(MarkerByte::Nothing);
+    }
+}
+
+void AsmGenerator::emit_literal_value(Bool value) {
+    m_Writer.write_bool(value);
+}
+
+void AsmGenerator::emit_literal_value(const Str& value) {
+    m_Writer.write_str(value);
+}
+
+void AsmGenerator::emit_literal_value(const NoneType& /*value*/) {
+    m_Writer.write_marker_byte(MarkerByte::Object);
+    m_Writer.write_marker_byte(MarkerByte::Nothing);
+}
 
 }  // namespace tm_parse::gen

@@ -8,10 +8,9 @@
 
 #include "tm_parse/pch.h"
 #include "tm_parse/parser/rules/expr/expr.h"
+#include "tm_parse/parser/rules/common/prop_dot_identifier.h"
 
 namespace tm_parse::rules {
-
-class PropertyDotIdentifier;
 
 class MetaVarExpr : public Expr {
    private:
@@ -26,6 +25,9 @@ class MetaVarExpr : public Expr {
     MetaVarExpr& operator=(const MetaVarExpr&) = delete;
     MetaVarExpr(MetaVarExpr&&) noexcept;
     MetaVarExpr& operator=(MetaVarExpr&&) noexcept;
+
+   public:
+    const PropertyDotIdentifier& property() const noexcept { return *m_Identifier; }
 
    public:
     RULE_STATIC_API(MetaVarExpr);
