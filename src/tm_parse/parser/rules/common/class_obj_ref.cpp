@@ -40,6 +40,14 @@ std::unique_ptr<ClassObjectRef> ClassObjectRef::create(Parser& parser) {
     return rule;
 }
 
+const PropertyDotIdentifier& ClassObjectRef::clazz() const {
+    return *m_Class;
+}
+
+const FullObjectRef& ClassObjectRef::object() const {
+    return *m_Object;
+}
+
 void ClassObjectRef::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
     ParserRule::visit(func);
     m_Class->visit(func);
