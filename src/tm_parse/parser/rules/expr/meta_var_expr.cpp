@@ -8,7 +8,6 @@
 
 #include "tm_parse/parser/parser.h"
 #include "tm_parse/parser/rules/expr/meta_var_expr.h"
-
 #include "tm_parse/parser/rules/common/prop_dot_identifier.h"
 
 namespace tm_parse::rules {
@@ -32,6 +31,10 @@ std::unique_ptr<MetaVarExpr> MetaVarExpr::create(Parser& parser) {
     rule->post_init(first, rule->m_Identifier->last_token());
 
     return rule;
+}
+
+const PropertyDotIdentifier& MetaVarExpr::property() const noexcept {
+    return *m_Identifier;
 }
 
 void MetaVarExpr::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
