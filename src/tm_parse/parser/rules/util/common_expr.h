@@ -27,10 +27,10 @@ using all_expressions = ExprTypeList<
     LiteralExpr,
     MetaVarExpr,
     ClassObjectRef,
-    PropertyDotIdentifier,
+    ComposedExpr,
+    // PropertyDotIdentifier,
     AssignmentExprList,
     TupleExpr,
-    ComposedExpr,
     UnquotedStrLiteral>;
 
 // TODO: Remove this and remove ParenExpr
@@ -49,10 +49,10 @@ using assignment_expr_types = ExprTypeList<
     LiteralExpr,
     MetaVarExpr,
     ClassObjectRef,
-    PropertyDotIdentifier,
+    ComposedExpr,
+    // PropertyDotIdentifier,
     AssignmentExprList,
     TupleExpr,
-    ComposedExpr,
     UnquotedStrLiteral>;
 
 //
@@ -64,10 +64,10 @@ using assignment_expr_list_types = ExprTypeList<
     LiteralExpr,
     MetaVarExpr,
     ClassObjectRef,
-    PropertyDotIdentifier,
+    ComposedExpr,
+    // PropertyDotIdentifier,
     AssignmentExprList,
-    TupleExpr,
-    ComposedExpr>;
+    TupleExpr>;
 
 //
 // What is allowed on the right hand side of an variable assignment expression
