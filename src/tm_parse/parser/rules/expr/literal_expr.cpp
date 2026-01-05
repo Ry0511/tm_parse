@@ -28,19 +28,23 @@ std::unique_ptr<LiteralExpr> LiteralExpr::create(Parser& parser) {
 
     switch (next.Kind) {
         case tk::True:
-        case tk::False:
+        case tk::False: {
             rule->m_Value = (next == tk::True);
             break;
-
-        case tk::None:
+        }
+        case tk::None: {
             rule->m_Value = NoneType{};
             break;
-
-        case tk::StringLiteral:
-            // TODO: Don't want this to kill the parsing if it is invalid
-            rule->m_Value = txt::sanitise_string(next.inner_text());
+        }
+        case tk::StringLiteral: {
+            try {
+                rule->m_Value = txt::sanitise_string(next.inner_text());
+            } catch (const std::logic_error& err) {
+                LOG_ERR("failed to sanitise string with error {}", err.what());
+                rule->m_Value = std::monostate{};
+            }
             break;
-
+        }
         case tk::Number: {
             if (next.has_radix()) {
                 rule->m_Value = txt::parse_double(next.text());
@@ -49,7 +53,6 @@ std::unique_ptr<LiteralExpr> LiteralExpr::create(Parser& parser) {
             }
             break;
         }
-
         default: {
             throw TokenError{"expecting one of [True, False, StringLiteral, Number]", next};
         }
