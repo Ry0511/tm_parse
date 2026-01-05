@@ -43,7 +43,9 @@ expected_parse_content = {
   SetCommand = (
     ObjectRef["foo'baz'"]
       ClassObjectRef["foo'baz'"]
-        ObjectDotIdentifier["baz"]
+        PropertyDotIdentifier["foo"]
+        FullObjectRef["baz"]
+          ObjectDotIdentifier["baz"]
     PropertyAccess["bar"]
       PropertyDotIdentifier["bar"]
     LiteralExpr["1"]

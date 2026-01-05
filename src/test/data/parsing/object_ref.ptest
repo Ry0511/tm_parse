@@ -15,7 +15,7 @@ expected_parse_content = {
   ObjectRef = ( FullObjectRef["foo:baz"]       ObjectDotIdentifier["foo"]     ObjectDotIdentifier["baz"] )
   ObjectRef = ( FullObjectRef["foo.baz:bar"]   ObjectDotIdentifier["foo.baz"] ObjectDotIdentifier["bar"] )
   ObjectRef = ( MetaVarExpr["$foo.baz.bar"]    PropertyDotIdentifier["foo.baz.bar"]                      )
-  ObjectRef = ( ClassObjectRef["foo'baz.bar'"] ObjectDotIdentifier["baz.bar"]                            )
+  ObjectRef = ( ClassObjectRef["foo'baz.bar'"] PropertyDotIdentifier["foo"] FullObjectRef["baz.bar"]     )
 }
 
 expected_text = {

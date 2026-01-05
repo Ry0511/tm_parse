@@ -96,7 +96,7 @@ int main() {
 
     LOG_INFO("Running all catch2 tests...");
     Catch::Session session{};
-    const char* catch2_args[]{"tm_parse_tests.exe", "-b", "-i", "-s"};
+    const char* catch2_args[]{"tm_parse_tests.exe", "-b", "-i"};
     session.applyCommandLine(std::size(catch2_args), catch2_args);
 
     int res = session.run();

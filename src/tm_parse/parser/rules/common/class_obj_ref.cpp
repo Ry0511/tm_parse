@@ -5,10 +5,11 @@
 //
 
 #include "tm_parse/pch.h"
-
 #include "tm_parse/parser/parser.h"
 #include "tm_parse/parser/rules/common/class_obj_ref.h"
-#include "tm_parse/parser/rules/common/obj_dot_identifier.h"
+
+#include "tm_parse/parser/rules/common/full_object_ref.h"
+#include "tm_parse/parser/rules/common/prop_dot_identifier.h"
 
 namespace tm_parse::rules {
 
@@ -18,31 +19,30 @@ ClassObjectRef::ClassObjectRef(ClassObjectRef&&) noexcept = default;
 ClassObjectRef& ClassObjectRef::operator=(ClassObjectRef&&) noexcept = default;
 
 bool ClassObjectRef::matches(Matcher& matcher) noexcept {
-    return matcher.maybe_real(tk::AnyIdentifier)
+    return matcher.matches<PropertyDotIdentifier>()
            && matcher.maybe_real(tk::SingleQuote)
-           && ObjectDotIdentifier::matches(matcher)
+           && FullObjectRef::matches(matcher)
            && matcher.maybe_real(tk::SingleQuote);
 }
 
 std::unique_ptr<ClassObjectRef> ClassObjectRef::create(Parser& parser) {
-
-    // TODO: This should allow for: foo.baz.bar'bar.baz:foo' currently it assumes single identifier
-    //  class names
-
-    Token first = parser.require_real(tk::AnyIdentifier);
-    parser.require_real(tk::SingleQuote);
-
     auto rule = std::make_unique<ClassObjectRef>();
-    rule->m_Class = str{first.text()};
-    rule->m_Object = ObjectDotIdentifier::create(parser);
-    Token last = parser.require_real(tk::SingleQuote);
 
-    rule->post_init(first, last);
+    rule->m_Class = PropertyDotIdentifier::create(parser);
+    parser.require_real(tk::SingleQuote);
+    rule->m_Object = FullObjectRef::create(parser);
+    const Token& last = parser.require_real(tk::SingleQuote);
+
+    rule->post_init(rule->m_Class->first_token(), last);
+
+    rule->m_Class->set_parent(*rule);
+    rule->m_Object->set_parent(*rule);
     return rule;
 }
 
 void ClassObjectRef::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
     ParserRule::visit(func);
+    m_Class->visit(func);
     m_Object->visit(func);
 }
 

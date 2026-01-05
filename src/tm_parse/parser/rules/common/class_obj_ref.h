@@ -12,12 +12,14 @@
 
 namespace tm_parse::rules {
 
-class ObjectDotIdentifier;
+class PropertyDotIdentifier;
+class FullObjectRef;
 
+// foo.baz.bar'bar.baz:foo'
 class ClassObjectRef : public ParserRule {
    private:
-    str m_Class;
-    std::unique_ptr<ObjectDotIdentifier> m_Object;
+    std::unique_ptr<PropertyDotIdentifier> m_Class;
+    std::unique_ptr<FullObjectRef> m_Object;
 
    public:
     ClassObjectRef();
@@ -30,8 +32,14 @@ class ClassObjectRef : public ParserRule {
     ClassObjectRef& operator=(ClassObjectRef&&) noexcept;
 
    public:
+    const PropertyDotIdentifier& clazz() const;
+    const FullObjectRef& object() const;
+
+   public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
     void cascade_assign_parents(ParserRule* parent) noexcept override;
+
+   public:
     RULE_STATIC_API(ClassObjectRef);
 };
 
