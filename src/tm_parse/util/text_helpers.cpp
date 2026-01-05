@@ -121,6 +121,8 @@ str sanitise_string(str_view text) {
                 case TXT('\''): out.push_back(c); break;
                     // clang-format on
                 default:
+                    // TODO: probably a good idea to give a more descriptive error message
+                    //  containing the actual position of the offending token.
                     throw std::logic_error{
                         std::format("invalid escape sequence \\{} in '{}'", c, text)
                     };

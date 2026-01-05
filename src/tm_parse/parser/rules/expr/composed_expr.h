@@ -20,15 +20,17 @@ namespace tm_parse::rules {
 //  i.e., VariableExpr and MetaVarExpr don't neccesarily have trivial type deduction.
 
 enum class Operator : uint8_t {
-    Add,            // +    Binary
-    Subtract,       // -    Binary
-    Divide,         // /    Binary
-    Multiply,       // *    Binary
-    Negate,         // -A   Unary
-    Positive,       // +A   Unary; Omitted from parse tree
-    LogicalNegate,  // !A   Unary
-    LogicalOr,      // or   Binary
-    LogicalAnd,     // and  Binary
+    Add,             // +    Binary
+    Subtract,        // -    Binary
+    Divide,          // /    Binary
+    Multiply,        // *    Binary
+    Negate,          // -A   Unary
+    Positive,        // +A   Unary; Omitted from parse tree
+    LogicalNegate,   // !A   Unary
+    LogicalOr,       // or   Binary
+    LogicalAnd,      // and  Binary
+    LogicalEqual,    // ==   Binary; TODO: not implemented
+    LogicalNotEqual, // !=   Binary
     Unknown
 };
 
