@@ -1,0 +1,28 @@
+test_type = ParserTest
+
+test_content = {
+  500
+  3.1415
+  True
+  False
+  "This is a string"
+  none
+}
+
+expected_parse_content = {
+  LiteralExpr = ( LiteralExpr["500"]              )
+  LiteralExpr = ( LiteralExpr["3.1415"]           )
+  LiteralExpr = ( LiteralExpr["True"]             )
+  LiteralExpr = ( LiteralExpr["False"]            )
+  LiteralExpr = ( LiteralExpr["This is a string"] )
+  LiteralExpr = ( LiteralExpr["none"]             )
+}
+
+expected_text = {
+  "500"
+  "3.1415"
+  "True"
+  "False"
+  "\"This is a string\""
+  "none"
+}

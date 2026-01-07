@@ -24,10 +24,10 @@ namespace tm_parse::rules {
 
 // All expressions in order of precedence.
 using all_expressions = ExprTypeList<
-    LiteralExpr,
     MetaVarExpr,
     ClassObjectRef,
     ComposedExpr,
+    LiteralExpr,
     // PropertyDotIdentifier,
     AssignmentExprList,
     TupleExpr,
@@ -46,10 +46,10 @@ using paren_expr_types = ExprTypeList<
 //   A = EXPR
 //
 using assignment_expr_types = ExprTypeList<
-    LiteralExpr,
     MetaVarExpr,
     ClassObjectRef,
     ComposedExpr,
+    LiteralExpr,
     // PropertyDotIdentifier,
     AssignmentExprList,
     TupleExpr,
@@ -61,10 +61,10 @@ using assignment_expr_types = ExprTypeList<
 //   ( A = EXPR, B = EXPR )
 //
 using assignment_expr_list_types = ExprTypeList<
-    LiteralExpr,
     MetaVarExpr,
     ClassObjectRef,
     ComposedExpr,
+    LiteralExpr,
     // PropertyDotIdentifier,
     AssignmentExprList,
     TupleExpr>;

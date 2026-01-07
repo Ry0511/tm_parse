@@ -2,11 +2,15 @@ test_type = ParserTest
 
 test_content = {
   set foo baz ( 5 * 10 )
+  set foo baz 50 + 100 * 10
   set foo:bar baz(+1.5) 1
   set foo:bar baz[-1.5] True
   set foo'baz' bar 1
   set $foo baz bar
   set $foo[0].baz(10) baz(0).bar[1] 10
+  set foo baz 1
+  set foo baz true
+  set foo baz "My string"
 }
 
 expected_parse_content = {
@@ -18,6 +22,20 @@ expected_parse_content = {
       PropertyDotIdentifier["baz"]
     ComposedExpr["( 5 * 10 )"]
       BinaryOpExpr["( 5 * 10 )"]
+  )
+
+  SetCommand = (
+    ObjectRef
+      FullObjectRef["foo"]
+        ObjectDotIdentifier["foo"]
+    PropertyAccess
+      PropertyDotIdentifier["baz"]
+    ComposedExpr["50 + 100 * 10"]
+      BinaryOpExpr["50 + 100 * 10"]
+        LiteralExpr["50"]
+        BinaryOpExpr["100 * 10"]
+          LiteralExpr["100"]
+          LiteralExpr["10"]
   )
 
   SetCommand = (
@@ -68,13 +86,44 @@ expected_parse_content = {
       PropertyDotIdentifier["baz(0).bar[1]"]
     LiteralExpr["10"]
   )
+
+  SetCommand = (
+    ObjectRef["foo"]
+      FullObjectRef["foo"]
+        ObjectDotIdentifier["foo"]
+    PropertyAccess["baz"]
+      PropertyDotIdentifier["baz"]
+    LiteralExpr["1"]
+  )
+
+  SetCommand = (
+    ObjectRef["foo"]
+      FullObjectRef["foo"]
+        ObjectDotIdentifier["foo"]
+    PropertyAccess["baz"]
+      PropertyDotIdentifier["baz"]
+    LiteralExpr["true"]
+  )
+
+  SetCommand = (
+    ObjectRef["foo"]
+      FullObjectRef["foo"]
+        ObjectDotIdentifier["foo"]
+    PropertyAccess["baz"]
+      PropertyDotIdentifier["baz"]
+    LiteralExpr["My string"]
+  )
 }
 
 expected_text = {
   "set foo baz ( 5 * 10 )"
+  "set foo baz 50 + 100 * 10"
   "set foo:bar baz(+1.5) 1"
   "set foo:bar baz[-1.5] True"
   "set foo'baz' bar 1"
   "set $foo baz bar"
   "set $foo[0].baz(10) baz(0).bar[1] 10"
+  "set foo baz 1"
+  "set foo baz true"
+  "set foo baz \"My string\""
 }
