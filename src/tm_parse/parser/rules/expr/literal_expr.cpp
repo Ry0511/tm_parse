@@ -47,9 +47,19 @@ std::unique_ptr<LiteralExpr> LiteralExpr::create(Parser& parser) {
         }
         case tk::Number: {
             if (next.has_radix()) {
-                rule->m_Value = txt::parse_double(next.text());
+                auto res = txt::parse_double(next.text());
+                if (res.has_value()) {
+                    rule->m_Value = Number{res.value()};
+                } else {
+                    rule->m_Value = std::monostate{};
+                }
             } else {
-                rule->m_Value = txt::parse_int64(next.text());
+                auto res = txt::parse_int64(next.text());
+                if (res.has_value()) {
+                    rule->m_Value = Number{res.value()};
+                } else {
+                    rule->m_Value = std::monostate{};
+                }
             }
             break;
         }

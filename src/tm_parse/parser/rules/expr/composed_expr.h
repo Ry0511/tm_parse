@@ -11,9 +11,6 @@
 
 namespace tm_parse::rules {
 
-// TODO: Probably a good idea to scrap the Expr base class as it just makes things harder to work
-//  with.
-
 // TODO: At some point we will want to evaluate expressions, not just composed expressions but all
 //  expressions. This evaluation needs to know of things we just don't have access to i.e., the
 //  Type of the expression. Some rules have a trivial type deduction i.e., LiteralExpr, but others

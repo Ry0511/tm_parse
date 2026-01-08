@@ -12,9 +12,10 @@
 namespace tm_parse::rules {
 
 class LiteralExpr : public Expr {
+   public:
+    using ValueType = std::variant<std::monostate, NoneType, Number, Bool, Str>;
+
    private:
-    // Kinda torn here on if we should default std::nullopt to std::monostate
-    using ValueType = std::variant<std::monostate, NoneType, Float, Int, Bool, Str>;
     ValueType m_Value;
 
    public:
@@ -29,6 +30,7 @@ class LiteralExpr : public Expr {
 
    public:
     const ValueType& value() const noexcept { return m_Value; }
+    void set_value(const ValueType& value) noexcept { m_Value = value; }
     bool has_value() const noexcept { return !std::holds_alternative<std::monostate>(m_Value); }
 
     template <class T>

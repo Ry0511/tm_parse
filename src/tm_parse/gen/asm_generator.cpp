@@ -131,19 +131,11 @@ void AsmGenerator::emit_expr(const ParserRule& expr) {
     }
 }
 
-void AsmGenerator::emit_literal_value(const Int& value) {
-    if (value.has_value()) {
-        m_Writer.write_int(*value);
+void AsmGenerator::emit_literal_value(const Number& value) {
+    if (value.is_float()) {
+        m_Writer.write_float(value.as_float());
     } else {
-        m_Writer.write_marker_byte(MarkerByte::Nothing);
-    }
-}
-
-void AsmGenerator::emit_literal_value(const Float& value) {
-    if (value.has_value()) {
-        m_Writer.write_float(*value);
-    } else {
-        m_Writer.write_marker_byte(MarkerByte::Nothing);
+        m_Writer.write_int(value.as_int());
     }
 }
 

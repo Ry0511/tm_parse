@@ -21,6 +21,7 @@ namespace tm_parse {
 struct ParseStateInfo {
     bool AllowUnquotedStrings{true};
     bool AllowCreateMod{true};
+    bool SimplifyExpressions{false};
 };
 
 // TODO: Move ownership of the string out of this
@@ -40,6 +41,7 @@ class Parser : public Matcher {
    public:
     str_view text() const noexcept { return m_Text; }
     ParseStateInfo& parse_state() noexcept { return m_ParseStateInfo; }
+    const ParseStateInfo& parse_state() const noexcept { return m_ParseStateInfo; }
 
    public:
     Matcher create_matcher() noexcept { return Matcher{*this}; }

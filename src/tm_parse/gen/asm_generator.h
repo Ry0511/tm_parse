@@ -61,8 +61,7 @@ class AsmGenerator : public CodeGenerator {
 
     void emit_expr(const ParserRule& expr);
 
-    void emit_literal_value(const Int& value);
-    void emit_literal_value(const Float& value);
+    void emit_literal_value(const Number& value);
     void emit_literal_value(Bool value);
     void emit_literal_value(const Str& value);
     void emit_literal_value(const NoneType& value);
