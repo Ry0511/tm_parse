@@ -62,6 +62,7 @@
 #include "tm_parse/lexer/token_type.h"
 #include "tm_parse/util/logging.h"
 #include "tm_parse/util/src_loc.h"
+#include "tm_parse/util/number.h"
 
 namespace tm_parse {
 
@@ -100,8 +101,6 @@ using str_istreambuf_it = std::istreambuf_iterator<str_char>;
 
 // Common type aliases
 // TODO: Check if its possible to remove the std::optional here
-using Float = std::optional<double>;
-using Int = std::optional<int64_t>;
 using Bool = bool;
 using Str = str;
 struct NoneType {}; // proxy type
