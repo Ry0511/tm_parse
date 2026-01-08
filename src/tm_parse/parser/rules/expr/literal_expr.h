@@ -20,7 +20,8 @@ class LiteralExpr : public Expr {
 
    public:
     LiteralExpr() = default;
-    ~LiteralExpr() override;
+    LiteralExpr(const ParserRule& node, const Number::Inner& value);
+    ~LiteralExpr() override = default;
 
    public:
     LiteralExpr(const LiteralExpr&) = default;
@@ -32,10 +33,17 @@ class LiteralExpr : public Expr {
     const ValueType& value() const noexcept { return m_Value; }
     void set_value(const ValueType& value) noexcept { m_Value = value; }
     bool has_value() const noexcept { return !std::holds_alternative<std::monostate>(m_Value); }
+    std::optional<Number> evaluate_numeric_expr() noexcept override { return get_opt<Number>(); }
 
     template <class T>
     const T* get_if() const {
         return std::get_if<T>(&m_Value);
+    }
+
+    template <class T>
+    std::optional<T> get_opt() const noexcept {
+        auto* val = get_if<T>();
+        return val != nullptr ? std::make_optional(*val) : std::nullopt;
     }
 
    public:

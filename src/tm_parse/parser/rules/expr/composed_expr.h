@@ -17,17 +17,17 @@ namespace tm_parse::rules {
 //  i.e., VariableExpr and MetaVarExpr don't neccesarily have trivial type deduction.
 
 enum class Operator : uint8_t {
-    Add,             // +    Binary
-    Subtract,        // -    Binary
-    Divide,          // /    Binary
-    Multiply,        // *    Binary
-    Negate,          // -A   Unary
-    Positive,        // +A   Unary; Omitted from parse tree
-    LogicalNegate,   // !A   Unary
-    LogicalOr,       // or   Binary
-    LogicalAnd,      // and  Binary
-    LogicalEqual,    // ==   Binary; TODO: not implemented
-    LogicalNotEqual, // !=   Binary
+    Add,              // +    Binary
+    Subtract,         // -    Binary
+    Divide,           // /    Binary
+    Multiply,         // *    Binary
+    Negate,           // -A   Unary
+    Positive,         // +A   Unary; Omitted from parse tree
+    LogicalNegate,    // !A   Unary
+    LogicalOr,        // or   Binary
+    LogicalAnd,       // and  Binary
+    LogicalEqual,     // ==   Binary; TODO: not implemented
+    LogicalNotEqual,  // !=   Binary
     Unknown
 };
 
@@ -56,6 +56,8 @@ class UnaryOpExpr : public ParserRule {
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
     void cascade_assign_parents(ParserRule* parent) noexcept override;
+    void simplify_ast() noexcept override;
+    std::optional<Number> evaluate_numeric_expr() noexcept override;
 
    public:
     RULE_STATIC_CONSTANTS(UnaryOpExpr);
@@ -82,8 +84,9 @@ class BinaryOpExpr : public ParserRule {
     Operator op() const noexcept { return m_Operator; }
     const ParserRule& left() const noexcept { return *m_Left; }
     const ParserRule& right() const noexcept { return *m_Right; }
+    void simplify_ast() noexcept override;
+    std::optional<Number> evaluate_numeric_expr() noexcept override;
 
-   public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
     void cascade_assign_parents(ParserRule* parent) noexcept override;
 
@@ -111,6 +114,8 @@ class ComposedExpr : public ParserRule {
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
     void cascade_assign_parents(ParserRule* parent) noexcept override;
+    void simplify_ast() noexcept override;
+    std::optional<Number> evaluate() const noexcept;
 
    public:
     RULE_STATIC_API(ComposedExpr);

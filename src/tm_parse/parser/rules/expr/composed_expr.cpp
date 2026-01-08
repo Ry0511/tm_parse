@@ -36,7 +36,7 @@ ComposedExpr::ComposedExpr(ComposedExpr&&) noexcept = default;
 ComposedExpr& ComposedExpr::operator=(ComposedExpr&&) noexcept = default;
 
 ////////////////////////////////////////////////////////////////////////////////
-// | VISITORS |
+// | METHODS |
 ////////////////////////////////////////////////////////////////////////////////
 
 void UnaryOpExpr::visit(const std::function<void(const ParserRule&)>& func) const noexcept {
@@ -69,6 +69,73 @@ void BinaryOpExpr::cascade_assign_parents(ParserRule* parent) noexcept {
 void ComposedExpr::cascade_assign_parents(ParserRule* parent) noexcept {
     ParserRule::cascade_assign_parents(parent);
     m_Expr->cascade_assign_parents(this);
+}
+
+void UnaryOpExpr::simplify_ast() noexcept {
+    m_Operand->simplify_ast();
+    std::optional<Number> res = m_Operand->evaluate_numeric_expr();
+    if (res.has_value()) {
+        m_Operand = std::make_unique<LiteralExpr>(*m_Operand, res->value());
+        m_Operand->set_parent(*this);
+    }
+}
+
+void BinaryOpExpr::simplify_ast() noexcept {
+    m_Left->simplify_ast();
+    m_Right->simplify_ast();
+
+    auto left = m_Left->evaluate_numeric_expr();
+    if (left.has_value()) {
+        m_Left = std::make_unique<LiteralExpr>(*m_Left, left->value());
+        m_Left->set_parent(*this);
+    }
+
+    auto right = m_Right->evaluate_numeric_expr();
+    if (right.has_value()) {
+        m_Right = std::make_unique<LiteralExpr>(*m_Right, right->value());
+        m_Right->set_parent(*this);
+    }
+}
+
+void ComposedExpr::simplify_ast() noexcept {
+    m_Expr->simplify_ast();
+    auto res = m_Expr->evaluate_numeric_expr();
+    if (res.has_value()) {
+        m_Expr = std::make_unique<LiteralExpr>(*m_Expr, res->value());
+        m_Expr->set_parent(*this);
+    }
+}
+
+std::optional<Number> UnaryOpExpr::evaluate_numeric_expr() noexcept {
+    auto res = m_Operand->evaluate_numeric_expr();
+    if (res.has_value() && m_Operator == Operator::Negate) {
+        return -(*res);
+    }
+    return res;
+}
+
+std::optional<Number> BinaryOpExpr::evaluate_numeric_expr() noexcept {
+    auto left = m_Left->evaluate_numeric_expr();
+    auto right = m_Right->evaluate_numeric_expr();
+
+    if (!left.has_value() || !right.has_value()) {
+        return std::nullopt;
+    }
+
+    // clang-format off
+    switch (m_Operator) {
+        case Operator::Add     : return (*left) + (*right);
+        case Operator::Subtract: return (*left) - (*right);
+        case Operator::Divide  : return (*left) / (*right);
+        case Operator::Multiply: return (*left) * (*right);
+        default: break;
+    }
+    // clang-format on
+    return std::nullopt;
+}
+
+std::optional<Number> ComposedExpr::evaluate() const noexcept {
+    return m_Expr->evaluate_numeric_expr();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -204,6 +271,13 @@ std::unique_ptr<ComposedExpr> ComposedExpr::create(Parser& parser) {
     rule->m_Expr = parse_expr(parser);
     rule->m_Expr->set_parent(*rule);
     rule->copy_state(*rule->m_Expr);
+
+    // TODO: Probably not a good idea to simplify this immediately since things like variables
+    //  being used may not be defined yet which could alter the way we simplify
+    if (parser.parse_state().SimplifyExpressions) {
+        rule->simplify_ast();
+    }
+
     return rule;
 }
 

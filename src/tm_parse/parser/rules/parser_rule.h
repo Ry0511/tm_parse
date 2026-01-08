@@ -72,6 +72,10 @@ class ParserRule {
 
    public:
     virtual void cascade_assign_parents(ParserRule* parent) noexcept { m_Parent = parent; };
+    // simplifies the child nodes of this node
+    virtual void simplify_ast() noexcept {};
+    // evaluates the result of this node to produce a numerical value ( if it produces one )
+    virtual std::optional<Number> evaluate_numeric_expr() noexcept { return std::nullopt; };
 
    public:
     template <class T>

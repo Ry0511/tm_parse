@@ -12,8 +12,11 @@
 namespace tm_parse {
 
 struct Number {
+   public:
+    using Inner = std::variant<std::int64_t, double>;
+
    private:
-    std::variant<std::int64_t, double> m_Value;
+    Inner m_Value;
 
     // clang-format off
    public:

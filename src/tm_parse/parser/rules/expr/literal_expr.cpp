@@ -18,6 +18,16 @@ constexpr tk::TokenKind
     literals[]{tk::Number, tk::None, tk::StringLiteral, tk::True, tk::False};
 }
 
+LiteralExpr::LiteralExpr(const ParserRule& node, const Number::Inner& value)
+    : m_Value(
+          std::visit(
+              [](auto val) { return ValueType{val}; },
+              value
+          )
+      ) {
+    copy_state(node);
+}
+
 bool LiteralExpr::matches(Matcher& matcher) noexcept {
     return matcher.any_real(literals);
 }
@@ -72,7 +82,5 @@ std::unique_ptr<LiteralExpr> LiteralExpr::create(Parser& parser) {
 
     return rule;
 }
-
-LiteralExpr::~LiteralExpr() = default;
 
 }  // namespace tm_parse::rules
