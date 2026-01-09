@@ -134,7 +134,7 @@ std::optional<Number> BinaryOpExpr::evaluate_numeric_expr() noexcept {
     return std::nullopt;
 }
 
-std::optional<Number> ComposedExpr::evaluate() const noexcept {
+std::optional<Number> ComposedExpr::evaluate_numeric_expr() noexcept {
     return m_Expr->evaluate_numeric_expr();
 }
 
@@ -161,9 +161,9 @@ std::optional<Number> ComposedExpr::evaluate() const noexcept {
 
 namespace {
 
-constexpr tk::TokenKind op_unary_operators[]{tk::Plus, tk::Minus, tk::Not, tk::ExclamationMark};
-constexpr tk::TokenKind op_high_precedence[]{tk::Star, tk::Slash, tk::And};
-constexpr tk::TokenKind op_low_precedence[]{tk::Plus, tk::Minus, tk::Or};
+constexpr std::array<tk::TokenKind, 4> op_unary_operators{tk::Plus, tk::Minus, tk::Not, tk::ExclamationMark};
+constexpr std::array<tk::TokenKind, 3> op_high_precedence{tk::Star, tk::Slash, tk::And};
+constexpr std::array<tk::TokenKind, 3> op_low_precedence{tk::Plus, tk::Minus, tk::Or};
 
 Operator get_unary_op_kind(const Token& tok) noexcept {
     switch (tok.Kind) {
