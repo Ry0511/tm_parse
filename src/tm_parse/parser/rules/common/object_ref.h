@@ -28,6 +28,9 @@ class ObjectRef : public ParserRule {
     ObjectRef& operator=(ObjectRef&&) noexcept;
 
    public:
+    const ParserRule& inner() const noexcept { return *m_Ref; }
+
+   public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
     void cascade_assign_parents(ParserRule* parent) noexcept override;
     RULE_STATIC_API(ObjectRef);
