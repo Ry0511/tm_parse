@@ -11,6 +11,8 @@
 
 namespace tm_parse::rules {
 
+// TODO: This should be removed
+
 class LogInfoExpr : public Expr {
    private:
     str m_Text;

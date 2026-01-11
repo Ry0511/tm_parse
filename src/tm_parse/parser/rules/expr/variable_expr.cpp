@@ -46,4 +46,8 @@ void VariableExpr::cascade_assign_parents(ParserRule* parent) noexcept {
     m_Expr->cascade_assign_parents(this);
 }
 
+void VariableExpr::simplify_ast() noexcept {
+    m_Expr->simplify_ast();
+}
+
 }  // namespace tm_parse::rules

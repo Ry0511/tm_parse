@@ -38,6 +38,7 @@ class ProgramRule : public ParserRule {
    public:
     const ModDefinition* mod_definition() const noexcept { return m_ModDefinition; }
     const auto& child_rules() const noexcept { return m_ChildRules; }
+    void simplify_ast() noexcept override;
 
    public:
     RULE_STATIC_API(ProgramRule);

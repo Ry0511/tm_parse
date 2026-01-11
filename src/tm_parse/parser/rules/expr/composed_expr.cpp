@@ -261,13 +261,6 @@ std::unique_ptr<ComposedExpr> ComposedExpr::create(Parser& parser) {
     rule->m_Expr = parse_expr(parser);
     rule->m_Expr->set_parent(*rule);
     rule->copy_state(*rule->m_Expr);
-
-    // TODO: Probably not a good idea to simplify this immediately since things like variables
-    //  being used may not be defined yet which could alter the way we simplify
-    if (parser.parse_state().SimplifyExpressions) {
-        rule->simplify_ast();
-    }
-
     return rule;
 }
 

@@ -57,6 +57,11 @@ void AssignmentExpr::cascade_assign_parents(ParserRule* parent) noexcept {
     m_Expr->cascade_assign_parents(this);
 }
 
+void AssignmentExpr::simplify_ast() noexcept {
+    m_Property->simplify_ast();
+    m_Expr->simplify_ast();
+}
+
 template bool AssignmentExpr::matches_with_expr_list<assignment_expr_types>(Matcher&);
 template bool AssignmentExpr::matches_with_expr_list<assignment_expr_list_types>(Matcher&);
 template std::unique_ptr<AssignmentExpr> AssignmentExpr::create_with_expr_list<assignment_expr_types>(Parser& parser);

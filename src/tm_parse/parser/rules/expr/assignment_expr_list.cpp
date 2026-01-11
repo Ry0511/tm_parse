@@ -79,4 +79,10 @@ void AssignmentExprList::cascade_assign_parents(ParserRule* parent) noexcept {
     }
 }
 
+void AssignmentExprList::simplify_ast() noexcept {
+    for (const auto& elem : m_Assignments) {
+        elem->simplify_ast();
+    }
+}
+
 }  // namespace tm_parse::rules

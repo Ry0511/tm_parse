@@ -80,6 +80,12 @@ std::unique_ptr<ProgramRule> ProgramRule::create(Parser& parser) {
     }
 
     rule->post_init(*rule->m_ChildRules.front(), *rule->m_ChildRules.back());
+
+    // once all nodes have been processed then we can try to simplify the AST
+    if (parser.parse_state().SimplifyExpressions) {
+        rule->simplify_ast();
+    }
+
     return rule;
 }
 
@@ -94,6 +100,12 @@ void ProgramRule::cascade_assign_parents(ParserRule* parent) noexcept {
     ParserRule::cascade_assign_parents(parent);
     for (const auto& rule : m_ChildRules) {
         rule->cascade_assign_parents(this);
+    }
+}
+
+void ProgramRule::simplify_ast() noexcept {
+    for (auto& node : m_ChildRules) {
+        node->simplify_ast();
     }
 }
 

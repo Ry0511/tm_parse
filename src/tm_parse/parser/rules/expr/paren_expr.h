@@ -27,10 +27,10 @@ class ParenExpr : public Expr {
 
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;
-    RULE_STATIC_API(ParenExpr);
+    void cascade_assign_parents(ParserRule* parent) noexcept override;
 
    public:
-    void cascade_assign_parents(ParserRule* parent) noexcept override;
+    RULE_STATIC_API(ParenExpr);
 };
 
 }  // namespace tm_parse::rules
