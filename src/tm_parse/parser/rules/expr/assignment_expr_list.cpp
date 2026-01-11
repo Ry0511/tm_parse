@@ -44,7 +44,7 @@ bool AssignmentExprList::matches(Matcher& matcher) noexcept {
 std::unique_ptr<AssignmentExprList> AssignmentExprList::create(Parser& parser) {
     auto rule = std::make_unique<AssignmentExprList>();
 
-    Token first = parser.require_real(tk::LeftParen);
+    const Token& first = parser.require_real(tk::LeftParen);
     rule->m_Assignments
         .emplace_back(AssignmentExpr::create_with_expr_list<assignment_expr_list_types>(parser))
         ->set_parent(*rule);
@@ -59,7 +59,7 @@ std::unique_ptr<AssignmentExprList> AssignmentExprList::create(Parser& parser) {
         }
     }
 
-    Token last = parser.require_real(tk::RightParen);
+    const Token& last = parser.require_real(tk::RightParen);
     rule->post_init(first, last);
 
     return rule;
