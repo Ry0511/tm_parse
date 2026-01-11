@@ -31,7 +31,7 @@ bool ScopedIdentifierList::insert(
     ParserRule* scope,
     ParserRule* node
 ) noexcept {
-    if (find(identifier, scope) == ScopedIdentifierEntry::invalid_entry) {
+    if (find(identifier, scope) != ScopedIdentifierEntry::invalid_entry) {
         return false;
     }
     m_IdentifierList.emplace_back(str{identifier}, scope, node);
