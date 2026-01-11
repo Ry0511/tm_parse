@@ -9,6 +9,7 @@
 
 #include "tm_parse/lexer/token_error.h"
 #include "tm_parse/parser/parser.h"
+#include "tm_parse/util/text_helpers.h"
 
 #include "tm_parse/parser/rules/expr/variable_expr.h"
 #include "tm_parse/parser/rules/expr_type_list.h"
@@ -36,6 +37,9 @@ std::unique_ptr<ProgramRule> ProgramRule::create(Parser& parser) {
     if (parser.peek_matches<PragmaToggle>()) {
         auto& child = rule->m_ChildRules.emplace_back(parser.create<PragmaToggle>());
         child->set_parent(*rule);
+        if (child->as_ref<PragmaToggle>().type() != PragmaToggleType::CreateMod) {
+            throw std::runtime_error{TXT("pragma toggle must be CreateMod")};
+        }
     }
 
     // if enabled create_mod = ( ... ) should be the first rule
@@ -58,6 +62,20 @@ std::unique_ptr<ProgramRule> ProgramRule::create(Parser& parser) {
                 parser.create_one_of<SetCommand, PragmaToggle, VariableExpr>()
             );
             child->set_parent(*rule);
+
+            if (auto* var = child->is<VariableExpr>()) {
+                auto name = var->identifier().text();
+                if (!rule->m_IdentifierList.insert(name, nullptr, var)) {
+                    auto it = rule->m_IdentifierList.find(name);
+                    throw std::runtime_error{
+                        std::format(
+                            TXT("attempting to overwrite\n{}with\n{}"),
+                            it.Node->format_rule(),
+                            var->format_rule()
+                        )
+                    };
+                }
+            }
         }
     }
 

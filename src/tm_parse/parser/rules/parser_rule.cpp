@@ -8,8 +8,19 @@
 
 #include "tm_parse/parser/parser.h"
 #include "tm_parse/parser/rules/parser_rule.h"
+#include "tm_parse/util/text_helpers.h"
 
 namespace tm_parse {
+
+ParserRule::~ParserRule() = default;
+
+ParserRule* ParserRule::root() const noexcept {
+    ParserRule* ptr = m_Parent;
+    while (ptr && ptr->parent()) {
+        ptr = ptr->parent();
+    }
+    return ptr;
+}
 
 str_view ParserRule::full_text() const {
     if (m_TextSource == nullptr) {
@@ -54,6 +65,34 @@ void ParserRule::copy_state(const ParserRule& other) noexcept {
     m_LastToken = other.m_LastToken;
 }
 
-ParserRule::~ParserRule() = default;
+str ParserRule::format_rule() const noexcept {
+
+    if (m_TextSource == nullptr || !m_FullTextRegion) {
+        return str{TXT("  > text source is null")};
+    }
+
+    constexpr str_view indent{TXT("  > ")};
+    str_view text = full_text();
+    str_stream out{};
+    out << indent;
+
+    // maybe worth adding line numbers into this?
+    bool last_was_new_line{false};
+    for (str_char elem : text) {
+        const bool is_newline = txt::is_newline(elem);
+        if (last_was_new_line && is_newline) {
+            continue;
+        }
+
+        if (is_newline) {
+            out << elem << indent;
+            last_was_new_line = true;
+        } else {
+            out << elem;
+        }
+    }
+
+    return out.str();
+}
 
 }  // namespace tm_parse

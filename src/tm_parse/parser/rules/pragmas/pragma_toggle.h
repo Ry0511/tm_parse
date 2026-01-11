@@ -31,6 +31,7 @@ class PragmaToggle : public ParserRule {
     PragmaToggle& operator=(PragmaToggle&&) = default;
 
    public:
+    PragmaToggleType type() const noexcept { return m_Type; }
     void toggle_for(Parser& parser) const noexcept;
 
    public:

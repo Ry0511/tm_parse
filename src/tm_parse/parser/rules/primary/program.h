@@ -8,6 +8,7 @@
 
 #include "tm_parse/pch.h"
 #include "tm_parse/parser/rules/parser_rule.h"
+#include "tm_parse/parser/scoped_identifier_list.h"
 
 namespace tm_parse::rules {
 
@@ -20,6 +21,7 @@ class ProgramRule : public ParserRule {
    private:
     ModDefinition* m_ModDefinition{nullptr};
     std::vector<std::unique_ptr<ParserRule>> m_ChildRules;
+    ScopedIdentifierList m_IdentifierList{};
 
    public:
     explicit ProgramRule() noexcept;

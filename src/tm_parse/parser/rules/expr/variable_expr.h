@@ -14,12 +14,16 @@ namespace tm_parse::rules {
 // let ID = EXPR
 class VariableExpr : public ParserRule {
    private:
-    str m_Identifier;
+    Token m_Identifier;
     std::unique_ptr<ParserRule> m_Expr;
 
    public:
     VariableExpr() noexcept;
     ~VariableExpr() noexcept override;
+
+   public:
+    const Token& identifier() const noexcept { return m_Identifier; }
+    const ParserRule& expr() const noexcept { return *m_Expr; }
 
    public:
     void visit(const std::function<void(const ParserRule&)>& func) const noexcept override;

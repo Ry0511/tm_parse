@@ -51,6 +51,7 @@ class ParserRule {
     operator bool() const noexcept { return m_FirstToken; }
 
    public:
+    ParserRule* root() const noexcept;
     ParserRule* parent() const noexcept { return m_Parent; }
     str_view full_text() const;
     const TextRegion& full_text_region() const noexcept { return m_FullTextRegion; }
@@ -76,6 +77,8 @@ class ParserRule {
     virtual void simplify_ast() noexcept {};
     // evaluates the result of this node to produce a numerical value ( if it produces one )
     virtual std::optional<Number> evaluate_numeric_expr() noexcept { return std::nullopt; };
+
+    virtual str format_rule() const noexcept;
 
    public:
     template <class T>
@@ -123,10 +126,6 @@ class ParserRule {
 // | STATIC API GENERATOR |
 ////////////////////////////////////////////////////////////////////////////////
 
-// TODO: This works well for simple rules but doesn't always match nicely for complex rules as seen
-//  with ComposedExpr. Primarily speaking in regards to the `matches` function as this effectively
-//  requires us to duplicate the create code just without the allocations...
-
 // TODO: Need to extract this out an put it into the tests section, only need two of the macros here
 
 #define TM_PARSE_TESTS
@@ -166,6 +165,7 @@ template <class T> struct RuleAutoRegister { RuleAutoRegister() { RuleTestApi::a
 
 }  // namespace tests
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define TM_PARSE_TEST_API(rule) \
     inline static const ::tm_parse::tests::RuleAutoRegister<rule> RULE_REGISTER {}
 
@@ -175,6 +175,7 @@ template <class T> struct RuleAutoRegister { RuleAutoRegister() { RuleTestApi::a
 
 #endif
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define RULE_STATIC_CONSTANTS(rule)                                                    \
     constexpr static ::tm_parse::rkind::ParserRuleKind KIND = ::tm_parse::rkind::rule; \
     constexpr static str_view NAME = TXT(#rule);                                       \
@@ -185,18 +186,12 @@ template <class T> struct RuleAutoRegister { RuleAutoRegister() { RuleTestApi::a
         return KIND;                                                                   \
     }
 
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define RULE_STATIC_METHODS(rule)                   \
     static bool matches(Matcher& matcher) noexcept; \
     static std::unique_ptr<rule> create(Parser& parser)
 
-// TODO: All throughout the codebase it is assumed that Rule::matches(matcher) doesn't invalidate
-//  the matcher *on failure* however this isn't actually the case. Calls directly to the matcher
-//  function will/can invalidate the matcher. This creates a need for a matcher function that does
-//  not invalidate the matcher. It would be best to implement some way of matching a rule without
-//  directly invalidating the matcher because otherwise you need to manually restore the position
-//  after each failed match.
-//   > 05/11/2025 Partly implemented this, needs some more checking
-
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define RULE_STATIC_API(rule)    \
     TM_PARSE_TEST_API(rule);     \
     RULE_STATIC_CONSTANTS(rule); \

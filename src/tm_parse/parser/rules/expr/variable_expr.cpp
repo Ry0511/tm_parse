@@ -28,7 +28,7 @@ std::unique_ptr<VariableExpr> VariableExpr::create(Parser& parser) {
     parser.require_real(tk::Equal);
 
     auto rule = std::make_unique<VariableExpr>();
-    rule->m_Identifier = str{id.text()};
+    rule->m_Identifier = id;
     rule->m_Expr = variable_expr_types{}.create(parser);
     rule->m_Expr->set_parent(*rule);
 
