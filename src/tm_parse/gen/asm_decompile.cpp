@@ -88,7 +88,7 @@ void read_file_header(str_stream& out, Iter& it) {
     out << TXT("[File Header]\n");
     auto start = it;
     // clang-format off
-    out << TXT("Magic   => "); read_int(out, it); out << TXT('\n');
+    out << TXT("Magic   => "); read_str(out, it); out << TXT('\n');
     out << TXT("Version => "); read_int(out, it); out << TXT('\n');
     out << TXT("SHA-1   => "); read_str(out, it); out << TXT('\n');
     out << TXT("Date    => "); read_str(out, it); out << TXT('\n');
@@ -120,10 +120,10 @@ double read_float(str_stream& out, Iter& it) {
     if (marker != MarkerByte::Float) {
         throw std::runtime_error{"expecting float marker byte"};
     }
-    uint64_t int_value = read_int(out, it);
     double value{};
-    std::memcpy(&value, &int_value, sizeof(double));
-    out << std::format(TXT(" {} {:.15g}"), marker_byte_name(marker), value);
+    std::memcpy(&value, &it[0], sizeof(double));
+    it += sizeof(double);
+    out << std::format(TXT("{} {:.15g}"), marker_byte_name(marker), value);
     return value;
 }
 

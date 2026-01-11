@@ -37,10 +37,10 @@ void AsmGenerator::evaluate(
 }
 
 void AsmGenerator::write_file_header(void) {
-    m_Writer.write_int_fixed<int32_t>(FILE_MAGIC_NUMBER);
+    m_Writer.write_str(FILE_MAGIC_BYTES);
     m_Writer.write_int_fixed<int32_t>(FILE_VERSION_NUMBER);
 
-    constexpr std::string_view git_head_sha1{TM_PARSE_GIT_HEAD_SHA1};
+    constexpr str_view git_head_sha1{TM_PARSE_GIT_HEAD_SHA1};
     m_Writer.write_str(git_head_sha1);
     m_Writer.write_str(txt::iso_date_now_str());
 

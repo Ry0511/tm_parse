@@ -31,7 +31,7 @@ namespace tm_parse::gen {
 
 class AsmGenerator : public CodeGenerator {
    public:
-    static constexpr int32_t FILE_MAGIC_NUMBER = 0x69626D74;
+    static constexpr str_view FILE_MAGIC_BYTES{TXT("tm_bin")};
     static constexpr int32_t FILE_VERSION_NUMBER{1};
 
    private:

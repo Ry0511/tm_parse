@@ -18,7 +18,7 @@ void BinaryFileWriter::write_float(double value) {
     uint64_t bits{0};
     std::memcpy(&bits, &value, sizeof(bits));
     write_marker_byte(MarkerByte::Float);
-    write_int_fixed<uint64_t>(bits);
+    write_int_fixed<uint64_t>(bits, false);
 }
 
 void BinaryFileWriter::write_str(str_view value) {

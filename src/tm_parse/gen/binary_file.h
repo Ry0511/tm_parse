@@ -61,9 +61,11 @@ class BinaryFileWriter {
      */
     template <class T>
         requires std::is_integral_v<T>
-    void write_int_fixed(T value) {
+    void write_int_fixed(T value, bool write_int_marker = true) {
         using UnsignedType = std::make_unsigned_t<T>;
-        write_marker_byte(marker_byte_for_int<T>());
+        if (write_int_marker) {
+            write_marker_byte(marker_byte_for_int<T>());
+        }
         auto uval = static_cast<UnsignedType>(value);
         for (size_t i = 0; i < sizeof(T); ++i) {
             m_Data.emplace_back(
