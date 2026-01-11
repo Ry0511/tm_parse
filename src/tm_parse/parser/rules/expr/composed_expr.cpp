@@ -108,7 +108,7 @@ void ComposedExpr::simplify_ast() noexcept {
 
 std::optional<Number> UnaryOpExpr::evaluate_numeric_expr() noexcept {
     auto res = m_Operand->evaluate_numeric_expr();
-    if (res.has_value() && m_Operator == Operator::Negate) {
+    if (res.has_value() && m_Operator == NumericOperator::Negate) {
         return -(*res);
     }
     return res;
@@ -124,10 +124,10 @@ std::optional<Number> BinaryOpExpr::evaluate_numeric_expr() noexcept {
 
     // clang-format off
     switch (m_Operator) {
-        case Operator::Add     : return (*left) + (*right);
-        case Operator::Subtract: return (*left) - (*right);
-        case Operator::Divide  : return (*left) / (*right);
-        case Operator::Multiply: return (*left) * (*right);
+        case NumericOperator::Add     : return (*left) + (*right);
+        case NumericOperator::Subtract: return (*left) - (*right);
+        case NumericOperator::Divide  : return (*left) / (*right);
+        case NumericOperator::Multiply: return (*left) * (*right);
         default: break;
     }
     // clang-format on
@@ -147,8 +147,6 @@ std::optional<Number> ComposedExpr::evaluate_numeric_expr() noexcept {
 // extended to support unary operations i.e., -( A + B ) and -( -A + +B ) albeit +B is just for
 // symmetry, it does nothing ( omitted from the parsed result as well ).
 //
-// We also include logical operators here which are: [and, or, not, !] with ! being the same as not
-//
 //   i.e, for C++ ( and presumably every other language )
 //     int a = -10;
 //     int b = +a;  // -10
@@ -161,41 +159,33 @@ std::optional<Number> ComposedExpr::evaluate_numeric_expr() noexcept {
 
 namespace {
 
-constexpr std::array<tk::TokenKind, 4> op_unary_operators{tk::Plus, tk::Minus, tk::Not, tk::ExclamationMark};
-constexpr std::array<tk::TokenKind, 3> op_high_precedence{tk::Star, tk::Slash, tk::And};
-constexpr std::array<tk::TokenKind, 3> op_low_precedence{tk::Plus, tk::Minus, tk::Or};
+constexpr std::array<tk::TokenKind, 2> op_unary_operators{tk::Plus, tk::Minus};
+constexpr std::array<tk::TokenKind, 2> op_high_precedence{tk::Star, tk::Slash};
+constexpr std::array<tk::TokenKind, 2> op_low_precedence{tk::Plus, tk::Minus};
+constexpr std::array<tk::TokenKind, 2> unary_operator_tokens{tk::Minus, tk::Plus};
 
-Operator get_unary_op_kind(const Token& tok) noexcept {
+NumericOperator get_unary_op_kind(const Token& tok) {
+    // clang-format off
     switch (tok.Kind) {
-        case tk::Plus:
-            return Operator::Positive;
-        case tk::Minus:
-            return Operator::Negate;
-        case tk::Not:
-        case tk::ExclamationMark:
-            return Operator::LogicalNegate;
+        case tk::Plus : return NumericOperator::Positive;
+        case tk::Minus: return NumericOperator::Negate;
         default:
-            return Operator::Unknown;
+            throw std::runtime_error{std::format("invalid unary operator token {}", tok.text())};
     }
+    // clang-format off
 }
 
-Operator get_binary_op_kind(const Token& tok) noexcept {
+NumericOperator get_binary_op_kind(const Token& tok) {
+    // clang-format off
     switch (tok.Kind) {
-        case tk::Plus:
-            return Operator::Add;
-        case tk::Minus:
-            return Operator::Subtract;
-        case tk::Star:
-            return Operator::Multiply;
-        case tk::Slash:
-            return Operator::Divide;
-        case tk::And:
-            return Operator::LogicalAnd;
-        case tk::Or:
-            return Operator::LogicalOr;
+        case tk::Plus : return NumericOperator::Add;
+        case tk::Minus: return NumericOperator::Subtract;
+        case tk::Star : return NumericOperator::Multiply;
+        case tk::Slash: return NumericOperator::Divide;
         default:
-            return Operator::Unknown;
+            throw std::runtime_error{std::format("invalid binary operator token {}", tok.text())};
     }
+    // clang-format off
 }
 
 bool match_expr(Matcher& matcher, bool& has_any_op);
@@ -284,8 +274,8 @@ std::unique_ptr<ComposedExpr> ComposedExpr::create(Parser& parser) {
 std::unique_ptr<ParserRule> ComposedExpr::parse_expr(Parser& parser) {
     std::unique_ptr<ParserRule> node = parse_term(parser);
 
-    while (Token cur = parser.any_real(op_low_precedence)) {
-        Operator op = get_binary_op_kind(cur);
+    while (const Token& cur = parser.any_real(op_low_precedence)) {
+        NumericOperator op = get_binary_op_kind(cur);
 
         auto binary_op = std::make_unique<BinaryOpExpr>();
         binary_op->m_Operator = op;
@@ -304,8 +294,8 @@ std::unique_ptr<ParserRule> ComposedExpr::parse_expr(Parser& parser) {
 std::unique_ptr<ParserRule> ComposedExpr::parse_term(Parser& parser) {
     auto node = parse_factor(parser);
 
-    while (Token cur = parser.any_real(op_high_precedence)) {
-        Operator op = get_binary_op_kind(cur);
+    while (const Token& cur = parser.any_real(op_high_precedence)) {
+        NumericOperator op = get_binary_op_kind(cur);
 
         auto binary_op = std::make_unique<BinaryOpExpr>();
         binary_op->m_Operator = op;
@@ -326,16 +316,16 @@ std::unique_ptr<ParserRule> ComposedExpr::parse_factor(Parser& parser) {
     Matcher matcher = parser.create_matcher();
 
     // sub expression
-    if (Token first = parser.maybe_real(tk::LeftParen)) {
+    if (const Token& first = parser.maybe_real(tk::LeftParen)) {
         auto node = parse_expr(parser);
-        Token last = parser.require_real(tk::RightParen);
+        const Token& last = parser.require_real(tk::RightParen);
         node->post_init(first, last);
         return node;
     }
 
     // unary operator + is generally ignored/no op and only done for symmetry, its only usage/change
     // is that the rules full text region will include it.
-    if (Token first = parser.maybe_real(tk::Plus)) {
+    if (const Token& first = parser.maybe_real(tk::Plus)) {
         auto node = parse_factor(parser);
         node->post_init(first, node->last_token());
         return node;
@@ -345,9 +335,8 @@ std::unique_ptr<ParserRule> ComposedExpr::parse_factor(Parser& parser) {
         return LiteralExpr::create(parser);
     }
 
-    // unary operators: -A, !A, not A
-    constexpr tk::TokenKind unary_operator_tokens[]{tk::Minus, tk::ExclamationMark, tk::Not};
-    if (Token first = parser.any_real(unary_operator_tokens)) {
+    // unary operators
+    if (const Token& first = parser.any_real(unary_operator_tokens)) {
         auto unary = std::make_unique<UnaryOpExpr>();
         unary->m_Operator = get_unary_op_kind(first);
         unary->m_Operand = parse_factor(parser);
@@ -367,7 +356,7 @@ std::unique_ptr<ParserRule> ComposedExpr::parse_factor(Parser& parser) {
     }
 
     // Don't know what this is
-    Token cur = matcher.next_real();
+    const Token& cur = matcher.next_real();
     throw TokenError{"unexpected input in composed expression", cur};
 }
 

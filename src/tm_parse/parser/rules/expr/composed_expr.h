@@ -16,19 +16,30 @@ namespace tm_parse::rules {
 //  Type of the expression. Some rules have a trivial type deduction i.e., LiteralExpr, but others
 //  i.e., VariableExpr and MetaVarExpr don't neccesarily have trivial type deduction.
 
-enum class Operator : uint8_t {
-    Add,              // +    Binary
-    Subtract,         // -    Binary
-    Divide,           // /    Binary
-    Multiply,         // *    Binary
-    Negate,           // -A   Unary
-    Positive,         // +A   Unary; Omitted from parse tree
-    LogicalNegate,    // !A   Unary
-    LogicalOr,        // or   Binary
-    LogicalAnd,       // and  Binary
-    LogicalEqual,     // ==   Binary; TODO: not implemented
-    LogicalNotEqual,  // !=   Binary
-    Unknown
+enum class NumericOperator : uint8_t {
+    Add,       // +    Binary
+    Subtract,  // -    Binary
+    Divide,    // /    Binary
+    Multiply,  // *    Binary
+    Negate,    // -A   Unary
+    Positive,  // +A   Unary; Omitted from parse tree
+    Unknown,
+};
+
+// TODO: This has not been implemented or used yet a rule using these should likely be of the form
+//  condition : ComposedExpr LogicalOperator ComposedExpr
+//            | UnaryLogicalOperator condition
+enum class LogicalOperator : uint8_t {
+    Negate,        // !A   Unary
+    Or,            // or   Binary
+    And,           // and  Binary
+    Equal,         // ==   Binary
+    NotEqual,      // !=   Binary
+    Greater,       // >    Binary
+    GreaterEqual,  // >=   Binary
+    Less,          // <    Binary
+    LessEqual,     // <=   Binary
+    Unknown,
 };
 
 class ComposedExpr;
@@ -36,7 +47,7 @@ class ComposedExpr;
 class UnaryOpExpr : public ParserRule {
    private:
     friend ComposedExpr;
-    Operator m_Operator{Operator::Unknown};
+    NumericOperator m_Operator{NumericOperator::Unknown};
     std::unique_ptr<ParserRule> m_Operand;
 
    public:
@@ -50,7 +61,7 @@ class UnaryOpExpr : public ParserRule {
     UnaryOpExpr& operator=(UnaryOpExpr&&) noexcept;
 
    public:
-    Operator op() const noexcept { return m_Operator; };
+    NumericOperator op() const noexcept { return m_Operator; };
     const ParserRule& operand() const noexcept { return *m_Operand; };
 
    public:
@@ -66,7 +77,7 @@ class UnaryOpExpr : public ParserRule {
 class BinaryOpExpr : public ParserRule {
    private:
     friend ComposedExpr;
-    Operator m_Operator{};
+    NumericOperator m_Operator{NumericOperator::Unknown};
     std::unique_ptr<ParserRule> m_Left;
     std::unique_ptr<ParserRule> m_Right;
 
@@ -81,7 +92,7 @@ class BinaryOpExpr : public ParserRule {
     BinaryOpExpr& operator=(BinaryOpExpr&&) noexcept;
 
    public:
-    Operator op() const noexcept { return m_Operator; }
+    NumericOperator op() const noexcept { return m_Operator; }
     const ParserRule& left() const noexcept { return *m_Left; }
     const ParserRule& right() const noexcept { return *m_Right; }
     void simplify_ast() noexcept override;
